@@ -1,7 +1,11 @@
+using BioDomes.Web.Middlewares;
+using BioDomes.Web.Middlewares.extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddScoped<ReverseProxyLinksMiddleware>();
 
 var app = builder.Build();
 
@@ -13,6 +17,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions());
+
+app.UseReverseProxyMiddleware();
 
 app.UseStaticFiles();
 
