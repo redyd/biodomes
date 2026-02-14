@@ -14,6 +14,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions());
 
+app.UseStaticFiles();
+
 app.UseHttpsRedirection();
 
 app.UseRouting();
