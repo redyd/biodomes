@@ -1,3 +1,4 @@
+using BioDomes.Infrastructures.repository;
 using BioDomes.Web.Middlewares;
 using BioDomes.Web.Middlewares.extensions;
 
@@ -10,6 +11,7 @@ builder.Services.AddWebOptimizer(pipeline =>
     pipeline.AddCssBundle("/css/bundle.css", "/css/paragraph-custom-style.css", "/css/site.css", "/css/title-custom-style.css");
 });
 builder.Services.AddScoped<ReverseProxyLinksMiddleware>();
+builder.Services.AddSingleton<IRepository, SqlRepository>();
 
 var app = builder.Build();
 

@@ -1,0 +1,30 @@
+﻿@page
+@model SpeciesModel
+
+@{
+    Layout = "Shared/_Layout";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Species</title>
+</head>
+<body>
+<div class="text-center">
+    <h1 class="display-4">Especes</h1>
+</div>
+<div class="text-center">
+    @foreach (var species in Model.SpeciesList)
+    {
+        <ul>
+            <li>@species.Name</li>
+            <li>@species.Type</li>
+            <li>@species.Diet</li>
+            <li>@species.Height</li>
+        </ul>
+    }
+</div>
+</body>
+</html>
