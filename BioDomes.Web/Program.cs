@@ -2,11 +2,17 @@ using BioDomes.Domains.Extensions;
 using BioDomes.Infrastructures.repository;
 using BioDomes.Web.Middlewares;
 using BioDomes.Web.Middlewares.extensions;
+using BioDomes.Web.Transformers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.Configure<RouteOptions>(options =>
+{ 
+    options.ConstraintMap.Add("kebab", typeof(SlugTransformer));
+});
+
 builder.Services.AddScoped<ReverseProxyLinksMiddleware>();
 builder.Services.AddWebOptimizer(pipeline =>
 {
