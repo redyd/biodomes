@@ -5,4 +5,6 @@ namespace BioDomes.Infrastructures.repository;
 public interface IRepository
 {
     List<Species> FindAll();
+
+    Species? FindBySlug(string slug);
 }

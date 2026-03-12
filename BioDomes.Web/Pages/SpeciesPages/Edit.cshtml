@@ -1,0 +1,42 @@
+﻿@page "/species/{slug:regex(^[a-z0-9-]+$)}"
+@model EditModel
+@{ Layout = "Shared/_Layout"; }
+
+<div class="edit-page">
+    <div class="edit-card">
+
+        <div class="edit-header">
+            <p class="edit-breadcrumb">Biodômes · Espèces</p>
+            <h1 class="edit-title">Éditer : <em>@Model.Species?.Name</em></h1>
+        </div>
+
+        <div class="edit-body">
+            <form method="post">
+                <div class="field-group">
+                    <label class="field-label">Nom</label>
+                    <input class="field-input" type="text" value="@Model.Species?.Name" name="Name"/>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Type</label>
+                    <input class="field-input" type="text" value="@Model.Species?.Type" name="Type"/>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Régime</label>
+                    <input class="field-input" type="text" value="@Model.Species?.Diet" name="Diet"/>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Taille adulte (cm)</label>
+                    <input class="field-input" type="number" value="@Model.Species?.Height" name="Height"/>
+                </div>
+
+                <div class="edit-divider"></div>
+
+                <div class="edit-actions">
+                    <a class="btn-cancel" asp-page="/SpeciesPages/Species">Annuler</a>
+                    <button class="btn-save" type="submit">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>

@@ -2,7 +2,7 @@
 using BioDomes.Infrastructures.repository;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace BioDomes.Web.Pages;
+namespace BioDomes.Web.Pages.SpeciesPages;
 
 public class SpeciesModel : PageModel
 {

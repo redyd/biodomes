@@ -1,3 +1,4 @@
+using BioDomes.Domains.Extensions;
 using BioDomes.Infrastructures.repository;
 using BioDomes.Web.Middlewares;
 using BioDomes.Web.Middlewares.extensions;
@@ -6,11 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddScoped<ReverseProxyLinksMiddleware>();
 builder.Services.AddWebOptimizer(pipeline =>
 {
-    pipeline.AddCssBundle("/css/bundle.css", "/css/paragraph-custom-style.css", "/css/site.css", "/css/title-custom-style.css");
+    pipeline.AddCssBundle("/css/bundle.css", "css/**/*.css");
 });
-builder.Services.AddScoped<ReverseProxyLinksMiddleware>();
 builder.Services.AddSingleton<IRepository, SqlRepository>();
 
 var app = builder.Build();

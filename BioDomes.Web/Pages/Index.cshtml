@@ -1,9 +1,38 @@
 ﻿@page
 @model IndexModel
-@{
-    ViewData["Title"] = "Home page";
-}
+@{ ViewData["Title"] = "Home page"; }
 
-<div class="text-center">
-    <h1 class="display-4">Bienvenue dans le Dôme</h1>
+<div class="home-hero">
+    <div class="hero-corner hero-corner--tl"></div>
+    <div class="hero-corner hero-corner--br"></div>
+
+    <p class="hero-label">Système de gestion biodôme</p>
+
+    <h1 class="hero-title">
+        Bienvenue dans<br>le <span>Dôme</span>
+    </h1>
+
+    <p class="hero-desc">
+        Catalogue scientifique des espèces du Terrarium Zéro.<br>
+        Consultez, analysez et gérez les données biologiques.
+    </p>
+
+    <div class="hero-stats">
+        <div class="hero-stat">
+            <span class="hero-stat-value">10</span>
+            <span class="hero-stat-label">Espèces</span>
+        </div>
+        <div class="hero-stat">
+            <span class="hero-stat-value">3</span>
+            <span class="hero-stat-label">Habitats</span>
+        </div>
+        <div class="hero-stat">
+            <span class="hero-stat-value">v2.4</span>
+            <span class="hero-stat-label">Version</span>
+        </div>
+    </div>
+
+    <a class="hero-cta" asp-page="/SpeciesPages/Species">
+        Explorer les espèces
+    </a>
 </div>

@@ -1,4 +1,5 @@
 ﻿using BioDomes.Domains.Core;
+using BioDomes.Domains.Extensions;
 
 namespace BioDomes.Infrastructures.repository;
 
@@ -27,5 +28,10 @@ public class SqlRepository : IRepository
     public List<Species> FindAll()
     {
         return _species;
+    }
+
+    public Species? FindBySlug(string slug)
+    {
+        return _species.FirstOrDefault(s => s.Name.ToKebabCase() == slug.ToKebabCase());
     }
 }

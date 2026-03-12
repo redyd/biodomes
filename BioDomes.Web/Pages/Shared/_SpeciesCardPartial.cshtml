@@ -1,4 +1,6 @@
-﻿<div class="species-card">
+﻿@model BioDomes.Domains.Core.Species
+
+<div class="species-card">
     <div class="species-name">@Model.Name</div>
 
     <div class="species-info">
@@ -12,4 +14,10 @@
     <div class="species-info">
         <span class="species-label">Taille adulte :</span> @Model.Height
     </div>
+    
+    <a asp-page="/SpeciesPages/Edit"
+       asp-route-slug="@Model.Name.ToKebabCase()">
+        Editer
+    </a>
+
 </div>
