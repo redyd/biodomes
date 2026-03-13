@@ -10,6 +10,8 @@ public class Species
     
     public int Height { get; set; }
     
+    public string? ImageUrl { get; set; }
+    
     public Species(string name, string type, string diet, int height)
     {
         Name = name;

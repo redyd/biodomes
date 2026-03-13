@@ -1,6 +1,6 @@
 ﻿using BioDomes.Domains.Core;
-using BioDomes.Domains.InputModel;
 using BioDomes.Infrastructures.repository;
+using BioDomes.Web.InputModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -38,13 +38,43 @@ public class EditModel : PageModel
         return Page();
     }
     
-    public IActionResult OnPost(string slug)
+    public async Task<IActionResult> OnPost(string slug)
     {
         if (Input == null || !ModelState.IsValid)
+        {
+            Species = _repository.FindBySlug(slug);
             return Page();
+        }
 
-        _repository.Update(slug, Input);
-        return RedirectToPage("/SpeciesPages/Species");
+        if (Input.Image != null)
+        {
+            var fileName = $"{slug}{Path.GetExtension(Input.Image.FileName)}";
+            var path = Path.Combine("wwwroot/images", fileName);
+
+            using var stream = System.IO.File.Create(path);
+            await Input.Image.CopyToAsync(stream);
+
+            _repository.UpdateImage(slug, $"/images/{fileName}");
+        }
+
+        try
+        {
+            _repository.Update(slug, new SpeciesData
+            {
+                Name = Input.Name,
+                Type = Input.Type,
+                Diet = Input.Diet,
+                Height = Input.Height
+            });
+
+            TempData["SuccessMessage"] = Input.Name;
+            return RedirectToPage("/SpeciesPages/Species");
+        }
+        catch (InvalidOperationException ex)
+        {
+            ModelState.AddModelError("Input.Name", ex.Message);
+            Species = _repository.FindBySlug(slug);
+            return Page();
+        }
     }
-    
 }

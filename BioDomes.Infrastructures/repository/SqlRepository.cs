@@ -1,6 +1,5 @@
 ﻿using BioDomes.Domains.Core;
 using BioDomes.Domains.Extensions;
-using BioDomes.Domains.InputModel;
 
 namespace BioDomes.Infrastructures.repository;
 
@@ -36,8 +35,11 @@ public class SqlRepository : IRepository
         return _species.FirstOrDefault(s => s.Name.ToKebabCase() == slug.ToKebabCase());
     }
 
-    public Species? Update(string slug, SpeciesInputModel input)
+    public Species? Update(string slug, SpeciesData input)
     {
+        if (_species.Any(s => s.Name.ToLower() == input.Name.ToLower()))
+            throw new InvalidOperationException($"Une espèce nommée '{input.Name}' existe déjà.");
+        
         var species = _species.FirstOrDefault(s => s.Name.ToKebabCase() == slug);
         if (species == null) return null;
 
@@ -46,6 +48,25 @@ public class SqlRepository : IRepository
         species.Diet = input.Diet;
         species.Height = input.Height;
 
+        return species;
+    }
+    
+    public void UpdateImage(string slug, string imagePath)
+    {
+        var species = _species.FirstOrDefault(s => s.Name.ToKebabCase() == slug);
+    
+        if (species == null) return;
+    
+        species.ImageUrl = imagePath;
+    }
+
+    public Species Add(SpeciesData data)
+    {
+        if (_species.Any(s => s.Name.ToLower() == data.Name.ToLower()))
+            throw new InvalidOperationException($"Une espèce nommée '{data.Name}' existe déjà.");
+
+        var species = new Species(data.Name, data.Type, data.Diet, data.Height);
+        _species.Add(species);
         return species;
     }
 }
