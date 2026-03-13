@@ -14,19 +14,19 @@
             <form method="post">
                 <div class="field-group">
                     <label class="field-label">Nom</label>
-                    <input class="field-input" type="text" value="@Model.Species?.Name" name="Name"/>
+                    <input class="field-input" type="text" asp-for="Input.Name"/>
                 </div>
                 <div class="field-group">
                     <label class="field-label">Type</label>
-                    <input class="field-input" type="text" value="@Model.Species?.Type" name="Type"/>
+                    <input class="field-input" type="text" asp-for="Input.Type"/>
                 </div>
                 <div class="field-group">
                     <label class="field-label">Régime</label>
-                    <input class="field-input" type="text" value="@Model.Species?.Diet" name="Diet"/>
+                    <input class="field-input" type="text" asp-for="Input.Diet"/>
                 </div>
                 <div class="field-group">
                     <label class="field-label">Taille adulte (cm)</label>
-                    <input class="field-input" type="number" value="@Model.Species?.Height" name="Height"/>
+                    <input class="field-input" type="text" asp-for="Input.Height"/>
                 </div>
 
                 <div class="edit-divider"></div>

@@ -1,4 +1,5 @@
 ﻿using BioDomes.Domains.Core;
+using BioDomes.Domains.InputModel;
 using BioDomes.Infrastructures.repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -15,6 +16,9 @@ public class EditModel : PageModel
     }
 
     public Species? Species { get; set; }
+    
+    [BindProperty]
+    public SpeciesInputModel? Input  { get; set; }
 
     public IActionResult OnGet(string slug)
     {
@@ -23,6 +27,24 @@ public class EditModel : PageModel
         if (Species == null)
             return NotFound();
 
+        Input = new SpeciesInputModel
+        {
+            Name = Species.Name,
+            Type = Species.Type,
+            Diet = Species.Diet,
+            Height = Species.Height
+        };
+        
         return Page();
     }
+    
+    public IActionResult OnPost(string slug)
+    {
+        if (Input == null || !ModelState.IsValid)
+            return Page();
+
+        _repository.Update(slug, Input);
+        return RedirectToPage("/SpeciesPages/Species");
+    }
+    
 }

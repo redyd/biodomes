@@ -1,5 +1,6 @@
 ﻿using BioDomes.Domains.Core;
 using BioDomes.Domains.Extensions;
+using BioDomes.Domains.InputModel;
 
 namespace BioDomes.Infrastructures.repository;
 
@@ -33,5 +34,18 @@ public class SqlRepository : IRepository
     public Species? FindBySlug(string slug)
     {
         return _species.FirstOrDefault(s => s.Name.ToKebabCase() == slug.ToKebabCase());
+    }
+
+    public Species? Update(string slug, SpeciesInputModel input)
+    {
+        var species = _species.FirstOrDefault(s => s.Name.ToKebabCase() == slug);
+        if (species == null) return null;
+
+        species.Name = input.Name;
+        species.Type = input.Type;
+        species.Diet = input.Diet;
+        species.Height = input.Height;
+
+        return species;
     }
 }
