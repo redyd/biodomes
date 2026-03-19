@@ -11,7 +11,8 @@ builder.Services.AddRazorPages();
 builder.Services.Configure<RouteOptions>(options =>
 { 
     options.ConstraintMap.Add("kebab", typeof(SlugTransformer));
-});
+}); 
+
 
 builder.Services.AddScoped<ReverseProxyLinksMiddleware>();
 builder.Services.AddWebOptimizer(pipeline =>
