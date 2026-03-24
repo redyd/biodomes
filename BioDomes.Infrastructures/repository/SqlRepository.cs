@@ -51,9 +51,9 @@ public class SqlRepository : IRepository
         return species;
     }
     
-    public void UpdateImage(string slug, string imagePath)
+    public void UpdateImage(string name, string imagePath)
     {
-        var species = _species.FirstOrDefault(s => s.Name.ToKebabCase() == slug);
+        var species = FindBySlug(name);
     
         if (species == null) return;
     
@@ -68,5 +68,18 @@ public class SqlRepository : IRepository
         var species = new Species(data.Name, data.Type, data.Diet, data.Height);
         _species.Add(species);
         return species;
+    }
+
+    public List<Species> Delete(string name)
+    {
+        var specieToDelete = FindBySlug(name);
+
+        if (specieToDelete == null)
+        {
+            return _species;
+        }
+        
+        _species.Remove(specieToDelete);
+        return _species;
     }
 }

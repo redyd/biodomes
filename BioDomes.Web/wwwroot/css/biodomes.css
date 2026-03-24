@@ -567,6 +567,7 @@ footer a:hover {
 }
 
 .btn-save {
+    text-decoration: none;
     flex: 1;
     padding: 0.85rem 1.5rem;
     background: var(--teal-dim);
@@ -726,4 +727,19 @@ body { margin-bottom: 0 !important; }
     font-family: var(--mono);
     font-size: 0.8rem;
     letter-spacing: 0.04em;
+}
+
+.add-title {
+    font-family: var(--sans);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin: 0;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.add-title em {
+    font-style: normal;
+    color: var(--teal);
 }

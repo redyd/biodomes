@@ -13,4 +13,6 @@ public interface IRepository
     void UpdateImage(string slug, string imagePath);
     
     Species Add(SpeciesData data);
+    
+    List<Species> Delete(string slug);
 }

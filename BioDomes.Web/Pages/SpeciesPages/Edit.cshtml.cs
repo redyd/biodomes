@@ -38,12 +38,20 @@ public class EditModel : PageModel
         return Page();
     }
     
-    public async Task<IActionResult> OnPost(string slug)
+    public async Task<IActionResult> OnPost(string slug, string action)
     {
+        Species = _repository.FindBySlug(slug);
+
         if (Input == null || !ModelState.IsValid)
         {
-            Species = _repository.FindBySlug(slug);
             return Page();
+        }
+        
+        if (action == "delete")
+        {
+            _repository.Delete(slug);
+            TempData["Message"] = "L'espece " + slug + " a bien été supprimé";
+            return RedirectToPage("/SpeciesPages/Species");
         }
 
         if (Input.Image != null)
