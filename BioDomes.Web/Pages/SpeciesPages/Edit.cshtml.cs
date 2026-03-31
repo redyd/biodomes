@@ -1,16 +1,17 @@
 ﻿using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Web.InputModel;
+using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BioDomes.Web.Pages.SpeciesPages;
 
-public class EditModel : PageModel
+public class EditModel : AppPageModel
 {
     private readonly IRepository _repository;
 
-    public EditModel(IRepository repository)
+    public EditModel(IRepository repository, IWebHostEnvironment environment) : base(environment)
     {
         _repository = repository;
     }
@@ -54,16 +55,7 @@ public class EditModel : PageModel
             return RedirectToPage("/SpeciesPages/Species");
         }
 
-        if (Input.Image != null)
-        {
-            var fileName = $"{slug}{Path.GetExtension(Input.Image.FileName)}";
-            var path = Path.Combine("wwwroot/images", fileName);
-
-            using var stream = System.IO.File.Create(path);
-            await Input.Image.CopyToAsync(stream);
-
-            _repository.UpdateImage(slug, $"/images/{fileName}");
-        }
+        var imageName = Input?.Image != null ? await SaveImage(Input.Image) : null;
 
         try
         {
@@ -72,8 +64,13 @@ public class EditModel : PageModel
                 Name = Input.Name,
                 Type = Input.Type,
                 Diet = Input.Diet,
-                Height = Input.Height
+                Height = Input.Height,
             });
+
+            if (imageName != null)
+            {
+                _repository.UpdateImage(slug, imageName);
+            }
 
             TempData["SuccessMessage"] = Input.Name;
             return RedirectToPage("/SpeciesPages/Species");

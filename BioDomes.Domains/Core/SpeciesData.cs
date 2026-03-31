@@ -6,4 +6,5 @@ public class SpeciesData
     public string Type { get; set; }
     public string Diet { get; set; }
     public int Height { get; set; }
+    public string? Image { get; set; }
 }
