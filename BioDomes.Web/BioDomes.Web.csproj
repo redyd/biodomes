@@ -19,4 +19,8 @@
       <_ContentIncludedByDefault Remove="Pages\Species\EditSpecies.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\img\uploads\" />
+    </ItemGroup>
+
 </Project>

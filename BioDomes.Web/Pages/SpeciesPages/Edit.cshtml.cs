@@ -43,7 +43,7 @@ public class EditModel : AppPageModel
     {
         Species = _repository.FindBySlug(slug);
 
-        if (Input == null || !ModelState.IsValid)
+        if (Input == null || !ModelState.IsValid || Species == null)
         {
             return Page();
         }
@@ -51,7 +51,9 @@ public class EditModel : AppPageModel
         if (action == "delete")
         {
             _repository.Delete(slug);
-            TempData["Message"] = "L'espece " + slug + " a bien été supprimé";
+            if (Species.ImageUrl != null) DeleteImage(Species.ImageUrl);
+            SuccessNotification($"Espèce {Species.Name} correctement supprimée");
+
             return RedirectToPage("/SpeciesPages/Species");
         }
 
@@ -72,7 +74,7 @@ public class EditModel : AppPageModel
                 _repository.UpdateImage(slug, imageName);
             }
 
-            TempData["SuccessMessage"] = Input.Name;
+            SuccessNotification($"Espèce {Input.Name} correctement modifiée");
             return RedirectToPage("/SpeciesPages/Species");
         }
         catch (InvalidOperationException ex)

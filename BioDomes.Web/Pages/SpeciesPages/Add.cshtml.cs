@@ -38,7 +38,7 @@ public class AddModel : AppPageModel
                 Height = Input.Height,
                 Image = imageName
             });
-            TempData["SuccessMessage"] = Input.Name;
+            SuccessNotification($"Espèce {Input.Name} correctement ajoutée.");
             return RedirectToPage("/SpeciesPages/Species");
         }
         catch (InvalidOperationException ex)
