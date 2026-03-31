@@ -9,17 +9,4 @@
     <div class="success-banner" id="success-banner">
         @notification.Message
     </div>
-
-    @section Scripts {
-        <script>
-            const banner = document.x('success-banner');
-            if (banner) {
-                setTimeout(() => {
-                    banner.style.transition = 'opacity 0.6s ease';
-                    banner.style.opacity = '0';
-                    setTimeout(() => banner.remove(), 600);
-                }, 3000);
-            }
-        </script>
-    }
 }
