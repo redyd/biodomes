@@ -1,0 +1,8 @@
+services:
+  biodome:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - 9200:80
+    container_name: biodome-web
