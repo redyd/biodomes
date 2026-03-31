@@ -28,7 +28,7 @@ public class AddModel : AppPageModel
     {
         try
         {
-            var imageName = Input?.Image != null ? await SaveImage(Input.Image) : null;
+            var imageName = Input?.Image == null ? null : await SaveImage(Input.Image);
             var specie = new Species(Input.Name, Input.Type, Input.Diet, Input.Height, imageName);
 
             _repository.Add(specie);

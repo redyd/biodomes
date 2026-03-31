@@ -17,9 +17,8 @@ public class EditModel : AppPageModel
     }
 
     public Species? Species { get; set; }
-    
-    [BindProperty]
-    public SpeciesInputModel? Input  { get; set; }
+
+    [BindProperty] public SpeciesInputModel? Input { get; set; }
 
     public IActionResult OnGet(string slug)
     {
@@ -35,47 +34,58 @@ public class EditModel : AppPageModel
             Diet = Species.Diet,
             Height = Species.Height
         };
-        
+
         return Page();
     }
-    
+
     public async Task<IActionResult> OnPost(string slug, string action)
     {
-        Species = _repository.FindBySlug(slug);
+        var species = _repository.FindBySlug(slug);
 
-        if (Input == null || !ModelState.IsValid || Species == null)
-        {
-            return Page();
-        }
-        
+        if (species == null)
+            return NotFound();
+
         if (action == "delete")
         {
             _repository.Delete(slug);
-            if (Species.ImageUrl != null) DeleteImage(Species.ImageUrl);
-            SuccessNotification($"Espèce {Species.Name} correctement supprimée");
 
+            if (!string.IsNullOrEmpty(species.ImageUrl))
+            {
+                DeleteImage(species.ImageUrl);
+                // TODO FIX BUG HELP ça supprime pas.................
+            }
+
+            SuccessNotification($"Espèce {species.Name} correctement supprimée");
             return RedirectToPage("/SpeciesPages/Species");
         }
 
-        var imageName = Input?.Image != null ? await SaveImage(Input.Image) : null;
+        if (Input == null || !ModelState.IsValid)
+            return Page();
 
         try
         {
-            var specie = new Species(Input.Name, Input.Type, Input.Diet, Input.Height);
-            _repository.Update(slug, specie);
+            species.Name = Input.Name;
+            species.Type = Input.Type;
+            species.Diet = Input.Diet;
+            species.Height = Input.Height;
 
-            if (imageName != null)
+            if (Input.Image != null)
             {
-                _repository.UpdateImage(slug, imageName);
+                if (!string.IsNullOrEmpty(species.ImageUrl))
+                {
+                    DeleteImage(species.ImageUrl);
+                }
+
+                var imageName = await SaveImage(Input.Image);
+                species.ImageUrl = imageName;
             }
 
-            SuccessNotification($"Espèce {Input.Name} correctement modifiée");
+            SuccessNotification($"Espèce {species.Name} correctement modifiée");
             return RedirectToPage("/SpeciesPages/Species");
         }
         catch (InvalidOperationException ex)
         {
             ModelState.AddModelError("Input.Name", ex.Message);
-            Species = _repository.FindBySlug(slug);
             return Page();
         }
     }

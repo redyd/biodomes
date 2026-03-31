@@ -6,9 +6,10 @@ namespace BioDomes.Web.PageModels;
 
 public abstract class AppPageModel(IWebHostEnvironment environment) : PageModel
 {
-    public static string BasePathForUploads = Path.Combine("wwwroot", "img", "uploads");
+    public static string BasePathForUploads = Path.Combine("img", "uploads");
+    public static string BasePathForDefault = Path.Combine("img", "defaults");
 
-    protected string GetUploadFilePath(string fileName)
+    protected string UseFileFromPath(string fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
         {
@@ -17,12 +18,29 @@ public abstract class AppPageModel(IWebHostEnvironment environment) : PageModel
 
         var safeFileName = Path.GetFileName(fileName);
 
-        return Path.Combine(environment.ContentRootPath, BasePathForUploads, safeFileName);
+        return Path.Combine("img", "uploads", safeFileName);
+    }
+
+    protected string GetFullPathOfFile(string fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            throw new ArgumentException("Invalid file name", nameof(fileName));
+        }
+
+        var safeFileName = Path.GetFileName(fileName);
+
+        return Path.Combine(environment.WebRootPath, BasePathForUploads, safeFileName);
+    }
+
+    protected string GetDefaultDirectoryPath()
+    {
+        return Path.Combine(environment.WebRootPath, BasePathForDefault);
     }
 
     protected void DeleteImage(string imageName)
     {
-        var targetLocation = GetUploadFilePath(imageName);
+        var targetLocation = GetFullPathOfFile(imageName);
 
         if (!System.IO.File.Exists(targetLocation)) return;
 

@@ -1,7 +1,6 @@
-﻿using BioDomes.Domains.Core;
-using BioDomes.Domains.Repository;
+﻿using BioDomes.Domains.Repository;
 using BioDomes.Web.PageModels;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using BioDomes.Web.ViewModels;
 
 namespace BioDomes.Web.Pages.SpeciesPages;
 
@@ -14,10 +13,27 @@ public class SpeciesModel : AppPageModel
         _repository = repository;
     }
     
-    public List<Species> SpeciesList { get; set; }
+    public List<SpecieView> SpeciesList { get; set; }
 
     public void OnGet()
     {
-        SpeciesList = _repository.FindAll();
+        SpeciesList = _repository
+            .FindAll()
+            .Select(specie =>
+            {
+                var path = specie.ImageUrl != null ? UseFileFromPath(specie.ImageUrl) : null;
+
+                Console.WriteLine($"path is {path}");
+
+                return new SpecieView
+                {
+                    Name = specie.Name,
+                    Type = specie.Type,
+                    Diet = specie.Diet,
+                    Height = specie.Height,
+                    ImageUrl = path
+                };
+            })
+            .ToList();
     }
 }

@@ -48,17 +48,9 @@ public class SqlRepository : IRepository
         species.Type = input.Type;
         species.Diet = input.Diet;
         species.Height = input.Height;
+        species.ImageUrl = input.ImageUrl;
 
         return species;
-    }
-    
-    public void UpdateImage(string name, string imagePath)
-    {
-        var species = FindBySlug(name);
-    
-        if (species == null) return;
-    
-        species.ImageUrl = imagePath;
     }
 
     public Species Add(Species data)
@@ -66,9 +58,8 @@ public class SqlRepository : IRepository
         if (_species.Any(s => s.Name.ToLower() == data.Name.ToLower()))
             throw new InvalidOperationException($"Une espèce nommée '{data.Name}' existe déjà.");
 
-        var species = new Species(data.Name, data.Type, data.Diet, data.Height);
-        _species.Add(species);
-        return species;
+        _species.Add(data);
+        return data;
     }
 
     public List<Species> Delete(string name)
