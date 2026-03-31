@@ -52,7 +52,6 @@ public class EditModel : AppPageModel
             if (!string.IsNullOrEmpty(species.ImageUrl))
             {
                 DeleteImage(species.ImageUrl);
-                // TODO FIX BUG HELP ça supprime pas.................
             }
 
             SuccessNotification($"Espèce {species.Name} correctement supprimée");
