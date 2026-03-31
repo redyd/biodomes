@@ -18,6 +18,10 @@
     --text-bright:   #e8f4f2;
     --text-mid:      #7aada8;
     --text-muted:    #3d6b66;
+    --red:          #ff4d4f;
+    --red-dim:      rgba(255, 77, 79, 0.15);
+    --red-glow:     rgba(255, 77, 79, 0.08);
+    --border-red:   rgba(255, 77, 79, 0.3);
     --mono:          'Space Mono', monospace;
     --sans:          'Syne', sans-serif;
     --radius-sm:     4px;
@@ -724,6 +728,18 @@ body { margin-bottom: 0 !important; }
     padding: 1rem 1.25rem;
     margin-bottom: 2rem;
     color: var(--teal);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+}
+
+.error-banner {
+    background: var(--red-glow);
+    border: 1px solid var(--border-red);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    margin-bottom: 2rem;
+    color: var(--red);
     font-family: var(--mono);
     font-size: 0.8rem;
     letter-spacing: 0.04em;

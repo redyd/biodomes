@@ -1,12 +1,19 @@
 @using BioDomes.Web.Extensions
+@using BioDomes.Web.InputModel
 
 @{
     var notification = TempData.ConsumeNotification();
+    var classType = notification?.Type switch
+    {
+        NotificationType.Success => "succes",
+        NotificationType.Error => "error",
+        _ => "success"
+    };
 }
 
 @if (notification is not null)
 {
-    <div class="success-banner" id="success-banner">
+    <div class="@classType-banner" id="notification-banner">
         @notification.Message
     </div>
 }

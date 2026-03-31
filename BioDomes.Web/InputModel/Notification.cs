@@ -9,6 +9,5 @@ public class Notification
 public enum NotificationType
 {
     Success,
-    Warning,
     Error
 }

@@ -61,13 +61,8 @@ public class EditModel : AppPageModel
 
         try
         {
-            _repository.Update(slug, new SpeciesData
-            {
-                Name = Input.Name,
-                Type = Input.Type,
-                Diet = Input.Diet,
-                Height = Input.Height,
-            });
+            var specie = new Species(Input.Name, Input.Type, Input.Diet, Input.Height);
+            _repository.Update(slug, specie);
 
             if (imageName != null)
             {

@@ -36,7 +36,7 @@ public class SqlRepository : IRepository
         return _species.FirstOrDefault(s => s.Name.ToKebabCase() == slug.ToKebabCase());
     }
 
-    public Species? Update(string slug, SpeciesData input)
+    public Species? Update(string slug, Species input)
     {
         if (_species.Any(s => s.Name.ToLower() == input.Name.ToLower()))
             throw new InvalidOperationException($"Une espèce nommée '{input.Name}' existe déjà.");
@@ -61,7 +61,7 @@ public class SqlRepository : IRepository
         species.ImageUrl = imagePath;
     }
 
-    public Species Add(SpeciesData data)
+    public Species Add(Species data)
     {
         if (_species.Any(s => s.Name.ToLower() == data.Name.ToLower()))
             throw new InvalidOperationException($"Une espèce nommée '{data.Name}' existe déjà.");

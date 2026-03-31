@@ -59,15 +59,6 @@ public abstract class AppPageModel(IWebHostEnvironment environment) : PageModel
         });
     }
 
-    protected void WarningNotification(string message)
-    {
-        TempData.PushNotification(new Notification
-        {
-            Type = NotificationType.Warning,
-            Message = message,
-        });
-    }
-
     protected void ErrorNotification(string message)
     {
         TempData.PushNotification(new Notification
