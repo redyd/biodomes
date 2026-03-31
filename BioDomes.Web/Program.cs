@@ -1,5 +1,6 @@
 using BioDomes.Domains.Extensions;
-using BioDomes.Infrastructures.repository;
+using BioDomes.Domains.Repository;
+using BioDomes.Infrastructures.Repositories;
 using BioDomes.Web.Middlewares;
 using BioDomes.Web.Middlewares.extensions;
 using BioDomes.Web.Transformers;

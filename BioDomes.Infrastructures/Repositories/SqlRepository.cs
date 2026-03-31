@@ -1,7 +1,8 @@
 ﻿using BioDomes.Domains.Core;
 using BioDomes.Domains.Extensions;
+using BioDomes.Domains.Repository;
 
-namespace BioDomes.Infrastructures.repository;
+namespace BioDomes.Infrastructures.Repositories;
 
 public class SqlRepository : IRepository
 {

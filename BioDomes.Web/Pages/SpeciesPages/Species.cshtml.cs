@@ -1,5 +1,5 @@
 ﻿using BioDomes.Domains.Core;
-using BioDomes.Infrastructures.repository;
+using BioDomes.Domains.Repository;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BioDomes.Web.Pages.SpeciesPages;

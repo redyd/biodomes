@@ -1,5 +1,5 @@
 ﻿using BioDomes.Domains.Core;
-using BioDomes.Infrastructures.repository;
+using BioDomes.Domains.Repository;
 using BioDomes.Web.InputModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
