@@ -8,11 +8,9 @@ public interface IRepository
 
     Species? FindBySlug(string slug);
 
-    Species? Update(string slug, SpeciesData input);
-    
-    void UpdateImage(string slug, string imagePath);
-    
-    Species Add(SpeciesData data);
+    Species? Update(string slug, Species input);
+
+    Species Add(Species data);
     
     List<Species> Delete(string slug);
 }

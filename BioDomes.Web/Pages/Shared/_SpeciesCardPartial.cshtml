@@ -1,9 +1,11 @@
-﻿@model BioDomes.Domains.Core.Species
+﻿@model BioDomes.Web.ViewModels.SpecieView
 
 <div class="species-card">
     @if (Model.ImageUrl != null)
     {
-        <img src="@Model.ImageUrl" alt="@Model.Name" class="species-card-image"/>
+        <div>
+            <img src="@Model.ImageUrl" alt="@Model.Name" class="species-card-image"/>
+        </div>
     }
     else
     {

@@ -6,13 +6,6 @@
 }
 
 <div class="species-container">
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="success-banner" id="success-banner">
-            L'espèce <strong>@TempData["SuccessMessage"]</strong> a été modifiée avec succès.
-        </div>
-    }
-    
     <div class="species-title">
         <h1>Espèces</h1>
         <p>Liste des espèces disponibles dans le biodôme</p>
@@ -28,16 +21,3 @@
         }
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        const banner = document.getElementById('success-banner');
-        if (banner) {
-            setTimeout(() => {
-                banner.style.transition = 'opacity 0.6s ease';
-                banner.style.opacity = '0';
-                setTimeout(() => banner.remove(), 600);
-            }, 3000);
-        }
-    </script>
-}

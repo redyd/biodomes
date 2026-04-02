@@ -36,9 +36,23 @@
 
 <main role="main">
     <div class="container">
+        <partial name="_Notification"/>
         @RenderBody()
     </div>
 </main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const banner = document.getElementById('notification-banner');
+        if (banner) {
+            setTimeout(() => {
+                banner.style.transition = 'opacity 0.6s ease';
+                banner.style.opacity = '0';
+                setTimeout(() => banner.remove(), 600);
+            }, 3000);
+        }
+    });
+</script>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

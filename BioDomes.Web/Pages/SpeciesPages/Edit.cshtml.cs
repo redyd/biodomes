@@ -1,24 +1,25 @@
 ﻿using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Web.InputModel;
+using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BioDomes.Web.Pages.SpeciesPages;
 
-public class EditModel : PageModel
+public class EditModel : AppPageModel
 {
     private readonly IRepository _repository;
 
-    public EditModel(IRepository repository)
+    public EditModel(IRepository repository, IWebHostEnvironment environment) : base(environment)
     {
         _repository = repository;
     }
 
     public Species? Species { get; set; }
-    
-    [BindProperty]
-    public SpeciesInputModel? Input  { get; set; }
+
+    [BindProperty] public SpeciesInputModel? Input { get; set; }
+    public string? ImageUrl { get; set; }
 
     public IActionResult OnGet(string slug)
     {
@@ -26,6 +27,8 @@ public class EditModel : PageModel
 
         if (Species == null)
             return NotFound();
+        
+        ImageUrl = Species.ImageUrl == null ? null : UseFileFromPath(Species.ImageUrl);
 
         Input = new SpeciesInputModel
         {
@@ -34,54 +37,57 @@ public class EditModel : PageModel
             Diet = Species.Diet,
             Height = Species.Height
         };
-        
+
         return Page();
     }
-    
+
     public async Task<IActionResult> OnPost(string slug, string action)
     {
-        Species = _repository.FindBySlug(slug);
+        var species = _repository.FindBySlug(slug);
 
-        if (Input == null || !ModelState.IsValid)
-        {
-            return Page();
-        }
-        
+        if (species == null)
+            return NotFound();
+
         if (action == "delete")
         {
             _repository.Delete(slug);
-            TempData["Message"] = "L'espece " + slug + " a bien été supprimé";
+
+            if (!string.IsNullOrEmpty(species.ImageUrl))
+            {
+                DeleteImage(species.ImageUrl);
+            }
+
+            SuccessNotification($"Espèce {species.Name} correctement supprimée");
             return RedirectToPage("/SpeciesPages/Species");
         }
 
-        if (Input.Image != null)
-        {
-            var fileName = $"{slug}{Path.GetExtension(Input.Image.FileName)}";
-            var path = Path.Combine("wwwroot/images", fileName);
-
-            using var stream = System.IO.File.Create(path);
-            await Input.Image.CopyToAsync(stream);
-
-            _repository.UpdateImage(slug, $"/images/{fileName}");
-        }
+        if (Input == null || !ModelState.IsValid)
+            return Page();
 
         try
         {
-            _repository.Update(slug, new SpeciesData
-            {
-                Name = Input.Name,
-                Type = Input.Type,
-                Diet = Input.Diet,
-                Height = Input.Height
-            });
+            species.Name = Input.Name;
+            species.Type = Input.Type;
+            species.Diet = Input.Diet;
+            species.Height = Input.Height;
 
-            TempData["SuccessMessage"] = Input.Name;
+            if (Input.Image != null)
+            {
+                if (!string.IsNullOrEmpty(species.ImageUrl))
+                {
+                    DeleteImage(species.ImageUrl);
+                }
+
+                var imageName = await SaveImage(Input.Image);
+                species.ImageUrl = imageName;
+            }
+
+            SuccessNotification($"Espèce {species.Name} correctement modifiée");
             return RedirectToPage("/SpeciesPages/Species");
         }
         catch (InvalidOperationException ex)
         {
             ModelState.AddModelError("Input.Name", ex.Message);
-            Species = _repository.FindBySlug(slug);
             return Page();
         }
     }
