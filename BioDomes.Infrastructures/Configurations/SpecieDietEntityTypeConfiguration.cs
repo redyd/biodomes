@@ -4,25 +4,27 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BioDomes.Infrastructures.Configurations;
 
-public class SpecieDietEntityTypeConfiguration : IEntityTypeConfiguration<SpecieDiet>
+public class SpecieDietEntityTypeConfiguration : IEntityTypeConfiguration<SpecieDietEntity>
 {
-    public void Configure(EntityTypeBuilder<SpecieDiet> builder)
+    public void Configure(EntityTypeBuilder<SpecieDietEntity> builder)
     {
+        builder.ToTable("diets");
+        
         builder.HasKey(diet => diet.Label);
 
         builder.Property(diet => diet.Label)
             .IsRequired();
 
         builder.HasData(
-            new SpecieDiet { Label = "Carnivore" },
-            new SpecieDiet { Label = "Herbivore" },
-            new SpecieDiet { Label = "Omnivore" },
-            new SpecieDiet { Label = "Coprophages" },
-            new SpecieDiet { Label = "Coprophage" },
-            new SpecieDiet { Label = "Limivores" },
-            new SpecieDiet { Label = "Détritivores" },
-            new SpecieDiet { Label = "Photosynthèse" },
-            new SpecieDiet { Label = "Hétérotrophie" }
+            new SpecieDietEntity { Label = "Carnivore" },
+            new SpecieDietEntity { Label = "Herbivore" },
+            new SpecieDietEntity { Label = "Omnivore" },
+            new SpecieDietEntity { Label = "Coprophages" },
+            new SpecieDietEntity { Label = "Coprophage" },
+            new SpecieDietEntity { Label = "Limivores" },
+            new SpecieDietEntity { Label = "Détritivores" },
+            new SpecieDietEntity { Label = "Photosynthèse" },
+            new SpecieDietEntity { Label = "Hétérotrophie" }
         );
     }
 }

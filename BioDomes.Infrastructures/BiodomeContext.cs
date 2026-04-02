@@ -1,13 +1,14 @@
+using BioDomes.Infrastructures.Configurations;
 using BioDomes.Infrastructures.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BioDomes.Infrastructures.Configurations;
+namespace BioDomes.Infrastructures;
 
-public class BiodomeContext(DbContextOptions options) : DbContext(options)
+public class BiodomeContext(DbContextOptions<BiodomeContext> options) : DbContext(options)
 {
-    public DbSet<Specie> Species { get; set; }
-    public DbSet<SpecieType> SpeciesTypes { get; set; }
-    public DbSet<SpecieDiet> SpeciesDiets { get; set; }
+    public DbSet<SpecieEntity> Species { get; set; }
+    public DbSet<SpecieClassificationEntity> SpeciesClassification { get; set; }
+    public DbSet<SpecieDietEntity> SpeciesDiets { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
     {

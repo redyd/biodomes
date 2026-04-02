@@ -1,5 +1,6 @@
 using BioDomes.Domains.Extensions;
 using BioDomes.Domains.Repository;
+using BioDomes.Infrastructures;
 using BioDomes.Infrastructures.Configurations;
 using BioDomes.Infrastructures.Repositories;
 using BioDomes.Web.Middlewares;
@@ -28,7 +29,8 @@ builder.Services.AddDbContext<BiodomeContext>(options
     => options.UseSqlServer(
         builder.Configuration.GetConnectionString("BiodomeContext")));
 
-builder.Services.AddSingleton<IRepository, SqlRepository>();
+builder.Services.AddScoped<ISpeciesRepository, SpeciesRepository>();
+builder.Services.AddScoped<IClassificationRepository, ClassificationRepository>();
 
 var app = builder.Build();
 

@@ -4,41 +4,43 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BioDomes.Infrastructures.Configurations;
 
-public class SpecieTypeEntityTypeConfiguration : IEntityTypeConfiguration<SpecieType>
+public class SpecieTypeEntityTypeConfiguration : IEntityTypeConfiguration<SpecieClassificationEntity>
 {
-    public void Configure(EntityTypeBuilder<SpecieType> builder)
+    public void Configure(EntityTypeBuilder<SpecieClassificationEntity> builder)
     {
+        builder.ToTable("species_classification");
+        
         builder.HasKey(type => type.Label);
 
         builder.Property(type => type.Label)
             .IsRequired();
 
         builder.HasData(
-            new SpecieType { Label = "Mammifères" },
-            new SpecieType { Label = "Oiseaux" },
-            new SpecieType { Label = "Poissons" },
-            new SpecieType { Label = "Reptiles" },
-            new SpecieType { Label = "Amphibiens" },
-            new SpecieType { Label = "Crustacés" },
-            new SpecieType { Label = "Arachnides" },
-            new SpecieType { Label = "Insectes" },
-            new SpecieType { Label = "Myriapodes" },
-            new SpecieType { Label = "Mollusques" },
-            new SpecieType { Label = "Echinodermes" },
-            new SpecieType { Label = "Anélides" },
-            new SpecieType { Label = "Cnidaires" },
-            new SpecieType { Label = "Plathelminthes" },
-            new SpecieType { Label = "Porifères" },
-            new SpecieType { Label = "Plantes" },
-            new SpecieType { Label = "Mousses" },
-            new SpecieType { Label = "Algues" },
-            new SpecieType { Label = "Lichen" },
-            new SpecieType { Label = "Champignons" },
-            new SpecieType { Label = "Mammifère" },
-            new SpecieType { Label = "Oiseau" },
-            new SpecieType { Label = "Reptile" },
-            new SpecieType { Label = "Plante" },
-            new SpecieType { Label = "Insecte" }
+            new SpecieClassificationEntity { Label = "Mammifères" },
+            new SpecieClassificationEntity { Label = "Oiseaux" },
+            new SpecieClassificationEntity { Label = "Poissons" },
+            new SpecieClassificationEntity { Label = "Reptiles" },
+            new SpecieClassificationEntity { Label = "Amphibiens" },
+            new SpecieClassificationEntity { Label = "Crustacés" },
+            new SpecieClassificationEntity { Label = "Arachnides" },
+            new SpecieClassificationEntity { Label = "Insectes" },
+            new SpecieClassificationEntity { Label = "Myriapodes" },
+            new SpecieClassificationEntity { Label = "Mollusques" },
+            new SpecieClassificationEntity { Label = "Echinodermes" },
+            new SpecieClassificationEntity { Label = "Anélides" },
+            new SpecieClassificationEntity { Label = "Cnidaires" },
+            new SpecieClassificationEntity { Label = "Plathelminthes" },
+            new SpecieClassificationEntity { Label = "Porifères" },
+            new SpecieClassificationEntity { Label = "Plantes" },
+            new SpecieClassificationEntity { Label = "Mousses" },
+            new SpecieClassificationEntity { Label = "Algues" },
+            new SpecieClassificationEntity { Label = "Lichen" },
+            new SpecieClassificationEntity { Label = "Champignons" },
+            new SpecieClassificationEntity { Label = "Mammifère" },
+            new SpecieClassificationEntity { Label = "Oiseau" },
+            new SpecieClassificationEntity { Label = "Reptile" },
+            new SpecieClassificationEntity { Label = "Plante" },
+            new SpecieClassificationEntity { Label = "Insecte" }
         );
     }
 }
