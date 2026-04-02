@@ -18,7 +18,7 @@ public abstract class AppPageModel(IWebHostEnvironment environment) : PageModel
 
         var safeFileName = Path.GetFileName(fileName);
 
-        return Path.Combine("img", "uploads", safeFileName);
+        return $"/img/uploads/{safeFileName}";
     }
 
     protected string GetFullPathOfFile(string fileName)

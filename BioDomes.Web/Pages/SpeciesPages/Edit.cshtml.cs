@@ -19,6 +19,7 @@ public class EditModel : AppPageModel
     public Species? Species { get; set; }
 
     [BindProperty] public SpeciesInputModel? Input { get; set; }
+    public string? ImageUrl { get; set; }
 
     public IActionResult OnGet(string slug)
     {
@@ -26,6 +27,8 @@ public class EditModel : AppPageModel
 
         if (Species == null)
             return NotFound();
+        
+        ImageUrl = Species.ImageUrl == null ? null : UseFileFromPath(Species.ImageUrl);
 
         Input = new SpeciesInputModel
         {

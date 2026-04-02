@@ -12,8 +12,8 @@ public class SpeciesModel : AppPageModel
     {
         _repository = repository;
     }
-    
-    public List<SpecieView> SpeciesList { get; set; }
+
+    public List<SpecieView> SpeciesList { get; set; } = [];
 
     public void OnGet()
     {
@@ -22,9 +22,7 @@ public class SpeciesModel : AppPageModel
             .Select(specie =>
             {
                 var path = specie.ImageUrl != null ? UseFileFromPath(specie.ImageUrl) : null;
-
-                Console.WriteLine($"path is {path}");
-
+                
                 return new SpecieView
                 {
                     Name = specie.Name,
