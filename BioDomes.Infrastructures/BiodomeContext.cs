@@ -7,15 +7,11 @@ namespace BioDomes.Infrastructures;
 public class BiodomeContext(DbContextOptions<BiodomeContext> options) : DbContext(options)
 {
     public DbSet<SpecieEntity> Species { get; set; }
-    public DbSet<SpecieClassificationEntity> SpeciesClassification { get; set; }
-    public DbSet<SpecieDietEntity> SpeciesDiets { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.HasDefaultSchema("dbo");
 
         builder.ApplyConfiguration(new SpecieEntityTypeConfiguration());
-        builder.ApplyConfiguration(new SpecieTypeEntityTypeConfiguration());
-        builder.ApplyConfiguration(new SpecieDietEntityTypeConfiguration());
     }
 }

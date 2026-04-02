@@ -24,7 +24,7 @@
                     <label class="field-label" asp-for="Input.Type">Classification</label>
                     <select class="field-input" asp-for="Input.Type">
                         <option value="">-- Choisir --</option>
-                        @foreach (var classification in Model.Classifications)
+                        @foreach (var classification in Enum.GetNames<BioDomes.Domains.Core.SpeciesClassification>())
                         {
                             <option value="@classification">@classification</option>
                         }

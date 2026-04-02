@@ -10,19 +10,15 @@ namespace BioDomes.Web.Pages.SpeciesPages;
 public class EditModel : AppPageModel
 {
     private readonly ISpeciesRepository _speciesRepository;
-    private readonly IClassificationRepository _classificationRepository;
 
     public EditModel(
         ISpeciesRepository speciesRepository,
-        IClassificationRepository classificationRepository,
         IWebHostEnvironment environment) : base(environment)
     {
         _speciesRepository = speciesRepository;
-        _classificationRepository = classificationRepository;
     }
 
     public Specie? Species { get; set; }
-    public List<string> Classifications { get; private set; } = [];
 
     [BindProperty] public SpeciesInputModel? Input { get; set; }
     public string? ImageUrl { get; set; }
@@ -34,7 +30,6 @@ public class EditModel : AppPageModel
         if (Species == null)
             return NotFound();
         
-        LoadClassifications();
         ImageUrl = Species.ImageUrl == null ? null : UseFileFromPath(Species.ImageUrl);
 
         Input = new SpeciesInputModel
@@ -52,7 +47,6 @@ public class EditModel : AppPageModel
     public async Task<IActionResult> OnPost(string slug, string action)
     {
         var species = _speciesRepository.FindBySlug(slug);
-        LoadClassifications();
 
         if (species == null)
             return NotFound();
@@ -106,10 +100,5 @@ public class EditModel : AppPageModel
             ModelState.AddModelError("Input.Name", ex.Message);
             return Page();
         }
-    }
-
-    private void LoadClassifications()
-    {
-        Classifications = _classificationRepository.FetchAll();
     }
 }

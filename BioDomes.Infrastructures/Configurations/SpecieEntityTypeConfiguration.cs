@@ -28,18 +28,6 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
 
         builder.Property(specie => specie.DietLabel)
             .IsRequired();
-
-        builder.HasOne(specie => specie.ClassificationEntity)
-            .WithMany(type => type.Species)
-            .HasForeignKey(specie => specie.TypeLabel)
-            .HasPrincipalKey(type => type.Label)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(specie => specie.DietEntity)
-            .WithMany(diet => diet.Species)
-            .HasForeignKey(specie => specie.DietLabel)
-            .HasPrincipalKey(diet => diet.Label)
-            .OnDelete(DeleteBehavior.Restrict);
         
         builder.HasIndex(specie => specie.Slug).IsUnique();
 

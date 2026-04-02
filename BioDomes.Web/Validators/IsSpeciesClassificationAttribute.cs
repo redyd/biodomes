@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using BioDomes.Domains.Repository;
+using BioDomes.Domains.Core;
 
 namespace BioDomes.Web.Validators;
 
@@ -10,17 +10,13 @@ public class IsSpeciesClassificationAttribute :  ValidationAttribute
         if (value == null)
             return new ValidationResult("La classification est requise.");
 
-        var repository = validationContext.GetService(typeof(IClassificationRepository)) as IClassificationRepository;
-        if (repository == null)
-            return new ValidationResult("Impossible de valider la classification.");
-
         var input = value.ToString();
-        if (input != null && repository.FetchAll().Contains(input, StringComparer.OrdinalIgnoreCase))
+        if (input != null && Enum.GetNames<SpeciesClassification>().Contains(input, StringComparer.OrdinalIgnoreCase))
             return ValidationResult.Success;
 
         return new ValidationResult(
             $"La classification '{value}' est invalide.\n " +
-            $"Valeurs acceptées : {string.Join(", ", repository.FetchAll())}"
+            $"Valeurs acceptées : {string.Join(", ", Enum.GetNames<SpeciesClassification>())}"
         );
     }
 }

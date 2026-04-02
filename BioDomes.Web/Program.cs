@@ -30,7 +30,6 @@ builder.Services.AddDbContext<BiodomeContext>(options
         builder.Configuration.GetConnectionString("BiodomeContext")));
 
 builder.Services.AddScoped<ISpeciesRepository, SpeciesRepository>();
-builder.Services.AddScoped<IClassificationRepository, ClassificationRepository>();
 
 var app = builder.Build();
 

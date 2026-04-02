@@ -10,31 +10,24 @@ namespace BioDomes.Web.Pages.SpeciesPages;
 public class AddModel : AppPageModel
 {
     private readonly ISpeciesRepository _speciesRepository;
-    private readonly IClassificationRepository _classificationRepository;
 
     public AddModel(
         ISpeciesRepository speciesRepository,
-        IClassificationRepository classificationRepository,
         IWebHostEnvironment environment) : base(environment)
     {
         _speciesRepository = speciesRepository;
-        _classificationRepository = classificationRepository;
     }
 
     public Specie Specie { get; set; }
-    public List<string> Classifications { get; private set; } = [];
 
     [BindProperty] public SpeciesInputModel? Input { get; set; }
 
     public void OnGet()
     {
-        LoadClassifications();
     }
 
     public async Task<IActionResult> OnPost()
     {
-        LoadClassifications();
-
         if (Input == null || !ModelState.IsValid)
             return Page();
 
@@ -52,10 +45,5 @@ public class AddModel : AppPageModel
             ModelState.AddModelError("Input.Name", ex.Message);
             return Page();
         }
-    }
-
-    private void LoadClassifications()
-    {
-        Classifications = _classificationRepository.FetchAll();
     }
 }

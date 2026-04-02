@@ -12,8 +12,4 @@ public class SpecieEntity
 
     public string TypeLabel { get; set; } = null!;
     public string DietLabel { get; set; } = null!;
-
-    // relations
-    public SpecieClassificationEntity ClassificationEntity { get; set; } = null!;
-    public SpecieDietEntity DietEntity { get; set; } = null!;
 }

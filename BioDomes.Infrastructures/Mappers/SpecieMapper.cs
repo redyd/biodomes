@@ -6,6 +6,6 @@ namespace BioDomes.Infrastructures.Mappers;
 public static class SpecieMapper
 {
     public static Specie MapSpecie(SpecieEntity specie)
-        => new(specie.Name, specie.ClassificationEntity.Label, specie.DietEntity.Label,
+        => new(specie.Name, specie.TypeLabel, specie.DietLabel,
             specie.Height, specie.Weight, specie.UploadedImageId);
 }

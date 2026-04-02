@@ -2,7 +2,6 @@ using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Infrastructures.Mappers;
 using BioDomes.Infrastructures.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace BioDomes.Infrastructures.Repositories;
 
@@ -11,8 +10,6 @@ public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
     public List<Specie> FindAll()
     {
         return context.Species
-            .Include(specie => specie.DietEntity)
-            .Include(specie => specie.ClassificationEntity)
             .Select(SpecieMapper.MapSpecie)
             .ToList();
     }
@@ -20,8 +17,6 @@ public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
     public Specie? FindBySlug(string slug)
     {
         var search = context.Species
-            .Include(specie => specie.DietEntity)
-            .Include(specie => specie.ClassificationEntity)
             .FirstOrDefault(specie => specie.Slug == slug);
 
         return search == null ? null : SpecieMapper.MapSpecie(search);
@@ -48,7 +43,7 @@ public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
             {
                 Slug = toUpdate.Slug,
                 Name = toUpdate.Name,
-                TypeLabel = toUpdate.Type,
+                TypeLabel = toUpdate.Type.ToString(),
                 DietLabel = toUpdate.Diet,
                 Height = toUpdate.Height,
                 Weight = toUpdate.Weight,
@@ -63,7 +58,7 @@ public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
         }
 
         entity.Name = toUpdate.Name;
-        entity.TypeLabel = toUpdate.Type;
+        entity.TypeLabel = toUpdate.Type.ToString();
         entity.DietLabel = toUpdate.Diet;
         entity.Height = toUpdate.Height;
         entity.Weight = toUpdate.Weight;
@@ -85,7 +80,7 @@ public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
         {
             Slug = toAdd.Slug,
             Name = toAdd.Name,
-            TypeLabel = toAdd.Type,
+            TypeLabel = toAdd.Type.ToString(),
             DietLabel = toAdd.Diet,
             Height = toAdd.Height,
             Weight = toAdd.Weight,
@@ -100,10 +95,7 @@ public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
 
     public Specie? Delete(string slug)
     {
-        var entity = context.Species
-            .Include(specie => specie.DietEntity)
-            .Include(specie => specie.ClassificationEntity)
-            .FirstOrDefault(specie => specie.Slug == slug);
+        var entity = context.Species.FirstOrDefault(specie => specie.Slug == slug);
 
         if (entity == null)
             return null;
