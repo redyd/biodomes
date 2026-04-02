@@ -11,6 +11,8 @@ public class BiodomeContext(DbContextOptions options) : DbContext(options)
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        builder.HasDefaultSchema("dbo");
+
         builder.ApplyConfiguration(new SpecieEntityTypeConfiguration());
         builder.ApplyConfiguration(new SpecieTypeEntityTypeConfiguration());
         builder.ApplyConfiguration(new SpecieDietEntityTypeConfiguration());
