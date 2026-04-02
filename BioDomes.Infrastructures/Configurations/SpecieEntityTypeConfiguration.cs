@@ -16,7 +16,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<Specie>
         builder.Property(specie => specie.Height)
             .IsRequired();
 
-        builder.Property(specie => specie.ImageUrl);
+        builder.Property(specie => specie.UploadedImageId);
 
         builder.Property(specie => specie.TypeLabel)
             .IsRequired();
@@ -48,91 +48,91 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<Specie>
             {
                 Slug = "lion",
                 Name = "Lion",
-                Height = 120,
-                ImageUrl = (string?)null,
+                Height = 180,
+                UploadedImageId = (string?)null,
                 TypeLabel = "Mammifère",
                 DietLabel = "Carnivore"
             },
             new
             {
-                Slug = "vache",
-                Name = "Vache",
-                Height = 150,
-                ImageUrl = (string?)null,
-                TypeLabel = "Mammifère",
-                DietLabel = "Herbivore"
+                Slug = "boa",
+                Name = "Boa",
+                Height = 225,
+                UploadedImageId = (string?)null,
+                TypeLabel = "Reptile",
+                DietLabel = "Carnivore"
             },
             new
             {
-                Slug = "aigle",
-                Name = "Aigle",
-                Height = 70,
-                ImageUrl = (string?)null,
-                TypeLabel = "Oiseau",
-                DietLabel = "Carnivore"
+                Slug = "hetre",
+                Name = "Hetre",
+                Height = 600,
+                UploadedImageId = (string?)null,
+                TypeLabel = "Plante",
+                DietLabel = "Photosynthèse"
             },
             new
             {
                 Slug = "chene",
-                Name = "Chêne",
-                Height = 2000,
-                ImageUrl = (string?)null,
+                Name = "Chene",
+                Height = 2500,
+                UploadedImageId = (string?)null,
                 TypeLabel = "Plante",
                 DietLabel = "Photosynthèse"
             },
             new
             {
-                Slug = "renard",
-                Name = "Renard",
-                Height = 40,
-                ImageUrl = (string?)null,
-                TypeLabel = "Mammifère",
-                DietLabel = "Omnivore"
+                Slug = "mouche",
+                Name = "Mouche",
+                Height = 1,
+                UploadedImageId = (string?)null,
+                TypeLabel = "Insecte",
+                DietLabel = "Coprophage"
             },
             new
             {
-                Slug = "requin",
-                Name = "Requin",
-                Height = 500,
-                ImageUrl = (string?)null,
-                TypeLabel = "Poisson",
+                Slug = "araignee",
+                Name = "Araignée",
+                Height = 4,
+                UploadedImageId = (string?)null,
+                TypeLabel = "Arachnides",
                 DietLabel = "Carnivore"
             },
             new
             {
-                Slug = "bambou",
-                Name = "Bambou",
-                Height = 1000,
-                ImageUrl = (string?)null,
+                Slug = "hirondelle",
+                Name = "Hirondelle",
+                Height = 18,
+                UploadedImageId = (string?)null,
+                TypeLabel = "Oiseau",
+                DietLabel = "Carnivore"
+            },
+            new
+            {
+                Slug = "lievre",
+                Name = "Lièvre",
+                Height = 50,
+                UploadedImageId = (string?)null,
+                TypeLabel = "Mammifère",
+                DietLabel = "Herbivore"
+            },
+            new
+            {
+                Slug = "paturin-des-pres",
+                Name = "Pâturin des prés",
+                Height = 23,
+                UploadedImageId = (string?)null,
                 TypeLabel = "Plante",
                 DietLabel = "Photosynthèse"
             },
             new
             {
-                Slug = "ours",
-                Name = "Ours",
-                Height = 180,
-                ImageUrl = (string?)null,
+                Slug = "souris",
+                Name = "Souris",
+                Height = 9,
+                UploadedImageId = (string?)null,
                 TypeLabel = "Mammifère",
                 DietLabel = "Omnivore"
-            },
-            new
-            {
-                Slug = "poulet",
-                Name = "Poulet",
-                Height = 45,
-                ImageUrl = (string?)null,
-                TypeLabel = "Oiseau",
-                DietLabel = "Omnivore"
-            },
-            new
-            {
-                Slug = "lapin",
-                Name = "Lapin",
-                Height = 35,
-                ImageUrl = (string?)null,
-                TypeLabel = "Mammifère",
-                DietLabel = "Herbivore"
             }
         );
     }

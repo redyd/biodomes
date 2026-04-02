@@ -17,7 +17,12 @@ public class SpecieDietEntityTypeConfiguration : IEntityTypeConfiguration<Specie
             new SpecieDiet { Label = "Carnivore" },
             new SpecieDiet { Label = "Herbivore" },
             new SpecieDiet { Label = "Omnivore" },
-            new SpecieDiet { Label = "Photosynthèse" }
+            new SpecieDiet { Label = "Coprophages" },
+            new SpecieDiet { Label = "Coprophage" },
+            new SpecieDiet { Label = "Limivores" },
+            new SpecieDiet { Label = "Détritivores" },
+            new SpecieDiet { Label = "Photosynthèse" },
+            new SpecieDiet { Label = "Hétérotrophie" }
         );
     }
 }

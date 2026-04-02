@@ -16,6 +16,7 @@ namespace BioDomes.Infrastructures.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("dbo")
                 .HasAnnotation("ProductVersion", "8.0.25")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -33,9 +34,6 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<int>("Height")
                         .HasColumnType("int");
 
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -43,6 +41,9 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<string>("TypeLabel")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UploadedImageId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Slug");
 
@@ -53,7 +54,7 @@ namespace BioDomes.Infrastructures.Migrations
 
                     b.HasIndex("TypeLabel");
 
-                    b.ToTable("Species");
+                    b.ToTable("Species", "dbo");
 
                     b.HasData(
                         new
@@ -145,7 +146,7 @@ namespace BioDomes.Infrastructures.Migrations
 
                     b.HasKey("Label");
 
-                    b.ToTable("SpeciesDiets");
+                    b.ToTable("SpeciesDiets", "dbo");
 
                     b.HasData(
                         new
@@ -173,7 +174,7 @@ namespace BioDomes.Infrastructures.Migrations
 
                     b.HasKey("Label");
 
-                    b.ToTable("SpeciesTypes");
+                    b.ToTable("SpeciesTypes", "dbo");
 
                     b.HasData(
                         new

@@ -7,7 +7,7 @@ public class Specie
     
     public string Name { get; set; } = null!;
     public int Height { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? UploadedImageId { get; set; }
 
     public string TypeLabel { get; set; } = null!;
     public string DietLabel { get; set; } = null!;
