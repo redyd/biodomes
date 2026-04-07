@@ -2,7 +2,7 @@
 using BioDomes.Web.PageModels;
 using BioDomes.Web.ViewModels;
 
-namespace BioDomes.Web.Pages.SpeciesPages;
+namespace BioDomes.Web.Pages.Species;
 
 public class SpeciesModel : AppPageModel
 {
@@ -15,10 +15,10 @@ public class SpeciesModel : AppPageModel
 
     public List<SpecieView> SpeciesList { get; set; } = [];
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
-        SpeciesList = _speciesRepository
-            .FindAll()
+        var species = await _speciesRepository.FindAllAsync();
+        SpeciesList = species
             .Select(specie =>
             {
                 var path = specie.ImageUrl != null ? UseFileFromPath(specie.ImageUrl) : null;
@@ -28,8 +28,8 @@ public class SpeciesModel : AppPageModel
                     Name = specie.Name,
                     Type = specie.Type,
                     Diet = specie.Diet,
-                    Height = specie.Height,
-                    Weight = specie.Weight,
+                    Height = FormatCentimeter(specie.Height),
+                    Weight = FormatGram(specie.Weight),
                     ImageUrl = path
                 };
             })

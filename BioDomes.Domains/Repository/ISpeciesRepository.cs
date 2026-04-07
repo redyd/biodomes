@@ -4,13 +4,15 @@ namespace BioDomes.Domains.Repository;
 
 public interface ISpeciesRepository
 {
-    List<Specie> FindAll();
+    Task<List<Specie>> FindAllAsync();
 
-    Specie? FindBySlug(string slug);
+    Task<int> CountAsync();
 
-    Specie? Update(string previousSlug, Specie toUpdate);
+    Task<Specie?> FindBySlugAsync(string slug);
 
-    Specie Add(Specie toAdd);
+    Task<Specie?> UpdateAsync(string previousSlug, Specie toUpdate);
+
+    Task<Specie> AddAsync(Specie toAdd);
     
-    Specie? Delete(string slug);
+    Task<Specie?> DeleteAsync(string slug);
 }

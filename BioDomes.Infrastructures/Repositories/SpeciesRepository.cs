@@ -2,40 +2,43 @@ using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Infrastructures.Mappers;
 using BioDomes.Infrastructures.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BioDomes.Infrastructures.Repositories;
 
 public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
 {
-    public List<Specie> FindAll()
+    public async Task<List<Specie>> FindAllAsync()
     {
-        return context.Species
-            .Select(SpecieMapper.MapSpecie)
-            .ToList();
+        var entities = await context.Species.ToListAsync();
+        return entities.Select(SpecieMapper.MapSpecie).ToList();
     }
 
-    public Specie? FindBySlug(string slug)
+    public async Task<int> CountAsync()
     {
-        var search = context.Species
-            .FirstOrDefault(specie => specie.Slug == slug);
-
-        return search == null ? null : SpecieMapper.MapSpecie(search);
+        return await context.Species.CountAsync();
     }
 
-    public Specie? Update(string previousSlug, Specie toUpdate)
+    public async Task<Specie?> FindBySlugAsync(string slug)
     {
-        if (context.Species.Any(specie =>
+        var entity = await context.Species
+            .FirstOrDefaultAsync(specie => specie.Slug == slug);
+
+        return entity == null ? null : SpecieMapper.MapSpecie(entity);
+    }
+
+    public async Task<Specie?> UpdateAsync(string previousSlug, Specie toUpdate)
+    {
+        if (await context.Species.AnyAsync(specie =>
                 specie.Slug != previousSlug &&
                 specie.Name.ToLower() == toUpdate.Name.ToLower()))
         {
             throw new InvalidOperationException($"Une espèce nommée '{toUpdate.Name}' existe déjà.");
         }
 
-        var entity = context.Species.FirstOrDefault(specie => specie.Slug == previousSlug);
+        var entity = await context.Species.FirstOrDefaultAsync(specie => specie.Slug == previousSlug);
         if (entity == null)
-        {
             return null;
-        }
 
         if (entity.Slug != toUpdate.Slug)
         {
@@ -43,7 +46,7 @@ public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
             {
                 Slug = toUpdate.Slug,
                 Name = toUpdate.Name,
-                TypeLabel = toUpdate.Type.ToString(),
+                TypeLabel = toUpdate.Type,
                 DietLabel = toUpdate.Diet,
                 Height = toUpdate.Height,
                 Weight = toUpdate.Weight,
@@ -51,27 +54,27 @@ public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
             };
 
             context.Species.Remove(entity);
-            context.Species.Add(replacement);
-            context.SaveChanges();
+            await context.Species.AddAsync(replacement);
+            await context.SaveChangesAsync();
 
-            return FindBySlug(replacement.Slug);
+            return await FindBySlugAsync(replacement.Slug);
         }
 
         entity.Name = toUpdate.Name;
-        entity.TypeLabel = toUpdate.Type.ToString();
+        entity.TypeLabel = toUpdate.Type;
         entity.DietLabel = toUpdate.Diet;
         entity.Height = toUpdate.Height;
         entity.Weight = toUpdate.Weight;
         entity.UploadedImageId = toUpdate.ImageUrl;
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
-        return FindBySlug(entity.Slug);
+        return await FindBySlugAsync(entity.Slug);
     }
 
-    public Specie Add(Specie toAdd)
+    public async Task<Specie> AddAsync(Specie toAdd)
     {
-        if (context.Species.Any(specie => specie.Name.ToLower() == toAdd.Name.ToLower()))
+        if (await context.Species.AnyAsync(specie => specie.Name.ToLower() == toAdd.Name.ToLower()))
         {
             throw new InvalidOperationException($"Une espèce nommée '{toAdd.Name}' existe déjà.");
         }
@@ -80,30 +83,29 @@ public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
         {
             Slug = toAdd.Slug,
             Name = toAdd.Name,
-            TypeLabel = toAdd.Type.ToString(),
+            TypeLabel = toAdd.Type,
             DietLabel = toAdd.Diet,
             Height = toAdd.Height,
             Weight = toAdd.Weight,
             UploadedImageId = toAdd.ImageUrl
         };
 
-        context.Species.Add(entity);
-        context.SaveChanges();
+        await context.Species.AddAsync(entity);
+        await context.SaveChangesAsync();
 
-        return FindBySlug(entity.Slug)!;
+        return (await FindBySlugAsync(entity.Slug))!;
     }
 
-    public Specie? Delete(string slug)
+    public async Task<Specie?> DeleteAsync(string slug)
     {
-        var entity = context.Species.FirstOrDefault(specie => specie.Slug == slug);
+        var entity = await context.Species.FirstOrDefaultAsync(specie => specie.Slug == slug);
 
-        if (entity == null)
-            return null;
+        if (entity == null) return null;
 
         var deleted = SpecieMapper.MapSpecie(entity);
 
         context.Species.Remove(entity);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         return deleted;
     }

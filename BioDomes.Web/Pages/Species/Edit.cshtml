@@ -1,6 +1,9 @@
 ﻿@page "/species/{slug:kebab}"
 @model EditModel
-@{ Layout = "Shared/_Layout"; }
+@{
+    Layout = "Shared/_Layout";
+    ViewData["Title"] = "Modifier une espèce";
+}
 
 <div class="edit-page">
     <div class="edit-card">
@@ -21,7 +24,7 @@
                     <label class="field-label" asp-for="Input.Type">Classification</label>
                     <select class="field-input" asp-for="Input.Type">
                         <option value="">-- Choisir --</option>
-                        @foreach (var classification in Enum.GetNames<BioDomes.Domains.Core.SpeciesClassification>())
+                        @foreach (var classification in Enum.GetNames<Domains.Core.SpeciesClassification>())
                         {
                             <option value="@classification">@classification</option>
                         }
@@ -43,7 +46,7 @@
                     <input class="field-input" type="number" asp-for="Input.Weight"/>
                     <span asp-validation-for="Input.Weight" class="field-error"></span>
                 </div>
-                
+
                 <div class="field-group">
                     @if (Model.ImageUrl != null)
                     {
@@ -62,7 +65,7 @@
                 <div class="edit-divider"></div>
 
                 <div class="edit-actions">
-                    <a class="btn-cancel" asp-page="/SpeciesPages/Species">Annuler</a>
+                    <a class="btn-cancel" asp-page="/Species/Index">Annuler</a>
                     <button class="btn-save" type="submit" name="action" value="delete">Supprimer</button>
                     <button class="btn-save" type="submit" name="action" value="save">Sauvegarder</button>
                 </div>
@@ -71,7 +74,3 @@
 
     </div>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial"/>
-}

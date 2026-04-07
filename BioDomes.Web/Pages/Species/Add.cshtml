@@ -3,6 +3,7 @@
 
 @{
     Layout = "Shared/_Layout";
+    ViewData["Title"] = "Ajouter une espèce";
 }
 
 <div class="edit-page">
@@ -48,14 +49,7 @@
                 </div>
                 
                 <div class="field-group">
-                    @if (Model.Specie?.ImageUrl != null)
-                    {
-                        <span class="image-current-label">Image actuelle</span>
-                        <img src="@Model.Specie.ImageUrl" class="species-image" alt="@Model.Specie.Name"/>
-                    }
-                    <label class="image-upload-hint">
-                        @(Model.Specie?.ImageUrl != null ? "Changer l'image" : "Ajouter une image")
-                    </label>
+                    <label class="image-upload-hint">Ajouter une image</label>
                     <div class="image-upload-zone">
                         <input type="file" asp-for="Input.Image" accept="image/*"/>
                     </div>
@@ -65,7 +59,7 @@
                 <div class="edit-divider"></div>
 
                 <div class="edit-actions">
-                    <a class="btn-cancel" asp-page="/SpeciesPages/Species">Annuler</a>
+                    <a class="btn-cancel" asp-page="/Species/Index">Annuler</a>
                     <button class="btn-save" type="submit">Sauvegarder</button>
                 </div>
             </form>

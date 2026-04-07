@@ -3,9 +3,8 @@ using BioDomes.Domains.Repository;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace BioDomes.Web.Pages.SpeciesPages;
+namespace BioDomes.Web.Pages.Species;
 
 public class AddModel : AppPageModel
 {
@@ -18,9 +17,8 @@ public class AddModel : AppPageModel
         _speciesRepository = speciesRepository;
     }
 
-    public Specie Specie { get; set; }
-
-    [BindProperty] public SpeciesInputModel? Input { get; set; }
+    [BindProperty]
+    public SpeciesInputModel? Input { get; set; }
 
     public void OnGet()
     {
@@ -36,9 +34,9 @@ public class AddModel : AppPageModel
             var imageName = Input.Image == null ? null : await SaveImage(Input.Image);
             var specie = new Specie(Input.Name, Input.Type, Input.Diet, Input.Height, Input.Weight, imageName);
 
-            _speciesRepository.Add(specie);
+            await _speciesRepository.AddAsync(specie);
             SuccessNotification($"Espèce {Input.Name} correctement ajoutée.");
-            return RedirectToPage("/SpeciesPages/Species");
+            return RedirectToPage("/Species/Index");
         }
         catch (InvalidOperationException ex)
         {
