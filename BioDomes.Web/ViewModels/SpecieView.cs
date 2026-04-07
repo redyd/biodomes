@@ -2,6 +2,7 @@ namespace BioDomes.Web.ViewModels;
 
 public class SpecieView
 {
+    public required string Slug { get; set; }
     public required string Name { get; set; }
     public required string Type { get; set; }
     public required string Diet { get; set; }

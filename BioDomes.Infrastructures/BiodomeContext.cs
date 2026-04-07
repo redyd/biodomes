@@ -13,5 +13,7 @@ public class BiodomeContext(DbContextOptions<BiodomeContext> options) : DbContex
         builder.HasDefaultSchema("dbo");
 
         builder.ApplyConfiguration(new SpecieEntityTypeConfiguration());
+        builder.ApplyConfiguration(new EquipmentResourceEntityTypeConfiguration());
+        builder.ApplyConfiguration(new EquipmentEntityTypeConfiguration());
     }
 }

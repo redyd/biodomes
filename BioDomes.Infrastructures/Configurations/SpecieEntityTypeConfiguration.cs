@@ -13,6 +13,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
         builder.HasKey(specie => specie.Slug);
         
         builder.Property(specie => specie.Name)
+            .HasMaxLength(75)
             .IsRequired();
         
         builder.Property(specie => specie.Height)
@@ -28,9 +29,14 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
 
         builder.Property(specie => specie.DietLabel)
             .IsRequired();
-        
-        builder.HasIndex(specie => specie.Slug).IsUnique();
 
+        builder.Property(specie => specie.IsPublic)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.HasIndex(specie => specie.Slug)
+            .IsUnique();
+        
         SeedSpecies(builder);
     }
 
@@ -45,7 +51,8 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Weight = 150000,
                 UploadedImageId = (string?)null,
                 TypeLabel = "Mammifère",
-                DietLabel = "Carnivore"
+                DietLabel = "Carnivore",
+                IsPublic = false
             },
             new
             {
@@ -55,7 +62,8 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Weight = 13000,
                 UploadedImageId = (string?)null,
                 TypeLabel = "Reptile",
-                DietLabel = "Carnivore"
+                DietLabel = "Carnivore",
+                IsPublic = false
             },
             new
             {
@@ -65,7 +73,8 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Weight = 830000,
                 UploadedImageId = (string?)null,
                 TypeLabel = "Plante",
-                DietLabel = "Photosynthèse"
+                DietLabel = "Photosynthèse",
+                IsPublic = false
             },
             new
             {
@@ -75,7 +84,8 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Weight = 2100000,
                 UploadedImageId = (string?)null,
                 TypeLabel = "Plante",
-                DietLabel = "Photosynthèse"
+                DietLabel = "Photosynthèse",
+                IsPublic = false
             },
             new
             {
@@ -85,7 +95,8 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Weight = 1,
                 UploadedImageId = (string?)null,
                 TypeLabel = "Insecte",
-                DietLabel = "Coprophage"
+                DietLabel = "Coprophage",
+                IsPublic = false
             },
             new
             {
@@ -95,7 +106,8 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Weight = 95,
                 UploadedImageId = (string?)null,
                 TypeLabel = "Arachnides",
-                DietLabel = "Carnivore"
+                DietLabel = "Carnivore",
+                IsPublic = false
             },
             new
             {
@@ -105,7 +117,8 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Weight = 45,
                 UploadedImageId = (string?)null,
                 TypeLabel = "Oiseau",
-                DietLabel = "Carnivore"
+                DietLabel = "Carnivore",
+                IsPublic = false
             },
             new
             {
@@ -115,7 +128,8 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Weight = 4000,
                 UploadedImageId = (string?)null,
                 TypeLabel = "Mammifère",
-                DietLabel = "Herbivore"
+                DietLabel = "Herbivore",
+                IsPublic = false
             },
             new
             {
@@ -125,7 +139,8 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Weight = 1,
                 UploadedImageId = (string?)null,
                 TypeLabel = "Plante",
-                DietLabel = "Photosynthèse"
+                DietLabel = "Photosynthèse",
+                IsPublic = false
             },
             new
             {
@@ -135,7 +150,8 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Weight = 25,
                 UploadedImageId = (string?)null,
                 TypeLabel = "Mammifère",
-                DietLabel = "Omnivore"
+                DietLabel = "Omnivore",
+                IsPublic = false
             }
         );
     }

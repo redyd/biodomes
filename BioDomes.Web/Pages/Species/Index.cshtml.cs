@@ -25,6 +25,7 @@ public class SpeciesModel : AppPageModel
                 
                 return new SpecieView
                 {
+                    Slug =  specie.Slug,
                     Name = specie.Name,
                     Type = specie.Type,
                     Diet = specie.Diet,
