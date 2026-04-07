@@ -3,9 +3,8 @@ using BioDomes.Domains.Repository;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace BioDomes.Web.Pages.SpeciesPages;
+namespace BioDomes.Web.Pages.Species;
 
 public class AddModel : AppPageModel
 {
@@ -38,7 +37,7 @@ public class AddModel : AppPageModel
 
             await _speciesRepository.AddAsync(specie);
             SuccessNotification($"Espèce {Input.Name} correctement ajoutée.");
-            return RedirectToPage("/SpeciesPages/Species");
+            return RedirectToPage("/Species/Species");
         }
         catch (InvalidOperationException ex)
         {

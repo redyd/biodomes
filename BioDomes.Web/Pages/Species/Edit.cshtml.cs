@@ -4,7 +4,7 @@ using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BioDomes.Web.Pages.SpeciesPages;
+namespace BioDomes.Web.Pages.Species;
 
 public class EditModel : AppPageModel
 {
@@ -60,7 +60,7 @@ public class EditModel : AppPageModel
             }
 
             SuccessNotification($"Espèce {species.Name} correctement supprimée");
-            return RedirectToPage("/SpeciesPages/Species");
+            return RedirectToPage("/Species/Species");
         }
 
         if (Input == null || !ModelState.IsValid)
@@ -92,7 +92,7 @@ public class EditModel : AppPageModel
                 return NotFound();
 
             SuccessNotification($"Espèce {saved.Name} correctement modifiée");
-            return RedirectToPage("/SpeciesPages/Species");
+            return RedirectToPage("/Species/Species");
         }
         catch (InvalidOperationException ex)
         {

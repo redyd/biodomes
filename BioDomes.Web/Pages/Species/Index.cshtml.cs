@@ -2,7 +2,7 @@
 using BioDomes.Web.PageModels;
 using BioDomes.Web.ViewModels;
 
-namespace BioDomes.Web.Pages.SpeciesPages;
+namespace BioDomes.Web.Pages.Species;
 
 public class SpeciesModel : AppPageModel
 {
