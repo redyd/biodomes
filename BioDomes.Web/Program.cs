@@ -1,9 +1,9 @@
 using BioDomes.Domains.Repository;
 using BioDomes.Infrastructures;
 using BioDomes.Infrastructures.Repositories;
+using BioDomes.Web.Constraints;
 using BioDomes.Web.Middlewares;
 using BioDomes.Web.Middlewares.extensions;
-using BioDomes.Web.Transformers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
@@ -11,8 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.Configure<RouteOptions>(options => { options.ConstraintMap.Add("kebab", typeof(SlugTransformer)); });
-
+builder.Services.Configure<RouteOptions>(options =>
+{
+    options.ConstraintMap.Add("kebab", typeof(KebabRouteConstraint));
+});
 
 builder.Services.AddScoped<ReverseProxyLinksMiddleware>();
 builder.Services.AddWebOptimizer(pipeline => { pipeline.AddCssBundle("/css/bundle.css", "css/**/*.css"); });
