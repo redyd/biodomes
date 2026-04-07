@@ -16,6 +16,7 @@
         <div class="species-info"><span class="species-label">Type :</span> @Model.Type</div>
         <div class="species-info"><span class="species-label">Régime :</span> @Model.Diet</div>
         <div class="species-info"><span class="species-label">Taille :</span> @Model.Height cm</div>
+        <div class="species-info"><span class="species-label">Poids :</span> @Model.Weight g</div>
         <a asp-page="/SpeciesPages/Edit" asp-route-slug="@Model.Name.ToKebabCase()">Éditer →</a>
     </div>
 </div>

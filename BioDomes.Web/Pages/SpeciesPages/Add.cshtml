@@ -24,7 +24,7 @@
                     <label class="field-label" asp-for="Input.Type">Classification</label>
                     <select class="field-input" asp-for="Input.Type">
                         <option value="">-- Choisir --</option>
-                        @foreach (var classification in Enum.GetNames<BioDomes.Domains.Core.ESpeciesClassification>())
+                        @foreach (var classification in Enum.GetNames<BioDomes.Domains.Core.SpeciesClassification>())
                         {
                             <option value="@classification">@classification</option>
                         }
@@ -38,18 +38,23 @@
                 </div>
                 <div class="field-group">
                     <label class="field-label">Taille adulte (cm)</label>
-                    <input class="field-input" type="text" asp-for="Input.Height"/>
+                    <input class="field-input" type="number" asp-for="Input.Height"/>
                     <span asp-validation-for="Input.Height" class="field-error"></span>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Poids adulte (g)</label>
+                    <input class="field-input" type="number" asp-for="Input.Weight"/>
+                    <span asp-validation-for="Input.Weight" class="field-error"></span>
                 </div>
                 
                 <div class="field-group">
-                    @if (Model.Species?.ImageUrl != null)
+                    @if (Model.Specie?.ImageUrl != null)
                     {
                         <span class="image-current-label">Image actuelle</span>
-                        <img src="@Model.Species.ImageUrl" class="species-image" alt="@Model.Species.Name"/>
+                        <img src="@Model.Specie.ImageUrl" class="species-image" alt="@Model.Specie.Name"/>
                     }
                     <label class="image-upload-hint">
-                        @(Model.Species?.ImageUrl != null ? "Changer l'image" : "Ajouter une image")
+                        @(Model.Specie?.ImageUrl != null ? "Changer l'image" : "Ajouter une image")
                     </label>
                     <div class="image-upload-zone">
                         <input type="file" asp-for="Input.Image" accept="image/*"/>

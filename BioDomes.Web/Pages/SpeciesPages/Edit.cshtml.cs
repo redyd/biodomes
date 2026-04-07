@@ -9,21 +9,23 @@ namespace BioDomes.Web.Pages.SpeciesPages;
 
 public class EditModel : AppPageModel
 {
-    private readonly IRepository _repository;
+    private readonly ISpeciesRepository _speciesRepository;
 
-    public EditModel(IRepository repository, IWebHostEnvironment environment) : base(environment)
+    public EditModel(
+        ISpeciesRepository speciesRepository,
+        IWebHostEnvironment environment) : base(environment)
     {
-        _repository = repository;
+        _speciesRepository = speciesRepository;
     }
 
-    public Species? Species { get; set; }
+    public Specie? Species { get; set; }
 
     [BindProperty] public SpeciesInputModel? Input { get; set; }
     public string? ImageUrl { get; set; }
 
     public IActionResult OnGet(string slug)
     {
-        Species = _repository.FindBySlug(slug);
+        Species = _speciesRepository.FindBySlug(slug);
 
         if (Species == null)
             return NotFound();
@@ -35,7 +37,8 @@ public class EditModel : AppPageModel
             Name = Species.Name,
             Type = Species.Type,
             Diet = Species.Diet,
-            Height = Species.Height
+            Height = Species.Height,
+            Weight = Species.Weight
         };
 
         return Page();
@@ -43,14 +46,14 @@ public class EditModel : AppPageModel
 
     public async Task<IActionResult> OnPost(string slug, string action)
     {
-        var species = _repository.FindBySlug(slug);
+        var species = _speciesRepository.FindBySlug(slug);
 
         if (species == null)
             return NotFound();
 
         if (action == "delete")
         {
-            _repository.Delete(slug);
+            _speciesRepository.Delete(slug);
 
             if (!string.IsNullOrEmpty(species.ImageUrl))
             {
@@ -66,10 +69,13 @@ public class EditModel : AppPageModel
 
         try
         {
-            species.Name = Input.Name;
-            species.Type = Input.Type;
-            species.Diet = Input.Diet;
-            species.Height = Input.Height;
+            var updatedSpecie = new Specie(
+                Input.Name,
+                Input.Type,
+                Input.Diet,
+                Input.Height,
+                Input.Weight,
+                species.ImageUrl);
 
             if (Input.Image != null)
             {
@@ -79,10 +85,14 @@ public class EditModel : AppPageModel
                 }
 
                 var imageName = await SaveImage(Input.Image);
-                species.ImageUrl = imageName;
+                updatedSpecie.ImageUrl = imageName;
             }
 
-            SuccessNotification($"Espèce {species.Name} correctement modifiée");
+            var saved = _speciesRepository.Update(slug, updatedSpecie);
+            if (saved == null)
+                return NotFound();
+
+            SuccessNotification($"Espèce {saved.Name} correctement modifiée");
             return RedirectToPage("/SpeciesPages/Species");
         }
         catch (InvalidOperationException ex)

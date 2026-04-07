@@ -10,12 +10,13 @@ public class IsSpeciesClassificationAttribute :  ValidationAttribute
         if (value == null)
             return new ValidationResult("La classification est requise.");
 
-        if (Enum.TryParse<ESpeciesClassification>(value.ToString(), out _))
+        var input = value.ToString();
+        if (input != null && Enum.GetNames<SpeciesClassification>().Contains(input, StringComparer.OrdinalIgnoreCase))
             return ValidationResult.Success;
 
         return new ValidationResult(
             $"La classification '{value}' est invalide.\n " +
-            $"Valeurs acceptées : {string.Join(", ", Enum.GetNames<ESpeciesClassification>())}"
+            $"Valeurs acceptées : {string.Join(", ", Enum.GetNames<SpeciesClassification>())}"
         );
     }
 }

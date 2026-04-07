@@ -1,9 +1,12 @@
 using BioDomes.Domains.Extensions;
 using BioDomes.Domains.Repository;
+using BioDomes.Infrastructures;
+using BioDomes.Infrastructures.Configurations;
 using BioDomes.Infrastructures.Repositories;
 using BioDomes.Web.Middlewares;
 using BioDomes.Web.Middlewares.extensions;
 using BioDomes.Web.Transformers;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +23,13 @@ builder.Services.AddWebOptimizer(pipeline =>
 {
     pipeline.AddCssBundle("/css/bundle.css", "css/**/*.css");
 });
-builder.Services.AddSingleton<IRepository, SqlRepository>();
+
+// repositories
+builder.Services.AddDbContext<BiodomeContext>(options
+    => options.UseSqlServer(
+        builder.Configuration.GetConnectionString("BiodomeContext")));
+
+builder.Services.AddScoped<ISpeciesRepository, SpeciesRepository>();
 
 var app = builder.Build();
 

@@ -6,18 +6,18 @@ namespace BioDomes.Web.Pages.SpeciesPages;
 
 public class SpeciesModel : AppPageModel
 {
-    private readonly IRepository _repository;
+    private readonly ISpeciesRepository _speciesRepository;
 
-    public SpeciesModel(IRepository repository, IWebHostEnvironment environment): base(environment)
+    public SpeciesModel(ISpeciesRepository speciesRepository, IWebHostEnvironment environment): base(environment)
     {
-        _repository = repository;
+        _speciesRepository = speciesRepository;
     }
 
     public List<SpecieView> SpeciesList { get; set; } = [];
 
     public void OnGet()
     {
-        SpeciesList = _repository
+        SpeciesList = _speciesRepository
             .FindAll()
             .Select(specie =>
             {
@@ -29,6 +29,7 @@ public class SpeciesModel : AppPageModel
                     Type = specie.Type,
                     Diet = specie.Diet,
                     Height = specie.Height,
+                    Weight = specie.Weight,
                     ImageUrl = path
                 };
             })
