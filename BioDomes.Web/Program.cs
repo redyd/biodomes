@@ -44,6 +44,8 @@ app.UseReverseProxyMiddleware();
 
 app.UseWebOptimizer();
 
+app.UseStaticFiles();
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
