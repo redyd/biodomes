@@ -48,12 +48,19 @@
         const banner = document.getElementById('notification-banner');
         if (banner) {
             setTimeout(() => {
-                banner.style.transition = 'opacity 0.6s ease';
                 banner.style.opacity = '0';
+
+                banner.style.height = '0';
+                banner.style.marginTop = '0';
+                banner.style.marginBottom = '0';
+                banner.style.paddingTop = '0';
+                banner.style.paddingBottom = '0';
+
                 setTimeout(() => banner.remove(), 600);
             }, 3000);
         }
     });
+
 </script>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
