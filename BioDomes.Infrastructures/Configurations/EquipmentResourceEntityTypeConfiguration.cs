@@ -16,6 +16,9 @@ public class EquipmentResourceEntityTypeConfiguration : IEntityTypeConfiguration
             .IsRequired()
             .HasMaxLength(50);
 
+        builder.HasMany(eq => eq.Equipments)
+            .WithOne();
+
         SeedData(builder);
     }
 

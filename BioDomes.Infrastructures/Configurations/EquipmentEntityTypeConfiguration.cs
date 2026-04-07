@@ -19,6 +19,10 @@ public class EquipmentEntityTypeConfiguration : IEntityTypeConfiguration<Equipme
         builder.Property(e => e.Image)
             .IsRequired();
         
+        builder.Property(e => e.IsPublic)
+            .IsRequired()
+            .HasDefaultValue(false);
+        
         builder.HasOne(e => e.ProducedResourceEntity)
             .WithMany()
             .HasForeignKey(e => e.ProducedResourceId)

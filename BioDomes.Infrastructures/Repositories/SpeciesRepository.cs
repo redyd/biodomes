@@ -50,7 +50,8 @@ public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
                 DietLabel = toUpdate.Diet,
                 Height = toUpdate.Height,
                 Weight = toUpdate.Weight,
-                UploadedImageId = toUpdate.ImageUrl
+                UploadedImageId = toUpdate.ImageUrl,
+                IsPublic = false
             };
 
             context.Species.Remove(entity);
@@ -87,7 +88,8 @@ public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
             DietLabel = toAdd.Diet,
             Height = toAdd.Height,
             Weight = toAdd.Weight,
-            UploadedImageId = toAdd.ImageUrl
+            UploadedImageId = toAdd.ImageUrl,
+            IsPublic = false
         };
 
         await context.Species.AddAsync(entity);

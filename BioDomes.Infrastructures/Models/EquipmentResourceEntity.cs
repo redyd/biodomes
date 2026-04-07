@@ -4,4 +4,7 @@ public class EquipmentResourceEntity
 {
     public required int Id { get; set; }
     public required string Label { get; set; }
+    
+    // relation
+    public List<EquipmentEntity> Equipments { get; set; } = null!;
 }
