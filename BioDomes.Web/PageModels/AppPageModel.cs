@@ -12,7 +12,10 @@ public abstract class AppPageModel(IWebHostEnvironment environment) : PageModel
     protected string UseFileFromPath(string fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
-            throw new ArgumentException(nameof(fileName));
+        {
+
+            throw new ArgumentException(null, nameof(fileName));
+        }
 
         var safeFileName = Path.GetFileName(fileName);
 

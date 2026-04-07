@@ -44,16 +44,16 @@ app.UseReverseProxyMiddleware();
 
 app.UseWebOptimizer();
 
+app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
         Path.Combine(builder.Environment.ContentRootPath, "wwwroot/img/uploads")),
-    RequestPath = "/wwwroot/img/uploads"
+    RequestPath = "/img/uploads"
 });
-
-app.UseHttpsRedirection();
 
 app.UseRouting();
 
