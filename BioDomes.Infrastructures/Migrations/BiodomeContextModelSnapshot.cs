@@ -22,6 +22,108 @@ namespace BioDomes.Infrastructures.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.EquipmentEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ConsumedResourceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(75)
+                        .HasColumnType("nvarchar(75)");
+
+                    b.Property<int>("ProducedResourceId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConsumedResourceId");
+
+                    b.HasIndex("ProducedResourceId");
+
+                    b.ToTable("equipments", "dbo");
+                });
+
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.EquipmentResourceEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("equipment_resources", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Label = "Lumière"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Label = "Eau"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Label = "Azote"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Label = "Hydrogène"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Label = "Oxygène"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Label = "CO2"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Label = "Phosphore"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Label = "Potassium"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Label = "Calcium"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Label = "Magnésium"
+                        });
+                });
+
             modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieEntity", b =>
                 {
                     b.Property<string>("Slug")
@@ -146,6 +248,25 @@ namespace BioDomes.Infrastructures.Migrations
                             TypeLabel = "Mammifère",
                             Weight = 25
                         });
+                });
+
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.EquipmentEntity", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.EquipmentResourceEntity", "ConsumedResourceEntity")
+                        .WithMany()
+                        .HasForeignKey("ConsumedResourceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BioDomes.Infrastructures.Models.EquipmentResourceEntity", "ProducedResourceEntity")
+                        .WithMany()
+                        .HasForeignKey("ProducedResourceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ConsumedResourceEntity");
+
+                    b.Navigation("ProducedResourceEntity");
                 });
 #pragma warning restore 612, 618
         }
