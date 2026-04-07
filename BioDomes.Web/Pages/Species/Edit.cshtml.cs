@@ -52,7 +52,7 @@ public class EditModel : AppPageModel
 
         if (action == "delete")
         {
-            _ = _speciesRepository.DeleteAsync(slug);
+            await _speciesRepository.DeleteAsync(slug);
 
             if (!string.IsNullOrEmpty(species.ImageUrl))
             {

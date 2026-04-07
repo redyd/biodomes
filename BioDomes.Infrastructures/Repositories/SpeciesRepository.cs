@@ -100,8 +100,7 @@ public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
     {
         var entity = await context.Species.FirstOrDefaultAsync(specie => specie.Slug == slug);
 
-        if (entity == null)
-            return null;
+        if (entity == null) return null;
 
         var deleted = SpecieMapper.MapSpecie(entity);
 
