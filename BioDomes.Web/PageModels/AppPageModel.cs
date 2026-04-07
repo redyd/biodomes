@@ -13,7 +13,6 @@ public abstract class AppPageModel(IWebHostEnvironment environment) : PageModel
     {
         if (string.IsNullOrWhiteSpace(fileName))
         {
-
             throw new ArgumentException(null, nameof(fileName));
         }
 
@@ -85,5 +84,51 @@ public abstract class AppPageModel(IWebHostEnvironment environment) : PageModel
             Type = NotificationType.Error,
             Message = message,
         });
+    }
+
+    protected string FormatGram(long grams)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(grams);
+
+        string[] units = { "gramme", "kilogramme", "tonne", "kilotonne", "mégatonne" };
+
+        double value = grams;
+        var unitIndex = 0;
+
+        while (value >= 1000 && unitIndex < units.Length - 1)
+        {
+            value /= 1000;
+            unitIndex++;
+        }
+
+        var unit = units[unitIndex];
+
+        if (value > 1)
+        {
+            unit += "s";
+        }
+
+        return $"{value:0.##} {unit}";
+    }
+
+    protected string FormatCentimeter(long centimeters)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(centimeters);
+        var tolerance = 0.1;
+        double value;
+        string unit;
+
+        if (centimeters >= 100)
+        {
+            value = centimeters / 100.0;
+            unit = Math.Abs(value - 1) < tolerance ? "mètre" : "mètres";
+        }
+        else
+        {
+            value = centimeters;
+            unit = Math.Abs(value - 1) < tolerance ? "centimètre" : "centimètres";
+        }
+
+        return $"{value:0.##} {unit}";
     }
 }

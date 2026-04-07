@@ -3,7 +3,6 @@ using BioDomes.Domains.Repository;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BioDomes.Web.Pages.SpeciesPages;
 
@@ -23,9 +22,9 @@ public class EditModel : AppPageModel
     [BindProperty] public SpeciesInputModel? Input { get; set; }
     public string? ImageUrl { get; set; }
 
-    public IActionResult OnGet(string slug)
+    public async Task<IActionResult> OnGetAsync(string slug)
     {
-        Species = _speciesRepository.FindBySlug(slug);
+        Species = await _speciesRepository.FindBySlugAsync(slug);
 
         if (Species == null)
             return NotFound();
@@ -46,14 +45,14 @@ public class EditModel : AppPageModel
 
     public async Task<IActionResult> OnPost(string slug, string action)
     {
-        var species = _speciesRepository.FindBySlug(slug);
+        var species = await _speciesRepository.FindBySlugAsync(slug);
 
         if (species == null)
             return NotFound();
 
         if (action == "delete")
         {
-            _speciesRepository.Delete(slug);
+            _ = _speciesRepository.DeleteAsync(slug);
 
             if (!string.IsNullOrEmpty(species.ImageUrl))
             {
@@ -88,7 +87,7 @@ public class EditModel : AppPageModel
                 updatedSpecie.ImageUrl = imageName;
             }
 
-            var saved = _speciesRepository.Update(slug, updatedSpecie);
+            var saved = await _speciesRepository.UpdateAsync(slug, updatedSpecie);
             if (saved == null)
                 return NotFound();
 

@@ -36,7 +36,7 @@ public class AddModel : AppPageModel
             var imageName = Input.Image == null ? null : await SaveImage(Input.Image);
             var specie = new Specie(Input.Name, Input.Type, Input.Diet, Input.Height, Input.Weight, imageName);
 
-            _speciesRepository.Add(specie);
+            await _speciesRepository.AddAsync(specie);
             SuccessNotification($"Espèce {Input.Name} correctement ajoutée.");
             return RedirectToPage("/SpeciesPages/Species");
         }
