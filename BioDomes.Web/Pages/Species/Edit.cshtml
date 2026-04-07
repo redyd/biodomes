@@ -1,6 +1,8 @@
 ﻿@page "/species/{slug:kebab}"
-@model EditModel
-@{ Layout = "Shared/_Layout"; }
+@model BioDomes.Web.Pages.SpeciesPages.EditModel
+@{
+    Layout = "Shared/_Layout";
+}
 
 <div class="edit-page">
     <div class="edit-card">
@@ -43,7 +45,7 @@
                     <input class="field-input" type="number" asp-for="Input.Weight"/>
                     <span asp-validation-for="Input.Weight" class="field-error"></span>
                 </div>
-                
+
                 <div class="field-group">
                     @if (Model.ImageUrl != null)
                     {
