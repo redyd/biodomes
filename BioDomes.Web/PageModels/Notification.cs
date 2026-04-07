@@ -1,4 +1,4 @@
-namespace BioDomes.Web.InputModel;
+namespace BioDomes.Web.PageModels;
 
 public class Notification
 {

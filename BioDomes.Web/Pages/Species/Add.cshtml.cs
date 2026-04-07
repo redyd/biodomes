@@ -17,9 +17,8 @@ public class AddModel : AppPageModel
         _speciesRepository = speciesRepository;
     }
 
-    public Specie Specie { get; set; }
-
-    [BindProperty] public SpeciesInputModel? Input { get; set; }
+    [BindProperty]
+    public SpeciesInputModel? Input { get; set; }
 
     public void OnGet()
     {
@@ -37,7 +36,7 @@ public class AddModel : AppPageModel
 
             await _speciesRepository.AddAsync(specie);
             SuccessNotification($"Espèce {Input.Name} correctement ajoutée.");
-            return RedirectToPage("/Species/Species");
+            return RedirectToPage("/Species/Index");
         }
         catch (InvalidOperationException ex)
         {

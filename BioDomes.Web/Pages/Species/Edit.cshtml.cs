@@ -60,7 +60,7 @@ public class EditModel : AppPageModel
             }
 
             SuccessNotification($"Espèce {species.Name} correctement supprimée");
-            return RedirectToPage("/Species/Species");
+            return RedirectToPage("/Species/Index");
         }
 
         if (Input == null || !ModelState.IsValid)
@@ -92,7 +92,7 @@ public class EditModel : AppPageModel
                 return NotFound();
 
             SuccessNotification($"Espèce {saved.Name} correctement modifiée");
-            return RedirectToPage("/Species/Species");
+            return RedirectToPage("/Species/Index");
         }
         catch (InvalidOperationException ex)
         {
