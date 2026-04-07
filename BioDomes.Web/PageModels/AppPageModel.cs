@@ -12,13 +12,11 @@ public abstract class AppPageModel(IWebHostEnvironment environment) : PageModel
     protected string UseFileFromPath(string fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
-        {
-            throw new ArgumentException("Invalid file name", nameof(fileName));
-        }
+            throw new ArgumentException(nameof(fileName));
 
         var safeFileName = Path.GetFileName(fileName);
 
-        return $"/img/uploads/{safeFileName}";
+        return $"{Request.PathBase}/{BasePathForUploads}/{safeFileName}".Replace("\\", "/");
     }
 
     protected string GetFullPathOfFile(string fileName)
