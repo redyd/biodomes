@@ -82,6 +82,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Name = "Chene",
                 Height = 2500,
                 Weight = 2100000,
+                UploadedImageId = (string?)null,
                 TypeLabel = "Plante",
                 DietLabel = "Photosynthèse",
                 IsPublic = false
@@ -114,6 +115,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Name = "Hirondelle",
                 Height = 18,
                 Weight = 45,
+                UploadedImageId = (string?)null,
                 TypeLabel = "Oiseau",
                 DietLabel = "Carnivore",
                 IsPublic = false
@@ -135,6 +137,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Name = "Pâturin des prés",
                 Height = 23,
                 Weight = 1,
+                UploadedImageId = (string?)null,
                 TypeLabel = "Plante",
                 DietLabel = "Photosynthèse",
                 IsPublic = false

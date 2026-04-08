@@ -633,6 +633,7 @@ footer a:hover {
     background: rgba(0, 210, 180, 0.22);
     box-shadow: 0 0 20px rgba(0, 210, 180, 0.1);
     transform: translateY(-1px);
+    color: var(--text-mid);
 }
 
 .btn-save:active {

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BioDomes.Infrastructures.Migrations
 {
     [DbContext(typeof(BiodomeContext))]
-    [Migration("20260407160334_equipment")]
-    partial class equipment
+    [Migration("20260408190111_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,6 +40,11 @@ namespace BioDomes.Infrastructures.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsPublic")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(75)
@@ -55,6 +60,80 @@ namespace BioDomes.Infrastructures.Migrations
                     b.HasIndex("ProducedResourceId");
 
                     b.ToTable("equipments", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ConsumedResourceId = 11,
+                            Image = "ca0fbc00-841b-41bb-8329-b0c95931d24e.png",
+                            IsPublic = false,
+                            Name = "Générateur de lumière artificielle",
+                            ProducedResourceId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ConsumedResourceId = 5,
+                            Image = "e7a73200-4110-492e-ad32-e10c6654995b.png",
+                            IsPublic = false,
+                            Name = "Condenseur atmosphérique",
+                            ProducedResourceId = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ConsumedResourceId = 5,
+                            Image = "2fa0bd7e-1425-4359-a841-9b6a59b1d3f6.png",
+                            IsPublic = false,
+                            Name = "Extracteur de CO2",
+                            ProducedResourceId = 6
+                        },
+                        new
+                        {
+                            Id = 4,
+                            ConsumedResourceId = 6,
+                            Image = "bff55fcc-19e0-4c59-9575-6689dedb8d05.png",
+                            IsPublic = false,
+                            Name = "Module de photosynthèse",
+                            ProducedResourceId = 5
+                        },
+                        new
+                        {
+                            Id = 5,
+                            ConsumedResourceId = 3,
+                            Image = "1056b6e4-fa44-4d5d-a309-13e7a7bd9999.png",
+                            IsPublic = false,
+                            Name = "Synthétiseur d'engrais",
+                            ProducedResourceId = 7
+                        },
+                        new
+                        {
+                            Id = 6,
+                            ConsumedResourceId = 12,
+                            Image = "a430eda5-2206-4963-8f6e-c9731c0d6bef.png",
+                            IsPublic = false,
+                            Name = "Recycleur de biomasse",
+                            ProducedResourceId = 3
+                        },
+                        new
+                        {
+                            Id = 7,
+                            ConsumedResourceId = 2,
+                            Image = "861decc8-a7e7-4b8c-8f31-76b3c09342b9.png",
+                            IsPublic = false,
+                            Name = "Filtre minéral",
+                            ProducedResourceId = 9
+                        },
+                        new
+                        {
+                            Id = 8,
+                            ConsumedResourceId = 2,
+                            Image = "4fba83ed-a55f-4e1b-80b5-6829a696b7b3.png",
+                            IsPublic = false,
+                            Name = "Extracteur d'électrolytes",
+                            ProducedResourceId = 10
+                        });
                 });
 
             modelBuilder.Entity("BioDomes.Infrastructures.Models.EquipmentResourceEntity", b =>
@@ -124,6 +203,16 @@ namespace BioDomes.Infrastructures.Migrations
                         {
                             Id = 10,
                             Label = "Magnésium"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Label = "Énergie"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Label = "Matière organique"
                         });
                 });
 
@@ -139,9 +228,15 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<int>("Height")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsPublic")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(75)
+                        .HasColumnType("nvarchar(75)");
 
                     b.Property<string>("TypeLabel")
                         .IsRequired()
@@ -166,8 +261,10 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "lion",
                             DietLabel = "Carnivore",
                             Height = 180,
+                            IsPublic = false,
                             Name = "Lion",
                             TypeLabel = "Mammifère",
+                            UploadedImageId = "3d128e91-b947-4bf7-b988-dc8ffd1de92f.jpg",
                             Weight = 150000
                         },
                         new
@@ -175,8 +272,10 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "boa",
                             DietLabel = "Carnivore",
                             Height = 225,
+                            IsPublic = false,
                             Name = "Boa",
                             TypeLabel = "Reptile",
+                            UploadedImageId = "47e0e461-066e-404f-8738-361d268f6219.jpg",
                             Weight = 13000
                         },
                         new
@@ -184,8 +283,10 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "hetre",
                             DietLabel = "Photosynthèse",
                             Height = 600,
+                            IsPublic = false,
                             Name = "Hetre",
                             TypeLabel = "Plante",
+                            UploadedImageId = "9f21e809-9eeb-4714-8cd0-14b78d14fb60.jpg",
                             Weight = 830000
                         },
                         new
@@ -193,6 +294,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "chene",
                             DietLabel = "Photosynthèse",
                             Height = 2500,
+                            IsPublic = false,
                             Name = "Chene",
                             TypeLabel = "Plante",
                             Weight = 2100000
@@ -202,8 +304,10 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "mouche",
                             DietLabel = "Coprophage",
                             Height = 1,
+                            IsPublic = false,
                             Name = "Mouche",
                             TypeLabel = "Insecte",
+                            UploadedImageId = "2b101f74-b1f0-4c18-a183-0331f7a4788c.jpg",
                             Weight = 1
                         },
                         new
@@ -211,8 +315,10 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "araignee",
                             DietLabel = "Carnivore",
                             Height = 4,
+                            IsPublic = false,
                             Name = "Araignée",
                             TypeLabel = "Arachnides",
+                            UploadedImageId = "623fbf44-7418-44d7-8098-6cc6c7122c27.jpg",
                             Weight = 95
                         },
                         new
@@ -220,6 +326,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "hirondelle",
                             DietLabel = "Carnivore",
                             Height = 18,
+                            IsPublic = false,
                             Name = "Hirondelle",
                             TypeLabel = "Oiseau",
                             Weight = 45
@@ -229,8 +336,10 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "lievre",
                             DietLabel = "Herbivore",
                             Height = 50,
+                            IsPublic = false,
                             Name = "Lièvre",
                             TypeLabel = "Mammifère",
+                            UploadedImageId = "7f084f4d-de3c-4436-b359-6fdfd4b93ec8.jpg",
                             Weight = 4000
                         },
                         new
@@ -238,6 +347,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "paturin-des-pres",
                             DietLabel = "Photosynthèse",
                             Height = 23,
+                            IsPublic = false,
                             Name = "Pâturin des prés",
                             TypeLabel = "Plante",
                             Weight = 1
@@ -247,8 +357,10 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "souris",
                             DietLabel = "Omnivore",
                             Height = 9,
+                            IsPublic = false,
                             Name = "Souris",
                             TypeLabel = "Mammifère",
+                            UploadedImageId = "7e6d0ba0-7be3-4f94-a929-e7c04d3e1d90.jpg",
                             Weight = 25
                         });
                 });

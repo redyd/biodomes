@@ -15,5 +15,6 @@ public class BiodomeContext(DbContextOptions<BiodomeContext> options) : DbContex
         builder.ApplyConfiguration(new SpecieEntityTypeConfiguration());
         builder.ApplyConfiguration(new EquipmentResourceEntityTypeConfiguration());
         builder.ApplyConfiguration(new EquipmentEntityTypeConfiguration());
+        builder.ApplyConfiguration(new BiomeEntityTypeConfiguration());
     }
 }
