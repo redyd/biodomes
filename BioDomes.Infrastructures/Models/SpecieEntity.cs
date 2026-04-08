@@ -6,7 +6,7 @@ public class SpecieEntity
     public required string Name { get; set; }
     public required int Height { get; set; }
     public required int Weight { get; set; }
-    public required string? UploadedImageId { get; set; }
+    public string? UploadedImageId { get; set; }
 
     public required string TypeLabel { get; set; }
     public required string DietLabel { get; set; }

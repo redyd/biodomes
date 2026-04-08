@@ -16,25 +16,26 @@ public class EquipmentResourceEntityTypeConfiguration : IEntityTypeConfiguration
             .IsRequired()
             .HasMaxLength(50);
 
-        builder.HasMany(eq => eq.Equipments)
-            .WithOne();
-
         SeedData(builder);
     }
 
     private void SeedData(EntityTypeBuilder<EquipmentResourceEntity> builder)
     {
-        builder.HasData(
-            new { Id = 1, Label = "Lumière" },
-            new { Id = 2, Label = "Eau" },
-            new { Id = 3, Label = "Azote" },
-            new { Id = 4, Label = "Hydrogène" },
-            new { Id = 5, Label = "Oxygène" },
-            new { Id = 6, Label = "CO2" },
-            new { Id = 7, Label = "Phosphore" },
-            new { Id = 8, Label = "Potassium" },
-            new { Id = 9, Label = "Calcium" },
-            new { Id = 10, Label = "Magnésium" }
+        builder.HasData(new List<EquipmentResourceEntity>
+            {
+                new() { Id = 1, Label = "Lumière" },
+                new() { Id = 2, Label = "Eau" },
+                new() { Id = 3, Label = "Azote" },
+                new() { Id = 4, Label = "Hydrogène" },
+                new() { Id = 5, Label = "Oxygène" },
+                new() { Id = 6, Label = "CO2" },
+                new() { Id = 7, Label = "Phosphore" },
+                new() { Id = 8, Label = "Potassium" },
+                new() { Id = 9, Label = "Calcium" },
+                new() { Id = 10, Label = "Magnésium" },
+                new() { Id = 11, Label = "Énergie" },
+                new() { Id = 12, Label = "Matière organique" }
+            }
         );
     }
 }
