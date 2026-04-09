@@ -4,10 +4,16 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BioDomes.Web.PageModels;
 
-public abstract class AppPageModel(IWebHostEnvironment environment) : PageModel
+public abstract class AppPageModel : PageModel
 {
+    private readonly IWebHostEnvironment _environement;
     public static string BasePathForUploads = Path.Combine("img", "uploads");
     public static string BasePathForDefault = Path.Combine("img", "defaults");
+
+    public AppPageModel(IWebHostEnvironment environment)
+    {
+        _environement = environment;
+    }
 
     protected string UseUploadedFromId(string fileName)
     {
@@ -30,12 +36,12 @@ public abstract class AppPageModel(IWebHostEnvironment environment) : PageModel
 
         var safeFileName = Path.GetFileName(fileName);
 
-        return Path.Combine(environment.WebRootPath, BasePathForUploads, safeFileName);
+        return Path.Combine(_environement.WebRootPath, BasePathForUploads, safeFileName);
     }
 
     protected string GetDefaultDirectoryPath()
     {
-        return Path.Combine(environment.WebRootPath, BasePathForDefault);
+        return Path.Combine(_environement.WebRootPath, BasePathForDefault);
     }
 
     protected void DeleteImage(string imageName)
@@ -52,7 +58,7 @@ public abstract class AppPageModel(IWebHostEnvironment environment) : PageModel
         var uuid = Guid.NewGuid().ToString();
         var filename = $"{uuid}{Path.GetExtension(file.FileName)}";
 
-        var directoryPath = Path.Combine(environment.WebRootPath, "img", "uploads");
+        var directoryPath = Path.Combine(_environement.WebRootPath, "img", "uploads");
 
         if (!Directory.Exists(directoryPath))
         {
