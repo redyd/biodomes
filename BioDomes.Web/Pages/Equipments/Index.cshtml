@@ -1,4 +1,5 @@
 @page "/equipments"
+@model EquipmentPage
 
 @{
     Layout = "Shared/_Layout";
@@ -15,5 +16,9 @@
     </div>
 
     <div class="cards-grid">
+        @foreach (var equipment in Model.Equipments)
+        {
+            <partial name="Shared/_EquipmentCardPartial" model="equipment"/>
+        }
     </div>
 </div>

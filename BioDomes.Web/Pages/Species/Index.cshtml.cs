@@ -21,7 +21,7 @@ public class SpeciesModel : AppPageModel
         SpeciesList = species
             .Select(specie =>
             {
-                var path = specie.ImageUrl != null ? UseFileFromPath(specie.ImageUrl) : null;
+                var path = specie.ImageUrl != null ? UseUploadedFromId(specie.ImageUrl) : null;
                 
                 return new SpecieView
                 {

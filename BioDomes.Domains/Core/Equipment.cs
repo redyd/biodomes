@@ -8,5 +8,4 @@ public class Equipment
     
     public required string Produced { get; set; }
     public required string Consumed { get; set; }
-    public required bool IsPublic { get; set; }
 }

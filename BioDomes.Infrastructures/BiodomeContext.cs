@@ -7,7 +7,10 @@ namespace BioDomes.Infrastructures;
 public class BiodomeContext(DbContextOptions<BiodomeContext> options) : DbContext(options)
 {
     public DbSet<SpecieEntity> Species { get; set; }
-    
+    public DbSet<BiomeEntity> Biomes { get; set; }
+    public DbSet<EquipmentEntity> Equipments { get; set; }
+    public DbSet<EquipmentResourceEntity> EquipmentResources { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.HasDefaultSchema("dbo");

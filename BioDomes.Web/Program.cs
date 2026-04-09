@@ -25,6 +25,7 @@ builder.Services.AddDbContext<BiodomeContext>(options
         builder.Configuration.GetConnectionString("BiodomeContext")));
 
 builder.Services.AddScoped<ISpeciesRepository, SpeciesRepository>();
+builder.Services.AddScoped<IEquipmentRepository, EquipmentRepository>();
 
 var app = builder.Build();
 

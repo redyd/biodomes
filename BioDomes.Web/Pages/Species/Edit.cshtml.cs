@@ -29,7 +29,7 @@ public class EditModel : AppPageModel
         if (Species == null)
             return NotFound();
         
-        ImageUrl = Species.ImageUrl == null ? null : UseFileFromPath(Species.ImageUrl);
+        ImageUrl = Species.ImageUrl == null ? null : UseUploadedFromId(Species.ImageUrl);
 
         Input = new SpeciesInputModel
         {

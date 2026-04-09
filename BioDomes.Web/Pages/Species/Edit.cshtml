@@ -51,7 +51,7 @@
                     @if (Model.ImageUrl != null)
                     {
                         <span class="image-current-label">Image actuelle</span>
-                        <img src="@Model.ImageUrl" class="species-image" alt="@Model.Species.Name"/>
+                        <img src="@Model.ImageUrl" class="card-image" alt="@Model.Species.Name"/>
                     }
                     <label class="image-upload-hint">
                         @(Model.Species?.ImageUrl != null ? "Changer l'image" : "Ajouter une image")
