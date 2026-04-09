@@ -2,9 +2,6 @@ namespace BioDomes.Infrastructures.Models;
 
 public class EquipmentResourceEntity
 {
-    public required int Id { get; set; }
-    public required string Label { get; set; }
-    
-    // relation
-    public List<EquipmentEntity> Equipments { get; set; } = null!;
+    public int Id { get; set; }
+    public string Label { get; set; }
 }

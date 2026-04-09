@@ -131,6 +131,12 @@ header {
     filter: invert(0.7) sepia(1) hue-rotate(130deg);
 }
 
+.selected-tab {
+    color: var(--teal) !important;
+    background: var(--teal-glow);
+    box-shadow: var(--shadow-teal);
+}
+
 /* ═══════════════════════════════════════
    FOOTER
 ═══════════════════════════════════════ */
@@ -352,18 +358,18 @@ footer a:hover {
 /* ═══════════════════════════════════════
    SPECIES LIST PAGE
 ═══════════════════════════════════════ */
-.species-container {
+.main-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 3rem 1.5rem;
 }
 
-.species-title {
+.container-title {
     text-align: center;
     margin-bottom: 3rem;
 }
 
-.species-title h1 {
+.container-title h1 {
     font-family: var(--sans), serif;
     font-size: clamp(1.8rem, 4vw, 2.6rem);
     font-weight: 700;
@@ -371,7 +377,7 @@ footer a:hover {
     margin-bottom: 0.5rem;
 }
 
-.species-title p {
+.container-title p {
     font-size: 0.9rem;
     color: var(--text-muted);
     font-family: var(--sans), serif;
@@ -390,7 +396,7 @@ footer a:hover {
 /* ═══════════════════════════════════════
    SPECIES CARD
 ═══════════════════════════════════════ */
-.species-card {
+.card {
     background: var(--panel);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
@@ -400,14 +406,14 @@ footer a:hover {
     overflow: hidden;
 }
 
-.species-card:hover {
+.card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 210, 180, 0.15);
     border-color: rgba(0, 210, 180, 0.2);
 }
 
 /* Zone image — toujours la même hauteur */
-.species-card-image {
+.card-image {
     width: 100%;
     height: 160px;
     object-fit: cover;
@@ -416,7 +422,7 @@ footer a:hover {
 }
 
 /* Placeholder si pas d'image */
-.species-card-image-placeholder {
+.card-image-placeholder {
     width: 100%;
     height: 160px;
     background: var(--surface);
@@ -432,12 +438,12 @@ footer a:hover {
     border-bottom: 1px solid var(--border);
 }
 
-.species-card-image-placeholder::before {
+.card-image-placeholder::before {
     content: '[ no image ]';
 }
 
 /* Contenu de la carte */
-.species-card-body {
+.card-body {
     padding: 1.25rem 1.5rem;
     display: flex;
     flex-direction: column;
@@ -445,7 +451,7 @@ footer a:hover {
     flex: 1;
 }
 
-.species-name {
+.card-name {
     font-family: var(--sans), serif;
     font-size: 1.1rem;
     font-weight: 700;
@@ -453,21 +459,21 @@ footer a:hover {
     margin-bottom: 0.3rem;
 }
 
-.species-info {
+.card-info {
     font-size: 0.82rem;
     color: var(--text-mid);
     display: flex;
     gap: 0.5rem;
 }
 
-.species-label {
+.card-label {
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--text-muted);
     min-width: 70px;
 }
 
-.species-card-body > a {
+.card-body > a {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
@@ -484,7 +490,7 @@ footer a:hover {
     text-transform: uppercase;
 }
 
-.species-card-body > a:hover {
+.card-body > a:hover {
     opacity: 1;
     gap: 0.6rem;
 }
@@ -627,6 +633,7 @@ footer a:hover {
     background: rgba(0, 210, 180, 0.22);
     box-shadow: 0 0 20px rgba(0, 210, 180, 0.1);
     transform: translateY(-1px);
+    color: var(--text-mid);
 }
 
 .btn-save:active {
@@ -738,7 +745,7 @@ body {
 /* ═══════════════════════════════════════
    IMAGE — carte et upload
 ═══════════════════════════════════════ */
-.species-image {
+.card-image {
     width: 100%;
     height: 160px;
     object-fit: cover;

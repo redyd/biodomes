@@ -1,0 +1,20 @@
+@model BioDomes.Web.ViewModels.EquipmentView
+
+<div class="card">
+    @if (!string.IsNullOrEmpty(Model.Image))
+    {
+        <div>
+            <img src="@Model.Image" alt="@Model.Name" class="card-image"/>
+        </div>
+    }
+    else
+    {
+        <div class="card-image-placeholder"></div>
+    }
+    <div class="card-body">
+        <div class="card-name">@Model.Name</div>
+        <div class="card-info"><span class="card-label">Produit :</span> @Model.Produced</div>
+        <div class="card-info"><span class="card-label">Consomme :</span> @Model.Consumed</div>
+        <a asp-page="/Equipments/Edit" asp-route-name="@Model.Name">Éditer</a>
+    </div>
+</div>

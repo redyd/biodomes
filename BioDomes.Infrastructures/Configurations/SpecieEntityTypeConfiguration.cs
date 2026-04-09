@@ -49,7 +49,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Name = "Lion",
                 Height = 180,
                 Weight = 150000,
-                UploadedImageId = (string?)null,
+                UploadedImageId = "3d128e91-b947-4bf7-b988-dc8ffd1de92f.jpg",
                 TypeLabel = "Mammifère",
                 DietLabel = "Carnivore",
                 IsPublic = false
@@ -60,7 +60,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Name = "Boa",
                 Height = 225,
                 Weight = 13000,
-                UploadedImageId = (string?)null,
+                UploadedImageId = "47e0e461-066e-404f-8738-361d268f6219.jpg",
                 TypeLabel = "Reptile",
                 DietLabel = "Carnivore",
                 IsPublic = false
@@ -71,7 +71,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Name = "Hetre",
                 Height = 600,
                 Weight = 830000,
-                UploadedImageId = (string?)null,
+                UploadedImageId = "9f21e809-9eeb-4714-8cd0-14b78d14fb60.jpg",
                 TypeLabel = "Plante",
                 DietLabel = "Photosynthèse",
                 IsPublic = false
@@ -93,7 +93,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Name = "Mouche",
                 Height = 1,
                 Weight = 1,
-                UploadedImageId = (string?)null,
+                UploadedImageId = "2b101f74-b1f0-4c18-a183-0331f7a4788c.jpg",
                 TypeLabel = "Insecte",
                 DietLabel = "Coprophage",
                 IsPublic = false
@@ -104,7 +104,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Name = "Araignée",
                 Height = 4,
                 Weight = 95,
-                UploadedImageId = (string?)null,
+                UploadedImageId = "623fbf44-7418-44d7-8098-6cc6c7122c27.jpg",
                 TypeLabel = "Arachnides",
                 DietLabel = "Carnivore",
                 IsPublic = false
@@ -126,7 +126,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Name = "Lièvre",
                 Height = 50,
                 Weight = 4000,
-                UploadedImageId = (string?)null,
+                UploadedImageId = "7f084f4d-de3c-4436-b359-6fdfd4b93ec8.jpg",
                 TypeLabel = "Mammifère",
                 DietLabel = "Herbivore",
                 IsPublic = false
@@ -148,7 +148,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                 Name = "Souris",
                 Height = 9,
                 Weight = 25,
-                UploadedImageId = (string?)null,
+                UploadedImageId = "7e6d0ba0-7be3-4f94-a929-e7c04d3e1d90.jpg",
                 TypeLabel = "Mammifère",
                 DietLabel = "Omnivore",
                 IsPublic = false
