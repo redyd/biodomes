@@ -21,5 +21,5 @@ public class EquipmentInputModel
     [DataType(DataType.Upload)]
     [AllowedExtensions([".jpg", ".jpeg", ".png", ".gif"],
         ErrorMessage = "Le fichier doit être une image (jpg, jpeg, png, gif).")]
-    public IFormFile Image { get; set; } = null!;
+    public IFormFile? Image { get; set; }
 }

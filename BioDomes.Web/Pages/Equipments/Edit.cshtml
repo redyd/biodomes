@@ -1,0 +1,72 @@
+@page "/equipments/edit/{id:int}"
+@model BioDomes.Web.Pages.Equipments.Edit
+@{
+    Layout = "Shared/_Layout";
+    ViewData["Title"] = "Modifier un équipement";
+}
+
+<div class="edit-page">
+    <div class="edit-card">
+
+        <div class="edit-header">
+            <p class="edit-breadcrumb">Biodômes · Equipements</p>
+            <h1 class="edit-title">Éditer : <em>@Model.Input.Name</em></h1>
+        </div>
+
+        <div class="edit-body">
+            <form method="post" enctype="multipart/form-data">
+                <div class="field-group">
+                    <label class="field-label">Nom</label>
+                    <input class="field-input" type="text" asp-for="Input.Name"/>
+                    <span asp-validation-for="Input.Name" class="field-error"></span>
+                </div>
+                
+                 <div class="field-group">
+                    <label class="field-label" asp-for="Input.ConsumedResourceId">Consomation</label>
+                    <select class="field-input" asp-for="Input.ConsumedResourceId">
+                        <option value="">-- Choisir --</option>
+                        @foreach (var classification in Model.Resources)
+                        {
+                            <option value="@classification.Id">@classification.Label</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Input.ConsumedResourceId" class="field-error"></span>
+                </div>
+                
+                <div class="field-group">
+                    <label class="field-label" asp-for="Input.ProducedResourceId">Production</label>
+                    <select class="field-input" asp-for="Input.ProducedResourceId">
+                        <option value="">-- Choisir --</option>
+                        @foreach (var classification in Model.Resources)
+                        {
+                            <option value="@classification.Id">@classification.Label</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Input.ProducedResourceId" class="field-error"></span>
+                </div>
+                
+                <div class="field-group">
+                    <span class="image-current-label">Image actuelle</span>
+                    <img src="@Model.ImageSource" class="card-image" alt="@Model.Input.Name"/>
+                    
+                    <label class="image-upload-hint">
+                        Changer l'image
+                    </label>
+                    <div class="image-upload-zone">
+                        <input type="file" asp-for="Input.Image" accept="image/*"/>
+                    </div>
+                    <span asp-validation-for="Input.Image" class="field-error"></span>
+                </div>
+
+                <div class="edit-divider"></div>
+
+                <div class="edit-actions">
+                    <a class="btn-cancel" asp-page="/Equipments/Index">Annuler</a>
+                    <button class="btn-save" type="submit" name="action" value="delete">Supprimer</button>
+                    <button class="btn-save" type="submit" name="action" value="save">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>

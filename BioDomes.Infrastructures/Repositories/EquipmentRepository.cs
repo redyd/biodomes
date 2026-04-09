@@ -19,12 +19,14 @@ public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
         return result.Select(EquipmentMapper.MapEquipment).ToList();
     }
 
-    public async Task<Dictionary<int, string>> GetResourcesAsync()
+    public async Task<List<EquipmentResource>> GetResourcesAsync()
     {
         var result = await context.EquipmentResources.ToListAsync();
-        var dict = new Dictionary<int, string>();
-        result.ForEach(e => dict[e.Id] = e.Label);
-        return dict;
+        return result.Select(r => new EquipmentResource
+        {
+            Id = r.Id,
+            Label = r.Label
+        }).ToList();
     }
 
     public async Task CreateEquipmentAsync(CreateEquipmentRequest createRequest)
@@ -40,4 +42,62 @@ public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
         await context.Equipments.AddAsync(entity);
         await context.SaveChangesAsync();
     }
+
+    public async Task<Equipment?> FindAsync(int id)
+    {
+        var maybe = await context.Equipments
+            .Include(e => e.ConsumedResourceEntity)
+            .Include(e => e.ProducedResourceEntity)
+            .FirstOrDefaultAsync(e => e.Id == id);
+        return maybe is null ? null : EquipmentMapper.MapEquipment(maybe);
+    }
+
+    public async Task<Equipment?> DeleteAsync(int id)
+    {
+        var entity = await context.Equipments.FirstOrDefaultAsync(e => e.Id == id);
+        if (entity is null) return null;
+        var model = EquipmentMapper.MapEquipment(entity);
+        context.Equipments.Remove(entity);
+        await context.SaveChangesAsync();
+        return model;
+    }
+
+    public async Task<Equipment> UpdateAsync(UpdateEquipmentRequest equipment)
+    {
+        var entity = await context.Equipments
+            .Include(e => e.ConsumedResourceEntity)
+            .Include(e => e.ProducedResourceEntity)
+            .FirstOrDefaultAsync(e => e.Id == equipment.Id);
+
+        if (entity is null)
+        {
+            throw new KeyNotFoundException($"Equipment with Id {equipment.Id} not found.");
+        }
+
+        entity.Name = equipment.Name;
+        entity.Image = equipment.Image;
+
+        entity.ProducedResourceId = equipment.ProducedResourceId;
+        entity.ConsumedResourceId = equipment.ConsumedResourceId;
+
+        await context.SaveChangesAsync();
+
+        return new Equipment
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            ImageId = entity.Image,
+            Produced = new EquipmentResource
+            {
+                Id = entity.ProducedResourceEntity.Id,
+                Label = entity.ProducedResourceEntity.Label
+            },
+            Consumed = new EquipmentResource
+            {
+                Id = entity.ConsumedResourceEntity.Id,
+                Label = entity.ConsumedResourceEntity.Label
+            }
+        };
+    }
+
 }

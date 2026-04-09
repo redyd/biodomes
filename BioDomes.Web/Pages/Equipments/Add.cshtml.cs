@@ -1,3 +1,4 @@
+using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Domains.Requests;
 using BioDomes.Web.InputModel;
@@ -18,9 +19,8 @@ public class Add : AppPageModel
         _logger = logger;
     }
 
-    [BindProperty]
-    public EquipmentInputModel Input { get; set; } = new();
-    public Dictionary<int, string> Resources { get; set; } = new();
+    [BindProperty] public EquipmentInputModel Input { get; set; } = new();
+    [BindProperty] public List<EquipmentResource> Resources { get; set; } = new();
 
     public async Task OnGetAsync()
     {
@@ -44,12 +44,11 @@ public class Add : AppPageModel
             ConsumedResourceId = (int)Input.ConsumedResourceId,
             ProducedResourceId = (int)Input.ProducedResourceId
         };
-        
+
         await _repository.CreateEquipmentAsync(createRequest);
 
         _logger.LogInformation("Adding new equipment: {Name}", Input.Name);
 
         return RedirectToPage("/Equipments/Index");
     }
-
 }

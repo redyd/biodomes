@@ -1,4 +1,4 @@
-@page
+@page "/equipments/add"
 @model BioDomes.Web.Pages.Equipments.Add
 
 @{
@@ -28,7 +28,7 @@
                         <option value="">-- Choisir --</option>
                         @foreach (var classification in Model.Resources)
                         {
-                            <option value="@classification.Key">@classification.Value</option>
+                            <option value="@classification.Id">@classification.Label</option>
                         }
                     </select>
                     <span asp-validation-for="Input.ConsumedResourceId" class="field-error"></span>
@@ -40,7 +40,7 @@
                         <option value="">-- Choisir --</option>
                         @foreach (var classification in Model.Resources)
                         {
-                            <option value="@classification.Key">@classification.Value</option>
+                            <option value="@classification.Id">@classification.Label</option>
                         }
                     </select>
                     <span asp-validation-for="Input.ProducedResourceId" class="field-error"></span>
