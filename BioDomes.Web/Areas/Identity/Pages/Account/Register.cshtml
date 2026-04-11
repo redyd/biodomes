@@ -1,0 +1,72 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="edit-page">
+    <div class="edit-card">
+        <div class="edit-header">
+            <p class="edit-breadcrumb">BioDomes · Authentication</p>
+            <h1 class="edit-title">Créer un <em>compte</em></h1>
+        </div>
+        <div class="edit-body">
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                <div asp-validation-summary="ModelOnly" class="validation-summary" role="alert"></div>
+
+                <div class="field-group">
+                    <label asp-for="Input.Email" class="field-label">Email</label>
+                    <input asp-for="Input.Email" class="field-input" autocomplete="username" aria-required="true" placeholder="name@example.com"/>
+                    <span asp-validation-for="Input.Email" class="field-error"></span>
+                </div>
+
+                <div class="field-group">
+                    <label asp-for="Input.Password" class="field-label">Mot de passe</label>
+                    <input asp-for="Input.Password" class="field-input" autocomplete="new-password" aria-required="true" placeholder="••••••••"/>
+                    <span asp-validation-for="Input.Password" class="field-error"></span>
+                </div>
+
+                <div class="field-group">
+                    <label asp-for="Input.ConfirmPassword" class="field-label">Confirmer le mot de passe</label>
+                    <input asp-for="Input.ConfirmPassword" class="field-input" autocomplete="new-password" aria-required="true" placeholder="••••••••"/>
+                    <span asp-validation-for="Input.ConfirmPassword" class="field-error"></span>
+                </div>
+
+                <div class="edit-divider"></div>
+
+                <div class="field-group">
+                    <label asp-for="Input.Birthdate" class="field-label">Date de naissance</label>
+                    <input asp-for="Input.Birthdate" class="field-input" type="date"/>
+                    <span asp-validation-for="Input.Birthdate" class="field-error"></span>
+                </div>
+
+                <div class="field-group">
+                    <label asp-for="Input.SearchOrganism" class="field-label">Organisme de recherche</label>
+                    <input asp-for="Input.SearchOrganism" class="field-input" placeholder="BiodomeCorp"/>
+                    <span asp-validation-for="Input.SearchOrganism" class="field-error"></span>
+                </div>
+
+                <div class="field-group">
+                    <label asp-for="Input.ImageUrl" class="field-label">Avatar</label>
+                    <input asp-for="Input.ImageUrl" class="field-input" placeholder=""/>
+                    <span asp-validation-for="Input.ImageUrl" class="field-error"></span>
+                </div>
+
+                <div class="edit-divider"></div>
+
+                <div class="edit-actions">
+                    <button id="registerSubmit" type="submit" class="btn-save">S'inscrire</button>
+                </div>
+            </form>
+
+            <p style="margin-top:1.5rem; font-family:var(--mono); font-size:0.75rem; color:var(--text-muted); text-align:center;">
+                Vous avez déjà un compte ?
+                <a asp-page="./Login" style="color:var(--teal); text-decoration:none; font-weight:600;">Connectez-vous !</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

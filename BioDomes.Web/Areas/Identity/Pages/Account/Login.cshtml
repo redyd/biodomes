@@ -1,0 +1,46 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<div class="edit-page">
+    <div class="edit-card">
+        <div class="edit-header">
+            <p class="edit-breadcrumb">BioDomes · Authentication</p>
+            <h1 class="edit-title">Connexion</h1>
+        </div>
+        <div class="edit-body">
+            <form id="account" method="post">
+                <div asp-validation-summary="ModelOnly" class="validation-summary" role="alert"></div>
+
+                <div class="field-group">
+                    <label asp-for="Input.Email" class="field-label">Email</label>
+                    <input asp-for="Input.Email" class="field-input" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                    <span asp-validation-for="Input.Email" class="field-error"></span>
+                </div>
+
+                <div class="field-group">
+                    <label asp-for="Input.Password" class="field-label">Password</label>
+                    <input asp-for="Input.Password" class="field-input" autocomplete="current-password" aria-required="true" placeholder="••••••••" />
+                    <span asp-validation-for="Input.Password" class="field-error"></span>
+                </div>
+
+                <div class="edit-divider"></div>
+
+                <div class="edit-actions">
+                    <button id="login-submit" type="submit" class="btn-save">Se connecter</button>
+                </div>
+            </form>
+            <p style="margin-top:1.5rem; font-size:0.75rem; color:var(--text-muted); text-align:center;">
+                Vous n'avez pas de compte ?
+                <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" style="color:var(--teal); text-decoration:none; font-weight:600;">Inscrivez-vous !</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
