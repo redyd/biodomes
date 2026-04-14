@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioDomes.Infrastructures;
 
-public class BiodomeContext(DbContextOptions<BiodomeContext> options) : IdentityDbContext<UserEntity, IdentityRole<int>, int>(options)
+public class BiodomeContext(DbContextOptions<BiodomeContext> options) : IdentityDbContext<UserEntity, IdentityRole, string>(options)
 {
     public DbSet<SpecieEntity> Species { get; set; }
     public DbSet<EquipmentEntity> Equipments { get; set; }

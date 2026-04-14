@@ -2,7 +2,7 @@
 
 namespace BioDomes.Infrastructures.Models;
 
-public class UserEntity : IdentityUser<int>
+public class UserEntity : IdentityUser
 {
     public DateOnly Birthdate { get; set; }
     

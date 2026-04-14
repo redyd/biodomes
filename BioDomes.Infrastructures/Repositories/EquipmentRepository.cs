@@ -9,7 +9,7 @@ namespace BioDomes.Infrastructures.Repositories;
 
 public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
 {
-    public async Task<List<Equipment>> GetAllAsync(int? userId, bool isAdmin)
+    public async Task<List<Equipment>> GetAllAsync(string? userId, bool isAdmin)
     {
         var query = context.Equipments
             .Include(e => e.ConsumedResourceEntity)
@@ -37,7 +37,7 @@ public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
         }).ToList();
     }
 
-    public async Task CreateEquipmentAsync(CreateEquipmentRequest createRequest, int userId)
+    public async Task CreateEquipmentAsync(CreateEquipmentRequest createRequest, string userId)
     {
         var entity = new EquipmentEntity
         {
@@ -51,7 +51,7 @@ public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
         await context.SaveChangesAsync();
     }
 
-    public async Task<Equipment?> FindAsync(int id, int userId)
+    public async Task<Equipment?> FindAsync(int id, string userId)
     {
         var maybe = await context.Equipments
             .Include(e => e.ConsumedResourceEntity)
@@ -60,7 +60,7 @@ public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
         return maybe is null ? null : EquipmentMapper.MapEquipment(maybe);
     }
 
-    public async Task<Equipment?> DeleteAsync(int id, int userId)
+    public async Task<Equipment?> DeleteAsync(int id, string userId)
     {
         var entity = await context.Equipments.FirstOrDefaultAsync(e => e.Id == id);
         if (entity is null) return null;
@@ -70,7 +70,7 @@ public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
         return model;
     }
 
-    public async Task UpdateAsync(UpdateEquipmentRequest equipment, int userId)
+    public async Task UpdateAsync(UpdateEquipmentRequest equipment, string userId)
     {
         var entity = await context.Equipments
             .Include(e => e.ConsumedResourceEntity)

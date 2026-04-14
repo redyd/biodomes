@@ -22,7 +22,7 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<UserEntity>
 
         var admin = new UserEntity
         {
-            Id = 1,
+            Id = "user-1",
             UserName = "admin",
             NormalizedUserName = "ADMIN",
             Email = "admin@biodomes.com",
@@ -36,7 +36,7 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<UserEntity>
 
         var user = new UserEntity
         {
-            Id = 2,
+            Id = "user-2",
             UserName = "john",
             NormalizedUserName = "JOHN",
             Email = "john@biodomes.com",

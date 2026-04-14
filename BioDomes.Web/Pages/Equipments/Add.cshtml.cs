@@ -2,6 +2,7 @@ using System.Security.Claims;
 using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Domains.Requests;
+using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +37,7 @@ public class Add : AppPageModel
             return Page();
         }
 
-        var userId = CurrentUserId();
+        var userId = User.GetUserId();
         if (userId == null)
         {
             return Forbid();
@@ -50,10 +51,10 @@ public class Add : AppPageModel
             Image = imageId,
             ConsumedResourceId = Input.ConsumedResourceId,
             ProducedResourceId = Input.ProducedResourceId,
-            UserId = (int)userId
+            UserId = userId
         };
 
-        await _repository.CreateEquipmentAsync(createRequest, (int)userId);
+        await _repository.CreateEquipmentAsync(createRequest, userId);
 
         _logger.LogInformation("Adding new equipment: {Name}", Input.Name);
         SuccessNotification($"L'équipement {Input.Name} a été créé avec succès");

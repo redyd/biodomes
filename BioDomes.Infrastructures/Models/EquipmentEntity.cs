@@ -8,7 +8,7 @@ public class EquipmentEntity
     public bool IsPublic { get; set; }
 
     // user
-    public int UserId { get; set; }
+    public string UserId { get; set; }
     public UserEntity User { get; set; } = null!;
 
     // relation

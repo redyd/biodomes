@@ -1,6 +1,7 @@
 using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Domains.Requests;
+using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Mvc;
@@ -17,13 +18,13 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
-        var userId = CurrentUserId();
+        var userId = User.GetUserId();
         if (userId == null)
         {
             return Forbid();
         }
 
-        var maybeEquipment = await repository.FindAsync(id, (int)userId);
+        var maybeEquipment = await repository.FindAsync(id, userId);
         if (maybeEquipment is null)
         {
             return NotFound();
@@ -45,18 +46,18 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
 
     public async Task<IActionResult> OnPostAsync(int id, string action)
     {
-        var userId = CurrentUserId();
+        var userId = User.GetUserId();
         if (userId == null)
         {
             return Forbid();
         }
 
-        var original = await repository.FindAsync(id, (int)userId);
+        var original = await repository.FindAsync(id, userId);
         if (original is null) return NotFound();
 
         if (action == "delete")
         {
-            var deleted = await repository.DeleteAsync(id, (int)userId);
+            var deleted = await repository.DeleteAsync(id, userId);
             if (deleted is null)
             {
                 ErrorNotification("Impossible de supprimer cet équipement");
@@ -91,7 +92,7 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
             request.Image = newImage;
         }
 
-        await repository.UpdateAsync(request, (int)userId);
+        await repository.UpdateAsync(request, userId);
         SuccessNotification($"Equipement {Input.Name} modifié avec succès");
 
         return RedirectToPage("/Equipments/Index");

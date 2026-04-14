@@ -10,7 +10,7 @@ public class RoleEntityTypeConfiguration: IEntityTypeConfiguration<IdentityRole>
     {
         builder.HasData(new IdentityRole
         {
-            Id = 1,
+            Id = "admin-role-id",
             Name = "Admin",
             NormalizedName = "ADMIN"
         });

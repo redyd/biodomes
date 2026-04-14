@@ -53,7 +53,7 @@ public class EquipmentEntityTypeConfiguration : IEntityTypeConfiguration<Equipme
                 ProducedResourceId = 1, // Lumière
                 ConsumedResourceId = 11, // Énergie
                 IsPublic = false,
-                UserId = 1
+                UserId = "user-1"
             },
             new()
             {
@@ -63,7 +63,7 @@ public class EquipmentEntityTypeConfiguration : IEntityTypeConfiguration<Equipme
                 ProducedResourceId = 2, // Eau
                 ConsumedResourceId = 5, // Oxygène
                 IsPublic = false,
-                UserId = 1
+                UserId = "user-1"
             },
             new()
             {
@@ -73,7 +73,7 @@ public class EquipmentEntityTypeConfiguration : IEntityTypeConfiguration<Equipme
                 ProducedResourceId = 6, // CO2
                 ConsumedResourceId = 5, // Oxygène
                 IsPublic = false,
-                UserId = 1
+                UserId = "user-1"
             },
             new()
             {
@@ -83,7 +83,7 @@ public class EquipmentEntityTypeConfiguration : IEntityTypeConfiguration<Equipme
                 ProducedResourceId = 5, // Oxygène
                 ConsumedResourceId = 6, // CO2
                 IsPublic = false,
-                UserId = 1
+                UserId = "user-1"
             },
             new()
             {
@@ -93,7 +93,7 @@ public class EquipmentEntityTypeConfiguration : IEntityTypeConfiguration<Equipme
                 ProducedResourceId = 7, // Phosphore
                 ConsumedResourceId = 3, // Azote
                 IsPublic = false,
-                UserId = 2
+                UserId = "user-2"
             },
             new()
             {
@@ -103,7 +103,7 @@ public class EquipmentEntityTypeConfiguration : IEntityTypeConfiguration<Equipme
                 ProducedResourceId = 3, // Azote
                 ConsumedResourceId = 12, // Matière organique
                 IsPublic = false,
-                UserId = 2
+                UserId = "user-2"
             },
             new()
             {
@@ -113,7 +113,7 @@ public class EquipmentEntityTypeConfiguration : IEntityTypeConfiguration<Equipme
                 ProducedResourceId = 9, // Calcium
                 ConsumedResourceId = 2, // Eau
                 IsPublic = false,
-                UserId = 2
+                UserId = "user-2"
             },
             new()
             {
@@ -123,7 +123,7 @@ public class EquipmentEntityTypeConfiguration : IEntityTypeConfiguration<Equipme
                 ProducedResourceId = 10, // Magnésium
                 ConsumedResourceId = 2, // Eau
                 IsPublic = false,
-                UserId = 2
+                UserId = "user-2"
             }
         });
 

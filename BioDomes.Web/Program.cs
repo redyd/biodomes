@@ -28,7 +28,7 @@ builder.Services.AddDbContext<BiodomeContext>(options
 
 builder.Services.AddDefaultIdentity<UserEntity>(options 
         => options.SignIn.RequireConfirmedAccount = false)
-        .AddRoles<IdentityRole<int>>()
+        .AddRoles<IdentityRole<string>>()
         .AddEntityFrameworkStores<BiodomeContext>();
 
 builder.Services.AddScoped<ISpeciesRepository, SpeciesRepository>();
