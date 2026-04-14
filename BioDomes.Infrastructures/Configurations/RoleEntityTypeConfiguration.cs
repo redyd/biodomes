@@ -4,11 +4,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BioDomes.Infrastructures.Configurations;
 
-public class RoleEntityTypeConfiguration: IEntityTypeConfiguration<IdentityRole>
+public class RoleEntityTypeConfiguration: IEntityTypeConfiguration<IdentityRole<string>>
 {
-    public void Configure(EntityTypeBuilder<IdentityRole> builder)
+    public void Configure(EntityTypeBuilder<IdentityRole<string>> builder)
     {
-        builder.HasData(new IdentityRole
+        builder.ToTable("IdentityRoles");
+        builder.HasData(new IdentityRole<string>
         {
             Id = "admin-role-id",
             Name = "Admin",

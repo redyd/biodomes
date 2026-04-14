@@ -18,8 +18,6 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<UserEntity>
 
     private static void SeedUser(EntityTypeBuilder<UserEntity> builder)
     {
-        var hasher = new PasswordHasher<UserEntity>();
-
         var admin = new UserEntity
         {
             Id = "user-1",
@@ -32,7 +30,6 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<UserEntity>
             SearchOrganism = "Saint Paul",
             SecurityStamp = Guid.NewGuid().ToString(),
         };
-        admin.PasswordHash = hasher.HashPassword(admin, "Admin1234!");
 
         var user = new UserEntity
         {
@@ -46,7 +43,6 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<UserEntity>
             SearchOrganism = "Marie Thérèse",
             SecurityStamp = Guid.NewGuid().ToString(),
         };
-        user.PasswordHash = hasher.HashPassword(user, "John1234!");
 
         builder.HasData(admin, user);
     }

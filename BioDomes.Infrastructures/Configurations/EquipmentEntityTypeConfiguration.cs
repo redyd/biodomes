@@ -62,7 +62,7 @@ public class EquipmentEntityTypeConfiguration : IEntityTypeConfiguration<Equipme
                 Image = "e7a73200-4110-492e-ad32-e10c6654995b.png",
                 ProducedResourceId = 2, // Eau
                 ConsumedResourceId = 5, // Oxygène
-                IsPublic = false,
+                IsPublic = true,
                 UserId = "user-1"
             },
             new()
@@ -82,7 +82,7 @@ public class EquipmentEntityTypeConfiguration : IEntityTypeConfiguration<Equipme
                 Image = "bff55fcc-19e0-4c59-9575-6689dedb8d05.png",
                 ProducedResourceId = 5, // Oxygène
                 ConsumedResourceId = 6, // CO2
-                IsPublic = false,
+                IsPublic = true,
                 UserId = "user-1"
             },
             new()
@@ -102,7 +102,7 @@ public class EquipmentEntityTypeConfiguration : IEntityTypeConfiguration<Equipme
                 Image = "a430eda5-2206-4963-8f6e-c9731c0d6bef.png",
                 ProducedResourceId = 3, // Azote
                 ConsumedResourceId = 12, // Matière organique
-                IsPublic = false,
+                IsPublic = true,
                 UserId = "user-2"
             },
             new()
@@ -122,7 +122,7 @@ public class EquipmentEntityTypeConfiguration : IEntityTypeConfiguration<Equipme
                 Image = "4fba83ed-a55f-4e1b-80b5-6829a696b7b3.png",
                 ProducedResourceId = 10, // Magnésium
                 ConsumedResourceId = 2, // Eau
-                IsPublic = false,
+                IsPublic = true,
                 UserId = "user-2"
             }
         });

@@ -20,7 +20,6 @@ public class BiodomeContext(DbContextOptions<BiodomeContext> options) : Identity
 
         builder.ApplyConfiguration(new UserEntityTypeConfiguration());
         builder.ApplyConfiguration(new RoleEntityTypeConfiguration());
-        builder.ApplyConfiguration(new UserRoleEntityTypeConfiguration());
 
         builder.ApplyConfiguration(new EquipmentResourceEntityTypeConfiguration());
         builder.ApplyConfiguration(new BiomeEntityTypeConfiguration());
