@@ -7,8 +7,8 @@ public interface IEquipmentRepository
 {
     Task<List<Equipment>> GetAllAsync(string? userId, bool isAdmin);
     Task<List<EquipmentResource>> GetResourcesAsync();
-    Task CreateEquipmentAsync(CreateEquipmentRequest createRequest, string userId);
-    Task<Equipment?> FindAsync(int id, string userId);
-    Task<Equipment?> DeleteAsync(int id, string userId);
-    Task UpdateAsync(UpdateEquipmentRequest equipment, string userId);
+    Task<Result<Equipment>> CreateEquipmentAsync(CreateEquipmentRequest createRequest, string userId);
+    Task<Result<Equipment>> FindAsync(int id, string userId, bool isAdmin);
+    Task<Result<Equipment>> DeleteAsync(int id, string userId, bool isAdmin);
+    Task UpdateAsync(UpdateEquipmentRequest equipment, string userId, bool isAdmin);
 }

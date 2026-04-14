@@ -15,6 +15,9 @@ public class EquipmentEntityTypeConfiguration : IEntityTypeConfiguration<Equipme
         builder.Property(e => e.Name)
             .IsRequired()
             .HasMaxLength(75);
+        
+        builder.HasIndex(e => e.Name)
+            .IsUnique();
 
         builder.Property(e => e.Image)
             .IsRequired();

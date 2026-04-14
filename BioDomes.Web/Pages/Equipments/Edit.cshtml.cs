@@ -24,20 +24,22 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
             return Forbid();
         }
 
-        var maybeEquipment = await repository.FindAsync(id, userId);
-        if (maybeEquipment is null)
+        var result = await repository.FindAsync(id, userId, User.IsAdmin());
+        if (!result.IsSuccess)
         {
-            return NotFound();
+            return result.ToPageResult(this);
         }
 
-        ImageSource = UseUploadedFromId(maybeEquipment.ImageId);
+        var equipment = result.Value!;
+
+        ImageSource = UseUploadedFromId(equipment.ImageId);
         Resources = await repository.GetResourcesAsync();
 
         Input = new UpdateEquipmentInputModel
         {
-            Name = maybeEquipment.Name,
-            ConsumedResourceId = maybeEquipment.Consumed.Id,
-            ProducedResourceId = maybeEquipment.Produced.Id
+            Name = equipment.Name,
+            ConsumedResourceId = equipment.Consumed.Id,
+            ProducedResourceId = equipment.Produced.Id
         };
 
         logger.LogInformation($"Editing {id}");
@@ -46,54 +48,71 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
 
     public async Task<IActionResult> OnPostAsync(int id, string action)
     {
+        // block unauth user
         var userId = User.GetUserId();
         if (userId == null)
         {
             return Forbid();
         }
 
-        var original = await repository.FindAsync(id, userId);
-        if (original is null) return NotFound();
-
-        if (action == "delete")
+        // find the result
+        var equipmentResult = await repository.FindAsync(id, userId, User.IsAdmin());
+        if (!equipmentResult.IsSuccess)
         {
-            var deleted = await repository.DeleteAsync(id, userId);
-            if (deleted is null)
-            {
-                ErrorNotification("Impossible de supprimer cet équipement");
-                return RedirectToPage("/Equipments/Index");
-            }
-
-            DeleteImage(original.ImageId);
-            SuccessNotification($"L'équipement {deleted.Name} a été supprimé");
-
-            return RedirectToPage("/Equipments/Index");
+            return equipmentResult.ToPageResult(this);
         }
 
+        var equipment = equipmentResult.Value!;
+
+        return action switch
+        {
+            "delete" => await PerformDelete(id, userId, equipment),
+            "save" => await PerformUpdate(equipment, userId),
+            _ => Page()
+        };
+    }
+
+    private async Task<IActionResult> PerformUpdate(Equipment equipment, string userId)
+    {
         if (!ModelState.IsValid)
         {
-            ErrorNotification("Formulaire invalide");
             return Page();
         }
 
         var request = new UpdateEquipmentRequest
         {
-            Id = original.Id,
+            Id = equipment.Id,
             Name = Input.Name,
             ConsumedResourceId = Input.ConsumedResourceId,
             ProducedResourceId = Input.ProducedResourceId,
-            Image = original.ImageId
+            Image = equipment.ImageId
         };
 
         if (Input.Image is not null)
         {
             var newImage = await SaveImage(Input.Image);
-            DeleteImage(original.ImageId);
+            DeleteImage(equipment.ImageId);
             request.Image = newImage;
         }
 
-        await repository.UpdateAsync(request, userId);
+        await repository.UpdateAsync(request, userId, User.IsAdmin());
         SuccessNotification($"Equipement {Input.Name} modifié avec succès");
+
+        return RedirectToPage("/Equipments/Index");
+    }
+
+    private async Task<IActionResult> PerformDelete(int id, string userId, Equipment equipment)
+    {
+        var deletedResult = await repository.DeleteAsync(id, userId, User.IsAdmin());
+        if (!deletedResult.IsSuccess)
+        {
+            return deletedResult.ToPageResult(this);
+        }
+
+        var deleted = deletedResult.Value!;
+
+        DeleteImage(equipment.ImageId);
+        SuccessNotification($"L'équipement {deleted.Name} a été supprimé");
 
         return RedirectToPage("/Equipments/Index");
     }
