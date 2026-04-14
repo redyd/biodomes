@@ -1,12 +1,15 @@
 using BioDomes.Domains.Core;
+using BioDomes.Domains.Extensions;
 using BioDomes.Domains.Repository;
+using BioDomes.Domains.Requests;
 using BioDomes.Infrastructures.Mappers;
 using BioDomes.Infrastructures.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BioDomes.Infrastructures.Repositories;
 
-public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
+public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository> logger) : ISpeciesRepository
 {
     public async Task<List<Specie>> FindAllAsync()
     {
@@ -19,7 +22,7 @@ public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
         return await context.Species.CountAsync();
     }
 
-    public async Task<Specie?> FindBySlugAsync(string slug)
+    public async Task<Result<Specie>> FindBySlugAsync(string slug)
     {
         var entity = await context.Species
             .FirstOrDefaultAsync(specie => specie.Slug == slug);
@@ -73,29 +76,49 @@ public class SpeciesRepository(BiodomeContext context) : ISpeciesRepository
         return await FindBySlugAsync(entity.Slug);
     }
 
-    public async Task<Specie> AddAsync(Specie toAdd)
+    public async Task<Result<Specie>> AddAsync(CreateSpecieRequest toAdd)
     {
-        if (await context.Species.AnyAsync(specie => specie.Name.ToLower() == toAdd.Name.ToLower()))
+        try
         {
-            throw new InvalidOperationException($"Une espèce nommée '{toAdd.Name}' existe déjà.");
+            var slug = toAdd.Name.ToKebabCase();
+
+            var exists = await context.Species
+                .AnyAsync(s => s.Slug == slug);
+
+            if (exists)
+            {
+                return Result<Specie>.Conflict("Specie already exists");
+            }
+            
+            var entity = new SpecieEntity
+            {
+                Slug = toAdd.Name.ToKebabCase(),
+                Name = toAdd.Name,
+                TypeLabel = toAdd.Type,
+                DietLabel = toAdd.Diet,
+                Height = toAdd.Height,
+                Weight = toAdd.Weight,
+                UploadedImageId = toAdd.Image,
+                IsPublic = false
+            };
+
+            await context.Species.AddAsync(entity);
+            await context.SaveChangesAsync();
+
+            var specie = await context.Species.FirstAsync(specie => specie.Slug == entity.Slug);
+
+            return Result<Specie>.Ok(SpecieMapper.MapSpecie(specie));
         }
-
-        var entity = new SpecieEntity
+        catch (DbUpdateException ex) when (SqlServerError.IsUniqueConstraintViolation(ex) ||
+                                           SqlServerError.IsPrimaryKeyViolation(ex))
         {
-            Slug = toAdd.Slug,
-            Name = toAdd.Name,
-            TypeLabel = toAdd.Type,
-            DietLabel = toAdd.Diet,
-            Height = toAdd.Height,
-            Weight = toAdd.Weight,
-            UploadedImageId = toAdd.ImageUrl,
-            IsPublic = false
-        };
-
-        await context.Species.AddAsync(entity);
-        await context.SaveChangesAsync();
-
-        return (await FindBySlugAsync(entity.Slug))!;
+            return Result<Specie>.Conflict("A specie with this name already exists.");
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning($"Database error: {ex.Message}");
+            return Result<Specie>.Failure("Database error");
+        }
     }
 
     public async Task<Specie?> DeleteAsync(string slug)

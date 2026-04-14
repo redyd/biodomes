@@ -6,9 +6,7 @@ namespace BioDomes.Web.Extensions;
 
 public static class ResultExtensions
 {
-    public static IActionResult ToPageResult<T>(
-        this Result<T> result,
-        PageModel page)
+    public static IActionResult ToPageResult<T>(this Result<T> result, PageModel page)
     {
         return result.Status switch
         {

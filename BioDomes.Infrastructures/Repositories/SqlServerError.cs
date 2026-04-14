@@ -5,9 +5,20 @@ namespace BioDomes.Infrastructures.Repositories;
 
 public class SqlServerError
 {
-    public static bool IsUniqueConstraintViolation(DbUpdateException ex) =>
-        ex.InnerException is SqlException { Number: 2601 or 2627 };
+    public static bool IsSqlException(DbUpdateException ex, int number)
+    {
+        var sqlEx = ex.InnerException as SqlException
+                    ?? ex.InnerException?.InnerException as SqlException;
 
-    public static bool IsForeignKeyViolation(DbUpdateException ex) =>
-        ex.InnerException is SqlException { Number: 547 };
+        return sqlEx?.Number == number;
+    }
+
+    public static bool IsUniqueConstraintViolation(DbUpdateException ex)
+        => IsSqlException(ex, 2601) || IsSqlException(ex, 2627);
+
+    public static bool IsForeignKeyViolation(DbUpdateException ex)
+        => IsSqlException(ex, 547);
+
+    public static bool IsPrimaryKeyViolation(DbUpdateException ex)
+        => IsSqlException(ex, 2627);
 }

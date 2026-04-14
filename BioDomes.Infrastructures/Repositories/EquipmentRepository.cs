@@ -42,6 +42,13 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
     {
         try
         {
+            var exist = await context.Equipments.AnyAsync(e => e.Name.ToLower() == request.Name.ToLower());
+
+            if (exist)
+            {
+                return Result<Equipment>.Conflict("An equipment with this name already exists.");
+            }
+            
             var entity = new EquipmentEntity
             {
                 Name = request.Name,
@@ -72,7 +79,7 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<Equipment>.Failure("Database error.");
+            return Result<Equipment>.Failure("Database error");
         }
     }
 

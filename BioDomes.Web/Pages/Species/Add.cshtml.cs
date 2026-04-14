@@ -1,24 +1,16 @@
 ﻿using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
+using BioDomes.Domains.Requests;
+using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Species;
 
-public class AddModel : AppPageModel
+public class AddModel(ISpeciesRepository speciesRepository, IWebHostEnvironment environment) : AppPageModel(environment)
 {
-    private readonly ISpeciesRepository _speciesRepository;
-
-    public AddModel(
-        ISpeciesRepository speciesRepository,
-        IWebHostEnvironment environment) : base(environment)
-    {
-        _speciesRepository = speciesRepository;
-    }
-
-    [BindProperty]
-    public SpeciesInputModel? Input { get; set; }
+    [BindProperty] public SpeciesInputModel? Input { get; set; }
 
     public void OnGet()
     {
@@ -32,9 +24,28 @@ public class AddModel : AppPageModel
         try
         {
             var imageName = Input.Image == null ? null : await SaveImage(Input.Image);
-            var specie = new Specie(Input.Name, Input.Type, Input.Diet, Input.Height, Input.Weight, imageName);
+            var specie = new CreateSpecieRequest
+            {
+                Name = Input.Name,
+                Diet = Input.Diet,
+                Image = imageName,
+                Height = Input.Height,
+                Weight = Input.Weight,
+                Type = Input.Type
+            };
 
-            await _speciesRepository.AddAsync(specie);
+            var result = await speciesRepository.AddAsync(specie);
+            if (result.Status == ResultStatus.Conflict)
+            {
+                ErrorNotification("Une espèce avec ce nom existe déjà");
+                return Page();
+            }
+
+            if (!result.IsSuccess)
+            {
+                return result.ToPageResult(this);
+            }
+            
             SuccessNotification($"Espèce {Input.Name} correctement ajoutée.");
             return RedirectToPage("/Species/Index");
         }
