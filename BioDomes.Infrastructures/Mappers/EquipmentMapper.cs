@@ -10,8 +10,15 @@ public static class EquipmentMapper
         {
             Id = entity.Id,
             Name = entity.Name,
-            Consumed = entity.ConsumedResourceEntity.Label,
-            Produced = entity.ProducedResourceEntity.Label,
+            Consumed = MapResource(entity.ConsumedResourceEntity),
+            Produced = MapResource(entity.ProducedResourceEntity),
             ImageId = entity.Image
+        };
+
+    private static EquipmentResource MapResource(EquipmentResourceEntity entity)
+        => new()
+        {
+            Id = entity.Id,
+            Label = entity.Label,
         };
 }

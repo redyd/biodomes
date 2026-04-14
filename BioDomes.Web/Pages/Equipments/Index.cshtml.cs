@@ -20,10 +20,11 @@ public class EquipmentPage : AppPageModel
         var equipments = await _repo.GetAllAsync();
         Equipments = equipments.Select(e => new EquipmentView
         {
+            Id = e.Id,
             Name = e.Name,
             Image = UseUploadedFromId(e.ImageId),
-            Produced = e.Produced,
-            Consumed = e.Consumed,
+            Produced = e.Produced.Label,
+            Consumed = e.Consumed.Label,
         })
         .ToList();
     }

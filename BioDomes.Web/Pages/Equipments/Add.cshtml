@@ -1,0 +1,67 @@
+@page "/equipments/add"
+@model BioDomes.Web.Pages.Equipments.Add
+
+@{
+    Layout = "Shared/_Layout";
+    ViewData["Title"] = "Ajouter un équipement";
+}
+
+<div class="edit-page">
+    <div class="edit-card">
+
+        <div class="edit-header">
+            <p class="edit-breadcrumb">Biodômes · Equipement</p>
+            <h1 class="add-title">Ajouter un équipement : </h1>
+        </div>
+
+        <div class="edit-body">
+            <form method="post" enctype="multipart/form-data">
+                <div class="field-group">
+                    <label class="field-label">Nom</label>
+                    <input class="field-input" type="text" asp-for="Input.Name"/>
+                    <span asp-validation-for="Input.Name" class="field-error"></span>
+                </div>
+                
+                <div class="field-group">
+                    <label class="field-label" asp-for="Input.ProducedResourceId">Production</label>
+                    <select class="field-input" asp-for="Input.ProducedResourceId">
+                        <option value="">-- Choisir --</option>
+                        @foreach (var classification in Model.Resources)
+                        {
+                            <option value="@classification.Id">@classification.Label</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Input.ProducedResourceId" class="field-error"></span>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" asp-for="Input.ConsumedResourceId">Consomation</label>
+                    <select class="field-input" asp-for="Input.ConsumedResourceId">
+                        <option value="">-- Choisir --</option>
+                        @foreach (var classification in Model.Resources)
+                        {
+                            <option value="@classification.Id">@classification.Label</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Input.ConsumedResourceId" class="field-error"></span>
+                </div>
+                
+                <div class="field-group">
+                    <label class="image-upload-hint">Ajouter une image</label>
+                    <div class="image-upload-zone">
+                        <input type="file" asp-for="Input.Image" accept="image/*"/>
+                    </div>
+                    <span asp-validation-for="Input.Image" class="field-error"></span>
+                </div>
+
+                <div class="edit-divider"></div>
+
+                <div class="edit-actions">
+                    <a class="btn-cancel" asp-page="/Equipments/Index">Annuler</a>
+                    <button class="btn-save" type="submit">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>

@@ -10,7 +10,6 @@ public class BiodomeContext(DbContextOptions<BiodomeContext> options) : Identity
 {
     public DbSet<SpecieEntity> Species { get; set; }
     public DbSet<EquipmentEntity> Equipments { get; set; }
-    
     public DbSet<EquipmentResourceEntity> EquipmentResources { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
