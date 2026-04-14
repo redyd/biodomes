@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BioDomes.Domains.Repository;
 using BioDomes.Web.PageModels;
 using BioDomes.Web.ViewModels;
@@ -17,7 +18,10 @@ public class EquipmentPage : AppPageModel
 
     public async Task OnGetAsync()
     {
-        var equipments = await _repo.GetAllAsync();
+        var userId = CurrentUserId();
+        var isAdmin = IsAdmin();
+
+        var equipments = await _repo.GetAllAsync(userId, isAdmin);
         Equipments = equipments.Select(e => new EquipmentView
         {
             Id = e.Id,

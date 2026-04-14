@@ -1,10 +1,8 @@
 using BioDomes.Web.Extensions;
-using BioDomes.Web.InputModel;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BioDomes.Web.PageModels;
 
-public abstract class AppPageModel(IWebHostEnvironment environment) : PageModel
+public abstract class AppPageModel(IWebHostEnvironment environment) : UserPageModel
 {
     public static string BasePathForUploads = Path.Combine("img", "uploads");
     public static string BasePathForDefault = Path.Combine("img", "defaults");

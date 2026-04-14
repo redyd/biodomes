@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Domains.Requests;
@@ -29,23 +30,30 @@ public class Add : AppPageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid || Input.ConsumedResourceId == null || Input.ProducedResourceId == null)
+        if (!ModelState.IsValid)
         {
             Resources = await _repository.GetResourcesAsync();
             return Page();
         }
 
+        var userId = CurrentUserId();
+        if (userId == null)
+        {
+            return Forbid();
+        }
+
         var imageId = await SaveImage(Input.Image);
 
-        var createRequest = new CreateEquipmentRequest()
+        var createRequest = new CreateEquipmentRequest
         {
             Name = Input.Name,
             Image = imageId,
-            ConsumedResourceId = (int)Input.ConsumedResourceId,
-            ProducedResourceId = (int)Input.ProducedResourceId
+            ConsumedResourceId = Input.ConsumedResourceId,
+            ProducedResourceId = Input.ProducedResourceId,
+            UserId = (int)userId
         };
 
-        await _repository.CreateEquipmentAsync(createRequest);
+        await _repository.CreateEquipmentAsync(createRequest, (int)userId);
 
         _logger.LogInformation("Adding new equipment: {Name}", Input.Name);
         SuccessNotification($"L'équipement {Input.Name} a été créé avec succès");

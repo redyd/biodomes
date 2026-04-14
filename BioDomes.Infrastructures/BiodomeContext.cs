@@ -18,9 +18,13 @@ public class BiodomeContext(DbContextOptions<BiodomeContext> options) : Identity
         
         builder.HasDefaultSchema("dbo");
 
-        builder.ApplyConfiguration(new SpecieEntityTypeConfiguration());
+        builder.ApplyConfiguration(new UserEntityTypeConfiguration());
+        builder.ApplyConfiguration(new RoleEntityTypeConfiguration());
+        builder.ApplyConfiguration(new UserRoleEntityTypeConfiguration());
+
         builder.ApplyConfiguration(new EquipmentResourceEntityTypeConfiguration());
-        builder.ApplyConfiguration(new EquipmentEntityTypeConfiguration());
         builder.ApplyConfiguration(new BiomeEntityTypeConfiguration());
+        builder.ApplyConfiguration(new EquipmentEntityTypeConfiguration());
+        builder.ApplyConfiguration(new SpecieEntityTypeConfiguration());
     }
 }

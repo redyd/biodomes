@@ -9,13 +9,21 @@ namespace BioDomes.Infrastructures.Repositories;
 
 public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
 {
-    public async Task<List<Equipment>> GetAllAsync()
+    public async Task<List<Equipment>> GetAllAsync(int? userId, bool isAdmin)
     {
-        var result = await context.Equipments
+        var query = context.Equipments
             .Include(e => e.ConsumedResourceEntity)
             .Include(e => e.ProducedResourceEntity)
-            .ToListAsync();
+            .AsQueryable();
 
+        if (!isAdmin)
+        {
+            query = query.Where(e =>
+                e.IsPublic
+                || (userId != null && e.UserId == userId));
+        }
+
+        var result = await query.ToListAsync();
         return result.Select(EquipmentMapper.MapEquipment).ToList();
     }
 
@@ -29,7 +37,7 @@ public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
         }).ToList();
     }
 
-    public async Task CreateEquipmentAsync(CreateEquipmentRequest createRequest)
+    public async Task CreateEquipmentAsync(CreateEquipmentRequest createRequest, int userId)
     {
         var entity = new EquipmentEntity
         {
@@ -38,12 +46,12 @@ public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
             ProducedResourceId = createRequest.ProducedResourceId,
             ConsumedResourceId = createRequest.ConsumedResourceId,
         };
-        
+
         await context.Equipments.AddAsync(entity);
         await context.SaveChangesAsync();
     }
 
-    public async Task<Equipment?> FindAsync(int id)
+    public async Task<Equipment?> FindAsync(int id, int userId)
     {
         var maybe = await context.Equipments
             .Include(e => e.ConsumedResourceEntity)
@@ -52,7 +60,7 @@ public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
         return maybe is null ? null : EquipmentMapper.MapEquipment(maybe);
     }
 
-    public async Task<Equipment?> DeleteAsync(int id)
+    public async Task<Equipment?> DeleteAsync(int id, int userId)
     {
         var entity = await context.Equipments.FirstOrDefaultAsync(e => e.Id == id);
         if (entity is null) return null;
@@ -62,7 +70,7 @@ public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
         return model;
     }
 
-    public async Task UpdateAsync(UpdateEquipmentRequest equipment)
+    public async Task UpdateAsync(UpdateEquipmentRequest equipment, int userId)
     {
         var entity = await context.Equipments
             .Include(e => e.ConsumedResourceEntity)
@@ -82,5 +90,4 @@ public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
 
         await context.SaveChangesAsync();
     }
-
 }

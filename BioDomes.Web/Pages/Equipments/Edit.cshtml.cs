@@ -17,7 +17,13 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
-        var maybeEquipment = await repository.FindAsync(id);
+        var userId = CurrentUserId();
+        if (userId == null)
+        {
+            return Forbid();
+        }
+
+        var maybeEquipment = await repository.FindAsync(id, (int)userId);
         if (maybeEquipment is null)
         {
             return NotFound();
@@ -39,12 +45,18 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
 
     public async Task<IActionResult> OnPostAsync(int id, string action)
     {
-        var original = await repository.FindAsync(id);
+        var userId = CurrentUserId();
+        if (userId == null)
+        {
+            return Forbid();
+        }
+
+        var original = await repository.FindAsync(id, (int)userId);
         if (original is null) return NotFound();
 
         if (action == "delete")
         {
-            var deleted = await repository.DeleteAsync(id);
+            var deleted = await repository.DeleteAsync(id, (int)userId);
             if (deleted is null)
             {
                 ErrorNotification("Impossible de supprimer cet équipement");
@@ -79,7 +91,7 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
             request.Image = newImage;
         }
 
-        await repository.UpdateAsync(request);
+        await repository.UpdateAsync(request, (int)userId);
         SuccessNotification($"Equipement {Input.Name} modifié avec succès");
 
         return RedirectToPage("/Equipments/Index");
