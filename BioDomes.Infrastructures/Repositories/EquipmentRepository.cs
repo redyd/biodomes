@@ -38,8 +38,7 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
         }).ToList();
     }
 
-    public async Task<Result<Equipment>> CreateEquipmentAsync(
-        CreateEquipmentRequest request, string userId)
+    public async Task<Result<Equipment>> CreateEquipmentAsync(CreateEquipmentRequest request, string userId)
     {
         try
         {
@@ -54,7 +53,7 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
 
             await context.Equipments.AddAsync(entity);
             await context.SaveChangesAsync();
-            
+
             var created = await context.Equipments
                 .Include(e => e.ConsumedResourceEntity)
                 .Include(e => e.ProducedResourceEntity)

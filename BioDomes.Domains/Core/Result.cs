@@ -8,8 +8,17 @@ public class Result<T>
 
     public bool IsSuccess => Status == ResultStatus.Success;
 
-    private Result(T value) { Value = value; Status = ResultStatus.Success; }
-    private Result(ResultStatus status, string error) { Status = status; Error = error; }
+    private Result(T value)
+    {
+        Value = value;
+        Status = ResultStatus.Success;
+    }
+
+    private Result(ResultStatus status, string error)
+    {
+        Status = status;
+        Error = error;
+    }
 
     public static Result<T> Ok(T value) => new(value);
     public static Result<T> NotFound(string error) => new(ResultStatus.NotFound, error);
@@ -18,4 +27,11 @@ public class Result<T>
     public static Result<T> Failure(string error) => new(ResultStatus.Failure, error);
 }
 
-public enum ResultStatus { Success, NotFound, Forbidden, Conflict, Failure }
+public enum ResultStatus
+{
+    Success,
+    NotFound,
+    Forbidden,
+    Conflict,
+    Failure
+}
