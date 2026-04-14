@@ -1,11 +1,13 @@
 using BioDomes.Domains.Repository;
 using BioDomes.Infrastructures;
+using BioDomes.Infrastructures.Models;
 using BioDomes.Infrastructures.Repositories;
 using BioDomes.Web.Constraints;
 using BioDomes.Web.Middlewares;
 using BioDomes.Web.Middlewares.extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,13 +26,18 @@ builder.Services.AddDbContext<BiodomeContext>(options
     => options.UseSqlServer(
         builder.Configuration.GetConnectionString("BiodomeContext")));
 
+builder.Services.AddDefaultIdentity<UserEntity>(options 
+        => options.SignIn.RequireConfirmedAccount = false)
+        .AddRoles<IdentityRole<int>>()
+        .AddEntityFrameworkStores<BiodomeContext>();
+
 builder.Services.AddScoped<ISpeciesRepository, SpeciesRepository>();
 builder.Services.AddScoped<IEquipmentRepository, EquipmentRepository>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
@@ -60,6 +67,7 @@ app.UseStaticFiles(new StaticFileOptions
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
