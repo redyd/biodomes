@@ -7,32 +7,24 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Equipments;
 
-public class Edit : AppPageModel
+public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipmentRepository repository)
+    : AppPageModel(environment)
 {
-    private readonly ILogger<Edit> _logger;
-    private readonly IEquipmentRepository _repository;
-
-    public Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipmentRepository repository) :
-        base(environment)
-    {
-        _logger = logger;
-        _repository = repository;
-    }
-
     [BindProperty] public UpdateEquipmentInputModel Input { get; set; } = new();
-    [BindProperty] public string ImageSource { get; set; } = string.Empty;
+
+    public string ImageSource { get; set; } = string.Empty;
     public List<EquipmentResource> Resources { get; set; } = [];
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
-        var maybeEquipment = await _repository.FindAsync(id);
+        var maybeEquipment = await repository.FindAsync(id);
         if (maybeEquipment is null)
         {
             return NotFound();
         }
 
         ImageSource = UseUploadedFromId(maybeEquipment.ImageId);
-        Resources = await _repository.GetResourcesAsync();
+        Resources = await repository.GetResourcesAsync();
 
         Input = new UpdateEquipmentInputModel
         {
@@ -41,18 +33,18 @@ public class Edit : AppPageModel
             ProducedResourceId = maybeEquipment.Produced.Id
         };
 
-        _logger.LogInformation($"Editing {id}");
+        logger.LogInformation($"Editing {id}");
         return Page();
     }
 
     public async Task<IActionResult> OnPostAsync(int id, string action)
     {
-        var original = await _repository.FindAsync(id);
+        var original = await repository.FindAsync(id);
         if (original is null) return NotFound();
 
         if (action == "delete")
         {
-            var deleted = await _repository.DeleteAsync(id);
+            var deleted = await repository.DeleteAsync(id);
             if (deleted is null)
             {
                 ErrorNotification("Impossible de supprimer cet équipement");
@@ -65,10 +57,10 @@ public class Edit : AppPageModel
             return RedirectToPage("/Equipments/Index");
         }
 
+        logger.LogInformation($"HERE THE LOOOOOG {Input.Name} {Input.ConsumedResourceId} {Input.ProducedResourceId} {Input.Image}");
+
         if (!ModelState.IsValid)
         {
-            Resources = await _repository.GetResourcesAsync();
-            ImageSource = UseUploadedFromId(original.ImageId);
             ErrorNotification("Formulaire invalide");
             return Page();
         }
@@ -77,8 +69,8 @@ public class Edit : AppPageModel
         {
             Id = original.Id,
             Name = Input.Name,
-            ConsumedResourceId = Input.ConsumedResourceId!.Value,
-            ProducedResourceId = Input.ProducedResourceId!.Value,
+            ConsumedResourceId = Input.ConsumedResourceId,
+            ProducedResourceId = Input.ProducedResourceId,
             Image = original.ImageId
         };
 
@@ -89,7 +81,7 @@ public class Edit : AppPageModel
             request.Image = newImage;
         }
 
-        await _repository.UpdateAsync(request);
+        await repository.UpdateAsync(request);
 
         return RedirectToPage("/Equipments/Index");
     }

@@ -20,7 +20,7 @@ public class Add : AppPageModel
     }
 
     [BindProperty] public EquipmentInputModel Input { get; set; } = new();
-    [BindProperty] public List<EquipmentResource> Resources { get; set; } = new();
+    [BindProperty] public List<EquipmentResource> Resources { get; set; } = [];
 
     public async Task OnGetAsync()
     {
@@ -48,6 +48,7 @@ public class Add : AppPageModel
         await _repository.CreateEquipmentAsync(createRequest);
 
         _logger.LogInformation("Adding new equipment: {Name}", Input.Name);
+        SuccessNotification($"L'équipement ${Input.Name} a été créé avec succès");
 
         return RedirectToPage("/Equipments/Index");
     }

@@ -10,5 +10,5 @@ public interface IEquipmentRepository
     Task CreateEquipmentAsync(CreateEquipmentRequest createRequest);
     Task<Equipment?> FindAsync(int id);
     Task<Equipment?> DeleteAsync(int id);
-    Task<Equipment> UpdateAsync(UpdateEquipmentRequest equipment);
+    Task UpdateAsync(UpdateEquipmentRequest equipment);
 }

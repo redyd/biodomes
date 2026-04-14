@@ -62,7 +62,7 @@ public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
         return model;
     }
 
-    public async Task<Equipment> UpdateAsync(UpdateEquipmentRequest equipment)
+    public async Task UpdateAsync(UpdateEquipmentRequest equipment)
     {
         var entity = await context.Equipments
             .Include(e => e.ConsumedResourceEntity)
@@ -81,23 +81,6 @@ public class EquipmentRepository(BiodomeContext context) : IEquipmentRepository
         entity.ConsumedResourceId = equipment.ConsumedResourceId;
 
         await context.SaveChangesAsync();
-
-        return new Equipment
-        {
-            Id = entity.Id,
-            Name = entity.Name,
-            ImageId = entity.Image,
-            Produced = new EquipmentResource
-            {
-                Id = entity.ProducedResourceEntity.Id,
-                Label = entity.ProducedResourceEntity.Label
-            },
-            Consumed = new EquipmentResource
-            {
-                Id = entity.ConsumedResourceEntity.Id,
-                Label = entity.ConsumedResourceEntity.Label
-            }
-        };
     }
 
 }
