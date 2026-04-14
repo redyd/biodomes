@@ -57,8 +57,6 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
             return RedirectToPage("/Equipments/Index");
         }
 
-        logger.LogInformation($"HERE THE LOOOOOG {Input.Name} {Input.ConsumedResourceId} {Input.ProducedResourceId} {Input.Image}");
-
         if (!ModelState.IsValid)
         {
             ErrorNotification("Formulaire invalide");
@@ -82,6 +80,7 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
         }
 
         await repository.UpdateAsync(request);
+        SuccessNotification($"Equipement {Input.Name} modifié avec succès");
 
         return RedirectToPage("/Equipments/Index");
     }

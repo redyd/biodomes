@@ -48,7 +48,7 @@ public class Add : AppPageModel
         await _repository.CreateEquipmentAsync(createRequest);
 
         _logger.LogInformation("Adding new equipment: {Name}", Input.Name);
-        SuccessNotification($"L'équipement ${Input.Name} a été créé avec succès");
+        SuccessNotification($"L'équipement {Input.Name} a été créé avec succès");
 
         return RedirectToPage("/Equipments/Index");
     }
