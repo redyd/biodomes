@@ -15,9 +15,16 @@ public class Add(IWebHostEnvironment environment, IEquipmentRepository repositor
     [BindProperty] public EquipmentInputModel Input { get; set; } = new();
     [BindProperty] public List<EquipmentResource> Resources { get; set; } = [];
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
+        var userId = User.GetUserId();
+        if (userId == null)
+        {
+            return Forbid();
+        }
+        
         Resources = await repository.GetResourcesAsync();
+        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()

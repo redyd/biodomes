@@ -12,14 +12,28 @@ public class AddModel(ISpeciesRepository speciesRepository, IWebHostEnvironment 
 {
     [BindProperty] public SpeciesInputModel? Input { get; set; }
 
-    public void OnGet()
+    public IActionResult OnGet()
     {
+        var userId = User.GetUserId();
+        if (userId == null)
+        {
+            return Forbid();
+        }
+        return Page();
     }
 
     public async Task<IActionResult> OnPost()
     {
         if (Input == null || !ModelState.IsValid)
+        {
             return Page();
+        }
+        
+        var userId = User.GetUserId();
+        if (userId == null)
+        {
+            return Forbid();
+        }
 
         try
         {
@@ -34,7 +48,7 @@ public class AddModel(ISpeciesRepository speciesRepository, IWebHostEnvironment 
                 Type = Input.Type
             };
 
-            var result = await speciesRepository.AddAsync(specie);
+            var result = await speciesRepository.AddAsync(specie, userId);
             if (result.Status == ResultStatus.Conflict)
             {
                 ErrorNotification("Une espèce avec ce nom existe déjà");

@@ -12,6 +12,10 @@ public class SpecieEntity
     public string DietLabel { get; set; }
 
     public bool IsPublic { get; set; }
+    
+    // user
+    public string UserId { get; set; }
+    public UserEntity User { get; set; }
 
     // relation
     public List<BiomeEntity> Biomes { get; set; } = new();

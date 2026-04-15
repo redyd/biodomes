@@ -1,43 +1,46 @@
 ﻿using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
+using BioDomes.Domains.Requests;
+using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Species;
 
-public class EditModel : AppPageModel
+public class EditModel(ISpeciesRepository repository, IWebHostEnvironment environment) : AppPageModel(environment)
 {
-    private readonly ISpeciesRepository _speciesRepository;
+    [BindProperty] public SpeciesInputModel Input { get; set; } = new();
+    public Specie? Specie { get; set; }
 
-    public EditModel(
-        ISpeciesRepository speciesRepository,
-        IWebHostEnvironment environment) : base(environment)
-    {
-        _speciesRepository = speciesRepository;
-    }
-
-    public Specie? Species { get; set; }
-
-    [BindProperty] public SpeciesInputModel? Input { get; set; }
     public string? ImageUrl { get; set; }
 
     public async Task<IActionResult> OnGetAsync(string slug)
     {
-        Species = await _speciesRepository.FindBySlugAsync(slug);
+        var userId = User.GetUserId();
+        if (userId == null)
+        {
+            return Forbid();
+        }
 
-        if (Species == null)
-            return NotFound();
-        
-        ImageUrl = Species.ImageUrl == null ? null : UseUploadedFromId(Species.ImageUrl);
+        var result = await repository.FindBySlugAsync(slug, userId, User.IsAdmin());
+        if (!result.IsSuccess)
+        {
+            return result.ToPageResult(this);
+        }
+
+        var specie = result.Value!;
+        Specie = specie;
+
+        ImageUrl = specie.ImageUrl == null ? null : UseUploadedFromId(specie.ImageUrl);
 
         Input = new SpeciesInputModel
         {
-            Name = Species.Name,
-            Type = Species.Type,
-            Diet = Species.Diet,
-            Height = Species.Height,
-            Weight = Species.Weight
+            Name = specie.Name,
+            Type = specie.Type,
+            Diet = specie.Diet,
+            Height = specie.Height,
+            Weight = specie.Weight
         };
 
         return Page();
@@ -45,59 +48,85 @@ public class EditModel : AppPageModel
 
     public async Task<IActionResult> OnPost(string slug, string action)
     {
-        var species = await _speciesRepository.FindBySlugAsync(slug);
-
-        if (species == null)
-            return NotFound();
-
-        if (action == "delete")
+        var userId = User.GetUserId();
+        if (userId == null)
         {
-            await _speciesRepository.DeleteAsync(slug);
-
-            if (!string.IsNullOrEmpty(species.ImageUrl))
-            {
-                DeleteImage(species.ImageUrl);
-            }
-
-            SuccessNotification($"Espèce {species.Name} correctement supprimée");
-            return RedirectToPage("/Species/Index");
+            return Forbid();
         }
 
-        if (Input == null || !ModelState.IsValid)
-            return Page();
-
-        try
+        var result = await repository.FindBySlugAsync(slug, userId, User.IsAdmin());
+        if (!result.IsSuccess)
         {
-            var updatedSpecie = new Specie(
-                Input.Name,
-                Input.Type,
-                Input.Diet,
-                Input.Height,
-                Input.Weight,
-                species.ImageUrl);
-
-            if (Input.Image != null)
-            {
-                if (!string.IsNullOrEmpty(species.ImageUrl))
-                {
-                    DeleteImage(species.ImageUrl);
-                }
-
-                var imageName = await SaveImage(Input.Image);
-                updatedSpecie.ImageUrl = imageName;
-            }
-
-            var saved = await _speciesRepository.UpdateAsync(slug, updatedSpecie);
-            if (saved == null)
-                return NotFound();
-
-            SuccessNotification($"Espèce {saved.Name} correctement modifiée");
-            return RedirectToPage("/Species/Index");
+            return result.ToPageResult(this);
         }
-        catch (InvalidOperationException ex)
+
+        var specie = result.Value!;
+        Specie = specie;
+
+        return action switch
         {
-            ModelState.AddModelError("Input.Name", ex.Message);
+            "delete" => await PerformDelete(slug, userId, specie),
+            "save" => await PerformUpdate(slug, userId, specie),
+            _ => Page()
+        };
+    }
+
+    private async Task<IActionResult> PerformDelete(string slug, string userId, Specie specie)
+    {
+        await repository.DeleteAsync(slug, userId, User.IsAdmin());
+
+        if (!string.IsNullOrEmpty(specie.ImageUrl))
+        {
+            DeleteImage(specie.ImageUrl);
+        }
+
+        SuccessNotification($"Espèce {specie.Name} correctement supprimée");
+        return RedirectToPage("/Species/Index");
+    }
+
+    private async Task<IActionResult> PerformUpdate(string slug, string userId, Specie specie)
+    {
+        if (!ModelState.IsValid)
+        {
             return Page();
         }
+
+        var updatedSpecie = new UpdateSpecieRequest
+        {
+            PreviousSlug = slug,
+            Name = Input.Name,
+            Type = Input.Type,
+            Diet = Input.Diet,
+            Height = Input.Height,
+            Weight = Input.Weight
+        };
+
+        if (Input.Image != null)
+        {
+            if (!string.IsNullOrEmpty(specie.ImageUrl))
+            {
+                DeleteImage(specie.ImageUrl);
+            }
+
+            var imageName = await SaveImage(Input.Image);
+            updatedSpecie.ImageUrl = imageName;
+        }
+
+        var result = await repository.UpdateAsync(updatedSpecie, userId, User.IsAdmin());
+        if (result.Status == ResultStatus.Conflict)
+        {
+            ErrorNotification("Une espèce avec ce nom existe déjà");
+            return Page();
+        }
+
+        if (!result.IsSuccess)
+        {
+            return result.ToPageResult(this);
+        }
+
+        var updated = result.Value!;
+
+        SuccessNotification($"Espèce {updated.Name} correctement modifiée");
+        return RedirectToPage("/Species/Index");
     }
 }

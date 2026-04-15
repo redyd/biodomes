@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioDomes.Infrastructures.Repositories;
 
-public class SqlServerError
+public static class SqlServerError
 {
-    public static bool IsSqlException(DbUpdateException ex, int number)
+    private static bool IsSqlException(DbUpdateException ex, int number)
     {
         var sqlEx = ex.InnerException as SqlException
                     ?? ex.InnerException?.InnerException as SqlException;

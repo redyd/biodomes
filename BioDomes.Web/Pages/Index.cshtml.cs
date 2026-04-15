@@ -1,23 +1,28 @@
 using BioDomes.Domains.Repository;
+using BioDomes.Web.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BioDomes.Web.Pages;
 
-public class IndexModel : PageModel
+public class IndexModel(ILogger<IndexModel> logger, ISpeciesRepository specieRepo, IEquipmentRepository equipmentRepos)
+    : PageModel
 {
-    private readonly ILogger<IndexModel> _logger;
-    private readonly ISpeciesRepository _repo;
-
-    public IndexModel(ILogger<IndexModel> logger, ISpeciesRepository repo)
-    {
-        _logger = logger;
-        _repo = repo;
-    }
-
     public int SpeciesCount { get; set; }
+    public int EquipmentCount { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
-        SpeciesCount = await _repo.CountAsync();
+        var countSpecieResult = await specieRepo.CountAsync();
+        var countEquipmentResult = await equipmentRepos.CountAsync();
+        if (!countSpecieResult.IsSuccess || !countEquipmentResult.IsSuccess)
+        {
+            return countSpecieResult.ToPageResult(this);
+        }
+
+        SpeciesCount = countSpecieResult.Value;
+        EquipmentCount = countEquipmentResult.Value;
+        
+        return Page();
     }
 }

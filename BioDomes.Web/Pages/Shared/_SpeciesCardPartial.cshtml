@@ -17,6 +17,9 @@
         <div class="card-info"><span class="card-label">Régime :</span> @Model.Diet</div>
         <div class="card-info"><span class="card-label">Taille :</span> @Model.Height</div>
         <div class="card-info"><span class="card-label">Poids :</span> @Model.Weight</div>
-        <a asp-page="/Species/Edit" asp-route-slug="@Model.Slug">Éditer</a>
+        @if (@Model.IsConnected)
+        {
+            <a asp-page="/Species/Edit" asp-route-slug="@Model.Slug">Éditer</a>
+        }
     </div>
 </div>

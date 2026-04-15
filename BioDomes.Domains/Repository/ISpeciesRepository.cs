@@ -5,15 +5,15 @@ namespace BioDomes.Domains.Repository;
 
 public interface ISpeciesRepository
 {
-    Task<List<Specie>> FindAllAsync(string userId, bool isAdmin);
+    Task<Result<List<Specie>>> FindAllAsync(string? userId, bool isAdmin);
 
-    Task<int> CountAsync();
+    Task<Result<int>> CountAsync();
 
-    Task<Result<Specie>> FindBySlugAsync(string slug, string userId, bool isAdmin);
+    Task<Result<Specie>> FindBySlugAsync(string slug, string? userId, bool isAdmin);
 
-    Task<Specie?> UpdateAsync(string previousSlug, Specie toUpdate, string userId);
+    Task<Result<Specie>> UpdateAsync(UpdateSpecieRequest toUpdate, string? userId, bool isAdmin);
 
-    Task<Result<Specie>> AddAsync(CreateSpecieRequest toAdd);
-    
-    Task<Specie?> DeleteAsync(string slug);
+    Task<Result<Specie>> AddAsync(CreateSpecieRequest toAdd, string? userId);
+
+    Task<Result<Specie>> DeleteAsync(string slug, string? userId, bool isAdmin);
 }

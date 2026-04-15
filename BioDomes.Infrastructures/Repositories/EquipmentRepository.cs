@@ -37,6 +37,20 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
             Label = r.Label
         }).ToList();
     }
+    
+    public async Task<Result<int>> CountAsync()
+    {
+        try
+        {
+            var count = await context.Equipments.CountAsync();
+            return Result<int>.Ok(count);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning($"Database error: {ex.Message}");
+            return Result<int>.Failure("Database error");
+        }
+    }
 
     public async Task<Result<Equipment>> CreateEquipmentAsync(CreateEquipmentRequest request, string userId)
     {
@@ -136,24 +150,47 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
         }
     }
 
-    public async Task UpdateAsync(UpdateEquipmentRequest equipment, string? userId, bool isAdmin)
+    public async Task<Result<Equipment>> UpdateAsync(UpdateEquipmentRequest equipment, string? userId, bool isAdmin)
     {
-        var entity = await context.Equipments
-            .Include(e => e.ConsumedResourceEntity)
-            .Include(e => e.ProducedResourceEntity)
-            .FirstOrDefaultAsync(e =>
-                e.Id == equipment.Id
-                && (isAdmin || (userId != null && e.UserId == userId)));
-
-        if (entity is null)
+        try
         {
-            throw new KeyNotFoundException($"Equipment with Id {equipment.Id} not found or access denied.");
-        }
+            var entity = await context.Equipments
+                .Include(e => e.ConsumedResourceEntity)
+                .Include(e => e.ProducedResourceEntity)
+                .FirstOrDefaultAsync(e => e.Id == equipment.Id);
 
-        entity.Name = equipment.Name;
-        entity.Image = equipment.Image;
-        entity.ProducedResourceId = equipment.ProducedResourceId;
-        entity.ConsumedResourceId = equipment.ConsumedResourceId;
-        await context.SaveChangesAsync();
+            if (entity is null)
+                return Result<Equipment>.NotFound($"Equipment {equipment.Id} not found.");
+
+            if (!isAdmin && entity.UserId != userId)
+                return Result<Equipment>.Forbidden("Access denied.");
+
+            entity.Name = equipment.Name;
+            entity.Image = equipment.Image;
+            entity.ProducedResourceId = equipment.ProducedResourceId;
+            entity.ConsumedResourceId = equipment.ConsumedResourceId;
+
+            await context.SaveChangesAsync();
+
+            var updated = await context.Equipments
+                .Include(e => e.ConsumedResourceEntity)
+                .Include(e => e.ProducedResourceEntity)
+                .FirstAsync(e => e.Id == entity.Id);
+
+            return Result<Equipment>.Ok(EquipmentMapper.MapEquipment(updated));
+        }
+        catch (DbUpdateException ex) when (SqlServerError.IsUniqueConstraintViolation(ex))
+        {
+            return Result<Equipment>.Conflict("An equipment with this name already exists.");
+        }
+        catch (DbUpdateException ex) when (SqlServerError.IsForeignKeyViolation(ex))
+        {
+            return Result<Equipment>.Failure("A referenced resource does not exist.");
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning($"Database error: {ex.Message}");
+            return Result<Equipment>.Failure("Database error");
+        }
     }
 }
