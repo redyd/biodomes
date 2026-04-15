@@ -1,5 +1,4 @@
 using BioDomes.Web.Extensions;
-using BioDomes.Web.InputModel;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BioDomes.Web.PageModels;

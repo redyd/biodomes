@@ -1,23 +1,20 @@
 using BioDomes.Domains.Repository;
+using BioDomes.Web.Extensions;
 using BioDomes.Web.PageModels;
 using BioDomes.Web.ViewModels;
 
 namespace BioDomes.Web.Pages.Equipments;
 
-public class EquipmentPage : AppPageModel
+public class EquipmentPage(IEquipmentRepository repo, IWebHostEnvironment environment) : AppPageModel(environment)
 {
-    private readonly IEquipmentRepository _repo;
-
-    public EquipmentPage(IEquipmentRepository repo, IWebHostEnvironment environment) : base(environment)
-    {
-        _repo = repo;
-    }
-
     public List<EquipmentView> Equipments { get; set; } = [];
-
+    public bool IsUserConnected { get; set; }
+    
     public async Task OnGetAsync()
     {
-        var equipments = await _repo.GetAllAsync();
+        IsUserConnected = User.GetUserId() is not null;
+        
+        var equipments = await repo.GetAllAsync(User.GetUserId(), User.IsAdmin());
         Equipments = equipments.Select(e => new EquipmentView
         {
             Id = e.Id,
@@ -25,6 +22,7 @@ public class EquipmentPage : AppPageModel
             Image = UseUploadedFromId(e.ImageId),
             Produced = e.Produced.Label,
             Consumed = e.Consumed.Label,
+            IsConnected = IsUserConnected
         })
         .ToList();
     }

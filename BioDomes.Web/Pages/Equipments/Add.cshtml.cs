@@ -1,53 +1,72 @@
+using System.Security.Claims;
 using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Domains.Requests;
+using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Equipments;
 
-public class Add : AppPageModel
+public class Add(IWebHostEnvironment environment, IEquipmentRepository repository, ILogger<Add> logger)
+    : AppPageModel(environment)
 {
-    private readonly IEquipmentRepository _repository;
-    private readonly ILogger<Add> _logger;
-
-    public Add(IWebHostEnvironment environment, IEquipmentRepository repository, ILogger<Add> logger)
-        : base(environment)
-    {
-        _repository = repository;
-        _logger = logger;
-    }
-
     [BindProperty] public EquipmentInputModel Input { get; set; } = new();
     [BindProperty] public List<EquipmentResource> Resources { get; set; } = [];
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
-        Resources = await _repository.GetResourcesAsync();
+        var userId = User.GetUserId();
+        if (userId == null)
+        {
+            return Forbid();
+        }
+        
+        Resources = await repository.GetResourcesAsync();
+        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid || Input.ConsumedResourceId == null || Input.ProducedResourceId == null)
+        if (!ModelState.IsValid)
         {
-            Resources = await _repository.GetResourcesAsync();
+            Resources = await repository.GetResourcesAsync();
             return Page();
+        }
+
+        var userId = User.GetUserId();
+        if (userId == null)
+        {
+            return Forbid();
         }
 
         var imageId = await SaveImage(Input.Image);
 
-        var createRequest = new CreateEquipmentRequest()
+        var createRequest = new CreateEquipmentRequest
         {
             Name = Input.Name,
             Image = imageId,
-            ConsumedResourceId = (int)Input.ConsumedResourceId,
-            ProducedResourceId = (int)Input.ProducedResourceId
+            ConsumedResourceId = Input.ConsumedResourceId,
+            ProducedResourceId = Input.ProducedResourceId,
+            UserId = userId
         };
 
-        await _repository.CreateEquipmentAsync(createRequest);
+        var result = await repository.CreateEquipmentAsync(createRequest, userId);
 
-        _logger.LogInformation("Adding new equipment: {Name}", Input.Name);
+        if (result.Status == ResultStatus.Conflict)
+        {
+            ErrorNotification("Un équipement de ce nom existe déjà.");
+            Resources = await repository.GetResourcesAsync();
+            return Page();
+        }
+
+        if (!result.IsSuccess)
+        {
+            return result.ToPageResult(this);
+        }
+
+        logger.LogInformation("Adding new equipment: {Name}", Input.Name);
         SuccessNotification($"L'équipement {Input.Name} a été créé avec succès");
 
         return RedirectToPage("/Equipments/Index");

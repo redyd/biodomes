@@ -5,10 +5,11 @@ namespace BioDomes.Domains.Repository;
 
 public interface IEquipmentRepository
 {
-    Task<List<Equipment>> GetAllAsync();
+    Task<List<Equipment>> GetAllAsync(string? userId, bool isAdmin);
     Task<List<EquipmentResource>> GetResourcesAsync();
-    Task CreateEquipmentAsync(CreateEquipmentRequest createRequest);
-    Task<Equipment?> FindAsync(int id);
-    Task<Equipment?> DeleteAsync(int id);
-    Task UpdateAsync(UpdateEquipmentRequest equipment);
+    Task<Result<int>> CountAsync();
+    Task<Result<Equipment>> CreateEquipmentAsync(CreateEquipmentRequest createRequest, string userId);
+    Task<Result<Equipment>> FindAsync(int id, string userId, bool isAdmin);
+    Task<Result<Equipment>> DeleteAsync(int id, string userId, bool isAdmin);
+    Task<Result<Equipment>> UpdateAsync(UpdateEquipmentRequest equipment, string userId, bool isAdmin);
 }

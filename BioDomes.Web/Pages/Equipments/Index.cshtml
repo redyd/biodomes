@@ -10,9 +10,12 @@
     <div class="container-title">
         <h1>Equipements</h1>
         <p>Les équipements disponibles pour les biômes</p>
-        <a class="btn-save" asp-page="/Equipments/Add">
-            Ajouter un nouvel équipement
-        </a>
+        @if (Model.IsUserConnected)
+        {
+            <a class="btn-save" asp-page="/Equipments/Add">
+                Ajouter un nouvel équipement
+            </a>
+        }
     </div>
 
     <div class="cards-grid">

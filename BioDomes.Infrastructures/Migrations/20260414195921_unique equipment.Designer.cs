@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BioDomes.Infrastructures.Migrations
 {
     [DbContext(typeof(BiodomeContext))]
-    [Migration("20260411140936_userWithIdentity")]
-    partial class userWithIdentity
+    [Migration("20260414195921_unique equipment")]
+    partial class uniqueequipment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -78,11 +78,20 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<int>("ProducedResourceId")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ConsumedResourceId");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.HasIndex("ProducedResourceId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("equipments", "dbo");
 
@@ -94,16 +103,18 @@ namespace BioDomes.Infrastructures.Migrations
                             Image = "ca0fbc00-841b-41bb-8329-b0c95931d24e.png",
                             IsPublic = false,
                             Name = "Générateur de lumière artificielle",
-                            ProducedResourceId = 1
+                            ProducedResourceId = 1,
+                            UserId = "user-1"
                         },
                         new
                         {
                             Id = 2,
                             ConsumedResourceId = 5,
                             Image = "e7a73200-4110-492e-ad32-e10c6654995b.png",
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Condenseur atmosphérique",
-                            ProducedResourceId = 2
+                            ProducedResourceId = 2,
+                            UserId = "user-1"
                         },
                         new
                         {
@@ -112,16 +123,18 @@ namespace BioDomes.Infrastructures.Migrations
                             Image = "2fa0bd7e-1425-4359-a841-9b6a59b1d3f6.png",
                             IsPublic = false,
                             Name = "Extracteur de CO2",
-                            ProducedResourceId = 6
+                            ProducedResourceId = 6,
+                            UserId = "user-1"
                         },
                         new
                         {
                             Id = 4,
                             ConsumedResourceId = 6,
                             Image = "bff55fcc-19e0-4c59-9575-6689dedb8d05.png",
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Module de photosynthèse",
-                            ProducedResourceId = 5
+                            ProducedResourceId = 5,
+                            UserId = "user-1"
                         },
                         new
                         {
@@ -130,16 +143,18 @@ namespace BioDomes.Infrastructures.Migrations
                             Image = "1056b6e4-fa44-4d5d-a309-13e7a7bd9999.png",
                             IsPublic = false,
                             Name = "Synthétiseur d'engrais",
-                            ProducedResourceId = 7
+                            ProducedResourceId = 7,
+                            UserId = "user-2"
                         },
                         new
                         {
                             Id = 6,
                             ConsumedResourceId = 12,
                             Image = "a430eda5-2206-4963-8f6e-c9731c0d6bef.png",
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Recycleur de biomasse",
-                            ProducedResourceId = 3
+                            ProducedResourceId = 3,
+                            UserId = "user-2"
                         },
                         new
                         {
@@ -148,16 +163,18 @@ namespace BioDomes.Infrastructures.Migrations
                             Image = "861decc8-a7e7-4b8c-8f31-76b3c09342b9.png",
                             IsPublic = false,
                             Name = "Filtre minéral",
-                            ProducedResourceId = 9
+                            ProducedResourceId = 9,
+                            UserId = "user-2"
                         },
                         new
                         {
                             Id = 8,
                             ConsumedResourceId = 2,
                             Image = "4fba83ed-a55f-4e1b-80b5-6829a696b7b3.png",
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Extracteur d'électrolytes",
-                            ProducedResourceId = 10
+                            ProducedResourceId = 10,
+                            UserId = "user-2"
                         });
                 });
 
@@ -392,11 +409,8 @@ namespace BioDomes.Infrastructures.Migrations
 
             modelBuilder.Entity("BioDomes.Infrastructures.Models.UserEntity", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -405,16 +419,17 @@ namespace BioDomes.Infrastructures.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -424,10 +439,12 @@ namespace BioDomes.Infrastructures.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedUserName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -449,11 +466,56 @@ namespace BioDomes.Infrastructures.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserEntity", "dbo");
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "user-1",
+                            AccessFailedCount = 0,
+                            Birthdate = new DateOnly(1990, 1, 1),
+                            ConcurrencyStamp = "6325675d-c665-4e97-9c94-d00854804b5b",
+                            Email = "admin@biodomes.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@BIODOMES.COM",
+                            NormalizedUserName = "ADMIN",
+                            PhoneNumberConfirmed = false,
+                            SearchOrganism = "Saint Paul",
+                            SecurityStamp = "3c24aeb2-242c-4307-8a0b-87928f7829cf",
+                            TwoFactorEnabled = false,
+                            UserName = "admin"
+                        },
+                        new
+                        {
+                            Id = "user-2",
+                            AccessFailedCount = 0,
+                            Birthdate = new DateOnly(1995, 6, 15),
+                            ConcurrencyStamp = "79c915a6-3c7c-4833-a969-d784b4e248e8",
+                            Email = "john@biodomes.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "JOHN@BIODOMES.COM",
+                            NormalizedUserName = "JOHN",
+                            PhoneNumberConfirmed = false,
+                            SearchOrganism = "Marie Thérèse",
+                            SecurityStamp = "48d8f95d-b5ec-42fc-aab4-a90154ca60ac",
+                            TwoFactorEnabled = false,
+                            UserName = "john"
+                        });
                 });
 
             modelBuilder.Entity("BiomeEntityEquipmentEntity", b =>
@@ -486,6 +548,170 @@ namespace BioDomes.Infrastructures.Migrations
                     b.ToTable("biomes_species", "dbo");
                 });
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", "dbo");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<string>", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IdentityRoles", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "admin-role-id",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        });
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", "dbo");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", "dbo");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", "dbo");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", "dbo");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", "dbo");
+                });
+
             modelBuilder.Entity("BioDomes.Infrastructures.Models.EquipmentEntity", b =>
                 {
                     b.HasOne("BioDomes.Infrastructures.Models.EquipmentResourceEntity", "ConsumedResourceEntity")
@@ -500,9 +726,17 @@ namespace BioDomes.Infrastructures.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("ConsumedResourceEntity");
 
                     b.Navigation("ProducedResourceEntity");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BiomeEntityEquipmentEntity", b =>
@@ -531,6 +765,57 @@ namespace BioDomes.Infrastructures.Migrations
                     b.HasOne("BioDomes.Infrastructures.Models.SpecieEntity", null)
                         .WithMany()
                         .HasForeignKey("SpeciesSlug")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

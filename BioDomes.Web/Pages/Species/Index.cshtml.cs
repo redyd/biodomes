@@ -1,39 +1,48 @@
 ﻿using BioDomes.Domains.Repository;
+using BioDomes.Web.Extensions;
 using BioDomes.Web.PageModels;
 using BioDomes.Web.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Species;
 
-public class SpeciesModel : AppPageModel
+public class SpeciesModel(ISpeciesRepository repo, IWebHostEnvironment environment) : AppPageModel(environment)
 {
-    private readonly ISpeciesRepository _speciesRepository;
-
-    public SpeciesModel(ISpeciesRepository speciesRepository, IWebHostEnvironment environment): base(environment)
-    {
-        _speciesRepository = speciesRepository;
-    }
-
     public List<SpecieView> SpeciesList { get; set; } = [];
+    public bool IsUserConnected { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
-        var species = await _speciesRepository.FindAllAsync();
+        var userId = User.GetUserId();
+        IsUserConnected = userId is not null;
+
+        var result = await repo.FindAllAsync(userId, User.IsAdmin());
+        if (!result.IsSuccess)
+        {
+            return result.ToPageResult(this);
+        }
+
+        var species = result.Value!;
+
         SpeciesList = species
             .Select(specie =>
             {
                 var path = specie.ImageUrl != null ? UseUploadedFromId(specie.ImageUrl) : null;
-                
+
                 return new SpecieView
                 {
-                    Slug =  specie.Slug,
+                    Slug = specie.Slug,
                     Name = specie.Name,
                     Type = specie.Type,
                     Diet = specie.Diet,
                     Height = FormatCentimeter(specie.Height),
                     Weight = FormatGram(specie.Weight),
-                    ImageUrl = path
+                    ImageUrl = path,
+                    IsConnected = IsUserConnected,
                 };
             })
             .ToList();
+
+        return Page();
     }
 }

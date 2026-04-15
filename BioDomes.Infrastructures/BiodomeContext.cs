@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioDomes.Infrastructures;
 
-public class BiodomeContext(DbContextOptions<BiodomeContext> options) : IdentityDbContext<UserEntity, IdentityRole<int>, int>(options)
+public class BiodomeContext(DbContextOptions<BiodomeContext> options) : IdentityDbContext<UserEntity, IdentityRole, string>(options)
 {
     public DbSet<SpecieEntity> Species { get; set; }
     public DbSet<EquipmentEntity> Equipments { get; set; }
@@ -18,9 +18,12 @@ public class BiodomeContext(DbContextOptions<BiodomeContext> options) : Identity
         
         builder.HasDefaultSchema("dbo");
 
-        builder.ApplyConfiguration(new SpecieEntityTypeConfiguration());
+        builder.ApplyConfiguration(new UserEntityTypeConfiguration());
+        builder.ApplyConfiguration(new RoleEntityTypeConfiguration());
+
         builder.ApplyConfiguration(new EquipmentResourceEntityTypeConfiguration());
-        builder.ApplyConfiguration(new EquipmentEntityTypeConfiguration());
         builder.ApplyConfiguration(new BiomeEntityTypeConfiguration());
+        builder.ApplyConfiguration(new EquipmentEntityTypeConfiguration());
+        builder.ApplyConfiguration(new SpecieEntityTypeConfiguration());
     }
 }
