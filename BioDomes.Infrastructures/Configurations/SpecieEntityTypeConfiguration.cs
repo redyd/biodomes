@@ -89,7 +89,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                     UploadedImageId = (string?)null,
                     TypeLabel = "Plante",
                     DietLabel = "Photosynthèse",
-                    IsPublic = true,
+                    IsPublic = false,
                     UserId = "user-2"
                 },
                 new()
@@ -114,7 +114,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                     TypeLabel = "Arachnides",
                     DietLabel = "Carnivore",
                     IsPublic = true,
-                    UserId = "user-2"
+                    UserId = "user-1"
                 },
                 new()
                 {
@@ -125,7 +125,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
                     UploadedImageId = (string?)null,
                     TypeLabel = "Oiseau",
                     DietLabel = "Carnivore",
-                    IsPublic = false,
+                    IsPublic = true,
                     UserId = "user-1"
                 },
                 new()

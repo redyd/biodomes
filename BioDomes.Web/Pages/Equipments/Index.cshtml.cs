@@ -22,7 +22,7 @@ public class EquipmentPage(IEquipmentRepository repo, IWebHostEnvironment enviro
             Image = UseUploadedFromId(e.ImageId),
             Produced = e.Produced.Label,
             Consumed = e.Consumed.Label,
-            IsConnected = IsUserConnected
+            CanEdit = IsUserConnected && (User.IsAdmin() || e.CreatedBy == User.GetUserId())
         })
         .ToList();
     }

@@ -342,7 +342,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "chene",
                             DietLabel = "Photosynthèse",
                             Height = 2500,
-                            IsPublic = true,
+                            IsPublic = false,
                             Name = "Chene",
                             TypeLabel = "Plante",
                             UserId = "user-2",
@@ -369,7 +369,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Name = "Araignée",
                             TypeLabel = "Arachnides",
                             UploadedImageId = "623fbf44-7418-44d7-8098-6cc6c7122c27.jpg",
-                            UserId = "user-2",
+                            UserId = "user-1",
                             Weight = 95
                         },
                         new
@@ -377,7 +377,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "hirondelle",
                             DietLabel = "Carnivore",
                             Height = 18,
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Hirondelle",
                             TypeLabel = "Oiseau",
                             UserId = "user-1",
@@ -500,7 +500,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "969facba-a004-4698-858d-905355fc0be9",
+                            ConcurrencyStamp = "1cb239c3-a7d3-4632-824a-5eda447d77a7",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -508,7 +508,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "9384203e-4f23-4808-895f-cdbe3a521b6d",
+                            SecurityStamp = "dd3c3d7d-3eb0-4afb-a5a6-686014111591",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -517,7 +517,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "159d6cc7-0409-4e14-bca1-f4260e7bd2c3",
+                            ConcurrencyStamp = "c873a04c-c345-4f75-976c-f4a91e0a27e0",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -525,7 +525,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "598d3034-207b-46cb-a0b8-0eeff0567a1d",
+                            SecurityStamp = "6d3c49d6-ee79-4035-a58c-f1fb431f4a16",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         });

@@ -15,7 +15,7 @@
         <div class="card-name">@Model.Name</div>
         <div class="card-info"><span class="card-label">Produit :</span> @Model.Produced</div>
         <div class="card-info"><span class="card-label">Consomme :</span> @Model.Consumed</div>
-        @if (Model.IsConnected)
+        @if (Model.CanEdit)
         {
             <a asp-page="/Equipments/Edit" asp-route-id="@Model.Id">Éditer</a>
         }

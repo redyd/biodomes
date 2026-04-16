@@ -38,7 +38,7 @@ public class SpeciesModel(ISpeciesRepository repo, IWebHostEnvironment environme
                     Height = FormatCentimeter(specie.Height),
                     Weight = FormatGram(specie.Weight),
                     ImageUrl = path,
-                    IsConnected = IsUserConnected,
+                    CanEdit = IsUserConnected && (User.IsAdmin() || User.GetUserId() == specie.CreatedBy),
                 };
             })
             .ToList();

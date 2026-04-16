@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BioDomes.Infrastructures.Migrations
 {
     [DbContext(typeof(BiodomeContext))]
-    [Migration("20260414191848_Initial")]
+    [Migration("20260416141345_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -85,6 +85,9 @@ namespace BioDomes.Infrastructures.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ConsumedResourceId");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.HasIndex("ProducedResourceId");
 
@@ -284,6 +287,10 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<string>("UploadedImageId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("Weight")
                         .HasColumnType("int");
 
@@ -291,6 +298,8 @@ namespace BioDomes.Infrastructures.Migrations
 
                     b.HasIndex("Slug")
                         .IsUnique();
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("species", "dbo");
 
@@ -304,6 +313,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Name = "Lion",
                             TypeLabel = "Mammifère",
                             UploadedImageId = "3d128e91-b947-4bf7-b988-dc8ffd1de92f.jpg",
+                            UserId = "user-1",
                             Weight = 150000
                         },
                         new
@@ -311,10 +321,11 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "boa",
                             DietLabel = "Carnivore",
                             Height = 225,
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Boa",
                             TypeLabel = "Reptile",
                             UploadedImageId = "47e0e461-066e-404f-8738-361d268f6219.jpg",
+                            UserId = "user-2",
                             Weight = 13000
                         },
                         new
@@ -326,6 +337,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Name = "Hetre",
                             TypeLabel = "Plante",
                             UploadedImageId = "9f21e809-9eeb-4714-8cd0-14b78d14fb60.jpg",
+                            UserId = "user-1",
                             Weight = 830000
                         },
                         new
@@ -336,6 +348,7 @@ namespace BioDomes.Infrastructures.Migrations
                             IsPublic = false,
                             Name = "Chene",
                             TypeLabel = "Plante",
+                            UserId = "user-2",
                             Weight = 2100000
                         },
                         new
@@ -347,6 +360,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Name = "Mouche",
                             TypeLabel = "Insecte",
                             UploadedImageId = "2b101f74-b1f0-4c18-a183-0331f7a4788c.jpg",
+                            UserId = "user-1",
                             Weight = 1
                         },
                         new
@@ -354,10 +368,11 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "araignee",
                             DietLabel = "Carnivore",
                             Height = 4,
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Araignée",
                             TypeLabel = "Arachnides",
                             UploadedImageId = "623fbf44-7418-44d7-8098-6cc6c7122c27.jpg",
+                            UserId = "user-1",
                             Weight = 95
                         },
                         new
@@ -365,9 +380,10 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "hirondelle",
                             DietLabel = "Carnivore",
                             Height = 18,
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Hirondelle",
                             TypeLabel = "Oiseau",
+                            UserId = "user-1",
                             Weight = 45
                         },
                         new
@@ -375,10 +391,11 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "lievre",
                             DietLabel = "Herbivore",
                             Height = 50,
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Lièvre",
                             TypeLabel = "Mammifère",
                             UploadedImageId = "7f084f4d-de3c-4436-b359-6fdfd4b93ec8.jpg",
+                            UserId = "user-2",
                             Weight = 4000
                         },
                         new
@@ -389,6 +406,7 @@ namespace BioDomes.Infrastructures.Migrations
                             IsPublic = false,
                             Name = "Pâturin des prés",
                             TypeLabel = "Plante",
+                            UserId = "user-1",
                             Weight = 1
                         },
                         new
@@ -396,10 +414,11 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "souris",
                             DietLabel = "Omnivore",
                             Height = 9,
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Souris",
                             TypeLabel = "Mammifère",
                             UploadedImageId = "7e6d0ba0-7be3-4f94-a929-e7c04d3e1d90.jpg",
+                            UserId = "user-2",
                             Weight = 25
                         });
                 });
@@ -484,7 +503,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "6bf0aec1-2435-4330-bc31-57588915c073",
+                            ConcurrencyStamp = "1cb239c3-a7d3-4632-824a-5eda447d77a7",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -492,7 +511,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "97cdbea4-3f27-487e-9a3b-eccc88a1c727",
+                            SecurityStamp = "dd3c3d7d-3eb0-4afb-a5a6-686014111591",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -501,7 +520,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "5e7707ef-0cc6-4a07-837c-4920c95ab471",
+                            ConcurrencyStamp = "c873a04c-c345-4f75-976c-f4a91e0a27e0",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -509,7 +528,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "34c64448-aa75-42a9-92c3-ab9570572bb0",
+                            SecurityStamp = "6d3c49d6-ee79-4035-a58c-f1fb431f4a16",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         });
@@ -732,6 +751,17 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Navigation("ConsumedResourceEntity");
 
                     b.Navigation("ProducedResourceEntity");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieEntity", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
