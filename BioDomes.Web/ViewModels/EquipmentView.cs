@@ -7,5 +7,5 @@ public class EquipmentView
     public required string Image { get; set; }
     public required string Produced { get; set; }
     public required string Consumed { get; set; }
-    public required bool IsConnected { get; set; }
+    public required bool CanEdit { get; set; }
 }

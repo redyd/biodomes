@@ -30,6 +30,12 @@ public class EditModel(ISpeciesRepository repository, IWebHostEnvironment enviro
         }
 
         var specie = result.Value!;
+
+        if (!User.IsAdmin() && specie.CreatedBy != userId)
+        {
+            return Forbid();
+        }
+        
         Specie = specie;
 
         ImageUrl = specie.ImageUrl == null ? null : UseUploadedFromId(specie.ImageUrl);

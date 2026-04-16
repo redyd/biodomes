@@ -9,5 +9,5 @@ public class SpecieView
     public required string Height { get; set; }
     public required string Weight { get; set; }
     public required string? ImageUrl { get; set; }
-    public required bool IsConnected { get; set; }
+    public required bool CanEdit { get; set; }
 }

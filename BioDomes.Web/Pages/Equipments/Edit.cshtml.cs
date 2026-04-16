@@ -15,7 +15,7 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
 
     public string ImageSource { get; set; } = string.Empty;
     public List<EquipmentResource> Resources { get; set; } = [];
-
+    
     public async Task<IActionResult> OnGetAsync(int id)
     {
         var userId = User.GetUserId();
@@ -31,6 +31,11 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
         }
 
         var equipment = result.Value!;
+
+        if (!User.IsAdmin() && equipment.CreatedBy != userId)
+        {
+            return Forbid();
+        }
 
         ImageSource = UseUploadedFromId(equipment.ImageId);
         Resources = await repository.GetResourcesAsync();

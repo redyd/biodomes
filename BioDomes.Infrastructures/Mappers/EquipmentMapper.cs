@@ -8,6 +8,7 @@ public static class EquipmentMapper
     public static Equipment MapEquipment(EquipmentEntity entity)
         => new()
         {
+            CreatedBy = entity.UserId,
             Id = entity.Id,
             Name = entity.Name,
             Consumed = MapResource(entity.ConsumedResourceEntity),
