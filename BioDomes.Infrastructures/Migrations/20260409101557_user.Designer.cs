@@ -424,18 +424,7 @@ namespace BioDomes.Infrastructures.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("users", "dbo");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Birthdate = new DateOnly(2006, 4, 9),
-                            Email = "admin@gmail.com",
-                            ImageUrl = "",
-                            Password = "admin",
-                            SearchOrganism = "adminOrganism",
-                            Username = "admin"
-                        });
+                    
                 });
 
             modelBuilder.Entity("BiomeEntityEquipmentEntity", b =>

@@ -30,11 +30,6 @@ namespace BioDomes.Infrastructures.Migrations
                     table.PrimaryKey("PK_users", x => x.Id);
                 });
 
-            migrationBuilder.InsertData(
-                schema: "dbo",
-                table: "users",
-                columns: new[] { "Id", "Birthdate", "Email", "ImageUrl", "Password", "SearchOrganism", "Username" },
-                values: new object[] { 1, new DateOnly(2006, 4, 9), "admin@gmail.com", "", "admin", "adminOrganism", "admin" });
         }
 
         /// <inheritdoc />

@@ -30,6 +30,7 @@
     <ItemGroup>
       <_ContentIncludedByDefault Remove="Pages\Species\EditSpecies.cshtml" />
       <_ContentIncludedByDefault Remove="wwwroot\img\static\logo.png" />
+      <_ContentIncludedByDefault Remove="Pages\Account\Account.cshtml" />
     </ItemGroup>
 
 </Project>
