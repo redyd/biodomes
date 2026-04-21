@@ -13,7 +13,8 @@ public static class EquipmentMapper
             Name = entity.Name,
             Consumed = MapResource(entity.ConsumedResourceEntity),
             Produced = MapResource(entity.ProducedResourceEntity),
-            ImageId = entity.Image
+            ImageId = entity.Image,
+            IsPublic = entity.IsPublic,
         };
 
     private static EquipmentResource MapResource(EquipmentResourceEntity entity)

@@ -150,25 +150,30 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
         }
     }
 
-    public async Task<Result<Equipment>> UpdateAsync(UpdateEquipmentRequest equipment, string? userId, bool isAdmin)
+    public async Task<Result<Equipment>> UpdateAsync(UpdateEquipmentRequest toUpdate, string? userId, bool isAdmin)
     {
         try
         {
             var entity = await context.Equipments
                 .Include(e => e.ConsumedResourceEntity)
                 .Include(e => e.ProducedResourceEntity)
-                .FirstOrDefaultAsync(e => e.Id == equipment.Id);
+                .FirstOrDefaultAsync(e => e.Id == toUpdate.Id);
 
             if (entity is null)
-                return Result<Equipment>.NotFound($"Equipment {equipment.Id} not found.");
+                return Result<Equipment>.NotFound($"Equipment {toUpdate.Id} not found.");
 
             if (!isAdmin && entity.UserId != userId)
                 return Result<Equipment>.Forbidden("Access denied.");
 
-            entity.Name = equipment.Name;
-            entity.Image = equipment.Image;
-            entity.ProducedResourceId = equipment.ProducedResourceId;
-            entity.ConsumedResourceId = equipment.ConsumedResourceId;
+            entity.Name = toUpdate.Name;
+            entity.Image = toUpdate.Image;
+            entity.ProducedResourceId = toUpdate.ProducedResourceId;
+            entity.ConsumedResourceId = toUpdate.ConsumedResourceId;
+
+            if (isAdmin)
+            {
+                entity.IsPublic = toUpdate.IsPublic ?? entity.IsPublic;
+            }
 
             await context.SaveChangesAsync();
 
