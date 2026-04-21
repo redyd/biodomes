@@ -14,6 +14,7 @@ public static class SpecieMapper
             Diet =  specie.DietLabel,
             Height =  specie.Height,
             Weight = specie.Weight,
-            ImageUrl = specie.UploadedImageId
+            ImageUrl = specie.UploadedImageId,
+            IsPublic = specie.IsPublic
         };
 }

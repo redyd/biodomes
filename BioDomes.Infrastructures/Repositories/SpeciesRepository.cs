@@ -88,18 +88,26 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
             if (!isAdmin && entity.UserId != userId)
                 return Result<Specie>.Forbidden("Access denied.");
 
+            var visibility = false;
+            if (isAdmin && toUpdate.IsPublic is not null)
+            {
+                visibility = (bool)toUpdate.IsPublic;
+            }
+
+            // if slugs are different
             if (entity.Slug != toUpdate.Slug)
             {
                 var replacement = new SpecieEntity
                 {
+                    UserId = entity.UserId,
                     Slug = toUpdate.Slug,
                     Name = toUpdate.Name,
                     TypeLabel = toUpdate.Type,
                     DietLabel = toUpdate.Diet,
                     Height = toUpdate.Height,
                     Weight = toUpdate.Weight,
-                    UploadedImageId = toUpdate.ImageUrl,
-                    IsPublic = false
+                    UploadedImageId = toUpdate.ImageUrl ?? entity.UploadedImageId,
+                    IsPublic = visibility
                 };
 
                 context.Species.Remove(entity);
@@ -114,7 +122,12 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
             entity.DietLabel = toUpdate.Diet;
             entity.Height = toUpdate.Height;
             entity.Weight = toUpdate.Weight;
-            entity.UploadedImageId = toUpdate.ImageUrl;
+            entity.IsPublic = visibility;
+
+            if (toUpdate.ImageUrl is not null)
+            {
+                entity.UploadedImageId = toUpdate.ImageUrl;
+            }
 
             await context.SaveChangesAsync();
 

@@ -11,9 +11,10 @@ namespace BioDomes.Web.Pages.Species;
 public class EditModel(ISpeciesRepository repository, IWebHostEnvironment environment) : AppPageModel(environment)
 {
     [BindProperty] public SpeciesInputModel Input { get; set; } = new();
-    public Specie? Specie { get; set; }
 
+    public Specie? Specie { get; set; }
     public string? ImageUrl { get; set; }
+    public bool IsAdmin { get; set; }
 
     public async Task<IActionResult> OnGetAsync(string slug)
     {
@@ -35,7 +36,8 @@ public class EditModel(ISpeciesRepository repository, IWebHostEnvironment enviro
         {
             return Forbid();
         }
-        
+
+        IsAdmin = User.IsAdmin();
         Specie = specie;
 
         ImageUrl = specie.ImageUrl == null ? null : UseUploadedFromId(specie.ImageUrl);
@@ -46,7 +48,8 @@ public class EditModel(ISpeciesRepository repository, IWebHostEnvironment enviro
             Type = specie.Type,
             Diet = specie.Diet,
             Height = specie.Height,
-            Weight = specie.Weight
+            Weight = specie.Weight,
+            Public = specie.IsPublic
         };
 
         return Page();
@@ -106,6 +109,11 @@ public class EditModel(ISpeciesRepository repository, IWebHostEnvironment enviro
             Height = Input.Height,
             Weight = Input.Weight
         };
+
+        if (User.IsAdmin())
+        {
+            updatedSpecie.IsPublic = Input.Public;
+        }
 
         if (Input.Image != null)
         {

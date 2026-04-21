@@ -12,4 +12,5 @@ public class Specie
     public required int Height { get; set; }
     public required int Weight { get; set; }
     public required string? ImageUrl { get; set; }
+    public required bool IsPublic { get; init; }
 }

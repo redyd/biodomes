@@ -22,6 +22,8 @@ public class SpeciesInputModel
 
     [Range(0, 100000000, ErrorMessage = "Le poids doit être entre 0 et 100000000")]
     public int Weight { get; set; }
+
+    public bool Public { get; set; }
     
     public IFormFile? Image { get; set; }
 }
