@@ -49,7 +49,7 @@ public class Add(IWebHostEnvironment environment) : AppPageModel(environment)
 
         var state = CalculateBiomeState(temp);
 
-        // TODO: sauvegarder le biome en base (température, humidité, état)
+        // TODO: sauvegarder en db
 
         SuccessNotification($"Biome créé avec succès ! État : {state}.");
         return RedirectToPage("/Biomes/Index");
