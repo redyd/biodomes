@@ -51,16 +51,27 @@
                     @if (Model.ImageUrl != null)
                     {
                         <span class="image-current-label">Image actuelle</span>
-                        <img src="@Model.ImageUrl" class="card-image" alt="@Model.Specie.Name"/>
+                        <img src="@Model.ImageUrl" class="card-image" alt="@Model?.Specie?.Name"/>
                     }
                     <label class="image-upload-hint">
-                        @(Model.Specie?.ImageUrl != null ? "Changer l'image" : "Ajouter une image")
+                        @(Model?.Specie?.ImageUrl != null ? "Changer l'image" : "Ajouter une image")
                     </label>
                     <div class="image-upload-zone">
                         <input type="file" asp-for="Input.Image" accept="image/*"/>
                     </div>
                     <span asp-validation-for="Input.Image" class="field-error"></span>
                 </div>
+
+                @if (Model is not null && Model.IsAdmin)
+                {
+                    <div class="field-group">
+                        <label class="field-label" for="checkbox-input">Changer la visibilité</label>
+                        <div class="d-flex align-middle gap-3">
+                            <p class="m-0">Visible</p>
+                            <input type="checkbox" asp-for="Input.Public" id="checkbox-input"/>
+                        </div>
+                    </div>
+                }
 
                 <div class="edit-divider"></div>
 

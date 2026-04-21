@@ -17,6 +17,8 @@ public class UpdateEquipmentInputModel
     [Range(1, int.MaxValue, ErrorMessage = "La ressource consommée doit être un ID valide.")]
     public int ConsumedResourceId { get; set; }
 
+    public bool Public { get; set; }
+
     [DataType(DataType.Upload)]
     [AllowedExtensions([".jpg", ".jpeg", ".png", ".gif"],
         ErrorMessage = "Le fichier doit être une image (jpg, jpeg, png, gif).")]

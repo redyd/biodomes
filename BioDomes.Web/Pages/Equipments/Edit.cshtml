@@ -58,6 +58,17 @@
                     <span asp-validation-for="Input.Image" class="field-error"></span>
                 </div>
 
+                @if (Model is not null && Model.IsAdmin)
+                {
+                    <div class="field-group">
+                        <label class="field-label" for="checkbox-input">Changer la visibilité</label>
+                        <div class="d-flex align-middle gap-3">
+                            <p class="m-0">Visible</p>
+                            <input type="checkbox" asp-for="Input.Public" id="checkbox-input"/>
+                        </div>
+                    </div>
+                }
+
                 <div class="edit-divider"></div>
 
                 <div class="edit-actions">

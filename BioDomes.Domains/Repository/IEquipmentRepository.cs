@@ -11,5 +11,5 @@ public interface IEquipmentRepository
     Task<Result<Equipment>> CreateEquipmentAsync(CreateEquipmentRequest createRequest, string userId);
     Task<Result<Equipment>> FindAsync(int id, string userId, bool isAdmin);
     Task<Result<Equipment>> DeleteAsync(int id, string userId, bool isAdmin);
-    Task<Result<Equipment>> UpdateAsync(UpdateEquipmentRequest equipment, string userId, bool isAdmin);
+    Task<Result<Equipment>> UpdateAsync(UpdateEquipmentRequest toUpdate, string userId, bool isAdmin);
 }

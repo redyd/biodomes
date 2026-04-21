@@ -15,6 +15,7 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
 
     public string ImageSource { get; set; } = string.Empty;
     public List<EquipmentResource> Resources { get; set; } = [];
+    public bool IsAdmin { get; set; }
     
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -37,6 +38,7 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
             return Forbid();
         }
 
+        IsAdmin = User.IsAdmin();
         ImageSource = UseUploadedFromId(equipment.ImageId);
         Resources = await repository.GetResourcesAsync();
 
@@ -44,7 +46,8 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
         {
             Name = equipment.Name,
             ConsumedResourceId = equipment.Consumed.Id,
-            ProducedResourceId = equipment.Produced.Id
+            ProducedResourceId = equipment.Produced.Id,
+            Public = equipment.IsPublic
         };
 
         logger.LogInformation($"Editing {id}");
@@ -92,6 +95,11 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
             ProducedResourceId = Input.ProducedResourceId,
             Image = equipment.ImageId
         };
+
+        if (User.IsAdmin())
+        {
+            request.IsPublic = Input.Public;
+        }
 
         if (Input.Image is not null)
         {
