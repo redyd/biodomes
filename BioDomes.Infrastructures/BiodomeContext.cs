@@ -9,6 +9,8 @@ namespace BioDomes.Infrastructures;
 public class BiodomeContext(DbContextOptions<BiodomeContext> options) : IdentityDbContext<UserEntity, IdentityRole, string>(options)
 {
     public DbSet<SpecieEntity> Species { get; set; }
+    
+    public DbSet<BiomeEntity> Biomes { get; set; }
     public DbSet<EquipmentEntity> Equipments { get; set; }
     public DbSet<EquipmentResourceEntity> EquipmentResources { get; set; }
     public DbSet<SpecieClassification> SpecieClassifications { get; set; }
