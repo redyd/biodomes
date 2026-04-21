@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using BioDomes.Web.PageModels;
 
@@ -16,8 +15,7 @@ public class Index(UserManager<UserEntity> userManager, SignInManager<UserEntity
 
     public class InputModel
     {
-        [Required]
-        [EmailAddress]
+        [Required, EmailAddress]
         public string Email { get; set; }
 
         public DateOnly? Birthdate { get; set; }
@@ -27,19 +25,25 @@ public class Index(UserManager<UserEntity> userManager, SignInManager<UserEntity
         [DataType(DataType.Password)]
         public string? CurrentPassword { get; set; }
 
-        [DataType(DataType.Password)]
-        [StringLength(100, MinimumLength = 6)]
+        [DataType(DataType.Password), StringLength(100, MinimumLength = 6)]
         public string? NewPassword { get; set; }
 
-        [DataType(DataType.Password)]
-        [Compare("NewPassword")]
+        [DataType(DataType.Password), Compare("NewPassword")]
         public string? ConfirmPassword { get; set; }
     }
+
+    private bool WantsToChangePassword =>
+        !string.IsNullOrEmpty(Input.CurrentPassword) ||
+        !string.IsNullOrEmpty(Input.NewPassword) ||
+        !string.IsNullOrEmpty(Input.ConfirmPassword);
 
     public async Task OnGetAsync()
     {
         var user = await userManager.GetUserAsync(User);
-        if (user == null) return;
+        if (user == null)
+        {
+            return;
+        }
 
         Input = new InputModel
         {
@@ -52,10 +56,78 @@ public class Index(UserManager<UserEntity> userManager, SignInManager<UserEntity
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid) return Page();
+        if (!WantsToChangePassword)
+        {
+            ModelState.Remove(nameof(Input.CurrentPassword));
+            ModelState.Remove(nameof(Input.NewPassword));
+            ModelState.Remove(nameof(Input.ConfirmPassword));
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
 
         var user = await userManager.GetUserAsync(User);
-        if (user == null) return NotFound();
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        if (WantsToChangePassword && !await ValidateAndChangePasswordAsync(user) || !await UpdateProfileAsync(user))
+        {
+            return Page();
+        }
+
+        await signInManager.RefreshSignInAsync(user);
+        SuccessNotification("Profil mis à jour avec succès !");
+        return RedirectToPage();
+    }
+
+    private async Task<bool> ValidateAndChangePasswordAsync(UserEntity user)
+    {
+        if (string.IsNullOrEmpty(Input.CurrentPassword))
+        {
+            ErrorNotification("Le mot de passe actuel est requis.");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(Input.NewPassword))
+        {
+            ErrorNotification("Le nouveau mot de passe est requis.");
+            return false;
+        }
+
+        if (Input.NewPassword != Input.ConfirmPassword)
+        {
+            ErrorNotification("Les nouveaux mots de passe ne correspondent pas.");
+            return false;
+        }
+
+        if (!await userManager.CheckPasswordAsync(user, Input.CurrentPassword))
+        {
+            ErrorNotification("Le mot de passe actuel est incorrect.");
+            return false;
+        }
+
+        var result = await userManager.ChangePasswordAsync(user, Input.CurrentPassword, Input.NewPassword);
+
+        return result.Succeeded;
+    }
+
+    private async Task<bool> UpdateProfileAsync(UserEntity user)
+    {
+        var hasError = RestoreIfEmpty(Input.SearchOrganism, user.SearchOrganism, "L'organisme de recherche ne peut pas être vide.",
+                           v => { Input.SearchOrganism = v; ModelState.Remove($"{nameof(Input)}.{nameof(Input.SearchOrganism)}"); })
+                     | RestoreIfEmpty(Input.ImageUrl, user.ImageUrl, "L'avatar ne peut pas être vide.",
+                           v => { Input.ImageUrl = v; ModelState.Remove($"{nameof(Input)}.{nameof(Input.ImageUrl)}"); })
+                     | RestoreIfEmpty(Input.Birthdate?.ToString(), user.Birthdate?.ToString(), "La date de naissance ne peut pas être vide.",
+                           _ => { Input.Birthdate = user.Birthdate; ModelState.Remove($"{nameof(Input)}.{nameof(Input.Birthdate)}"); });
+
+        if (hasError)
+        {
+            return false;
+        }
 
         user.Email = Input.Email;
         user.UserName = Input.Email;
@@ -63,16 +135,20 @@ public class Index(UserManager<UserEntity> userManager, SignInManager<UserEntity
         user.SearchOrganism = Input.SearchOrganism;
         user.ImageUrl = Input.ImageUrl;
 
-        await userManager.UpdateAsync(user);
+        var result = await userManager.UpdateAsync(user);
+        
+        return result.Succeeded;
+    }
 
-        if (!string.IsNullOrEmpty(Input.NewPassword) && !string.IsNullOrEmpty(Input.CurrentPassword))
+    private bool RestoreIfEmpty(string? inputValue, string? savedValue, string errorMessage, Action<string> restore)
+    {
+        if (!string.IsNullOrEmpty(inputValue) || savedValue == null)
         {
-            await userManager.ChangePasswordAsync(user, Input.CurrentPassword, Input.NewPassword);
+            return false;
         }
 
-        await signInManager.RefreshSignInAsync(user);
-
-        SuccessNotification("Profil mis à jour avec succès !");
-        return RedirectToPage();
+        ErrorNotification(errorMessage);
+        restore(savedValue);
+        return true;
     }
 }
