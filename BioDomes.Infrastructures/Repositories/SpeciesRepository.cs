@@ -141,10 +141,18 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
             var exists = await context.Species.AnyAsync(s => s.Slug == slug);
 
             if (exists)
+            {
                 return Result<Specie>.Conflict("Specie already exists");
+            }
+
+            if (userId is null)
+            {
+                return Result<Specie>.Forbidden("You should be authenticate to add a specie");
+            }
 
             var entity = new SpecieEntity
             {
+                UserId = userId,
                 Slug = slug,
                 Name = toAdd.Name,
                 TypeLabel = toAdd.Type,
