@@ -130,6 +130,8 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
         try
         {
             var entity = await context.Equipments
+                .Include(e => e.ConsumedResourceEntity)
+                .Include(e => e.ProducedResourceEntity)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (entity is null)
