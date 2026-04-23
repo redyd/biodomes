@@ -33,8 +33,8 @@ public class SpeciesModel(ISpeciesRepository repo, IWebHostEnvironment environme
                 {
                     Slug = specie.Slug,
                     Name = specie.Name,
-                    Type = specie.Type,
-                    Diet = specie.Diet,
+                    Type = specie.Classification.Label,
+                    Diet = specie.Diet.Label,
                     Height = FormatCentimeter(specie.Height),
                     Weight = FormatGram(specie.Weight),
                     ImageUrl = path,

@@ -15,7 +15,11 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
     {
         try
         {
-            var query = context.Species.AsQueryable();
+            var query = context
+                .Species
+                .Include(e => e.DietEntity)
+                .Include(e => e.ClassificationEntity)
+                .AsQueryable();
 
             if (!isAdmin)
             {
@@ -52,7 +56,11 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
     {
         try
         {
-            var result = await context.Species.FirstOrDefaultAsync(e => e.Slug == slug);
+            var result = await context
+                .Species
+                .Include(e => e.DietEntity)
+                .Include(e => e.ClassificationEntity)
+                .FirstOrDefaultAsync(e => e.Slug == slug);
 
             if (result is null)
                 return Result<Specie>.NotFound("Specie not found");
@@ -102,8 +110,8 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
                     UserId = entity.UserId,
                     Slug = toUpdate.Slug,
                     Name = toUpdate.Name,
-                    TypeLabel = toUpdate.Type,
-                    DietLabel = toUpdate.Diet,
+                    ClassificationId = toUpdate.ClassificationId,
+                    DietId = toUpdate.DietId,
                     Height = toUpdate.Height,
                     Weight = toUpdate.Weight,
                     UploadedImageId = toUpdate.ImageUrl ?? entity.UploadedImageId,
@@ -118,8 +126,8 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
             }
 
             entity.Name = toUpdate.Name;
-            entity.TypeLabel = toUpdate.Type;
-            entity.DietLabel = toUpdate.Diet;
+            entity.ClassificationId = toUpdate.ClassificationId;
+            entity.DietId = toUpdate.DietId;
             entity.Height = toUpdate.Height;
             entity.Weight = toUpdate.Weight;
             entity.IsPublic = visibility;
@@ -168,8 +176,8 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
                 UserId = userId,
                 Slug = slug,
                 Name = toAdd.Name,
-                TypeLabel = toAdd.Type,
-                DietLabel = toAdd.Diet,
+                ClassificationId = toAdd.ClassificationId,
+                DietId = toAdd.DietId,
                 Height = toAdd.Height,
                 Weight = toAdd.Weight,
                 UploadedImageId = toAdd.Image,
@@ -179,7 +187,11 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
             await context.Species.AddAsync(entity);
             await context.SaveChangesAsync();
 
-            var specie = await context.Species.FirstAsync(s => s.Slug == entity.Slug);
+            var specie = await context
+                .Species
+                .Include(s => s.DietEntity)
+                .Include(s => s.ClassificationEntity)
+                .FirstAsync(s => s.Slug == entity.Slug);
             return Result<Specie>.Ok(SpecieMapper.MapSpecie(specie));
         }
         catch (DbUpdateException ex) when (SqlServerError.IsUniqueConstraintViolation(ex) ||
