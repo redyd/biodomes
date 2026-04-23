@@ -10,12 +10,10 @@ public class SpeciesInputModel
     public string Name { get; set; } = string.Empty;
     
     [Required(ErrorMessage = "Le type est requis.")]
-    [IsSpeciesClassification(ErrorMessage = "Type invalide")]
-    public string Type { get; set; } = string.Empty;
+    public int ClassificationId { get; set; }
     
     [Required(ErrorMessage = "Le régime alimentaire est requis.")]
-    [RegularExpression(@"^[a-zA-ZÀ-ÿ\s-]+$", ErrorMessage = "Le régime alimentaire ne peut contenir que des lettres, espaces ou tirets.")]
-    public string Diet { get; set; } = string.Empty;
+    public int DietId { get; set; }
     
     [Range(0, 10000, ErrorMessage = "La taille doit être entre 0 et 10000")]
     public int Height { get; set; }

@@ -21,22 +21,27 @@
                     <input class="field-input" type="text" asp-for="Input.Name"/>
                     <span asp-validation-for="Input.Name" class="field-error"></span>
                 </div>
+
                 <div class="field-group">
-                    <label class="field-label" asp-for="Input.Type">Classification</label>
-                    <select class="field-input" asp-for="Input.Type">
+                    <label class="field-label" asp-for="Input.ClassificationId">Classification</label>
+                    <select class="field-input"
+                            asp-for="Input.ClassificationId"
+                            asp-items="Model.Classifications">
                         <option value="">-- Choisir --</option>
-                        @foreach (var classification in Enum.GetNames<Domains.Core.SpeciesClassification>())
-                        {
-                            <option value="@classification">@classification</option>
-                        }
                     </select>
-                    <span asp-validation-for="Input.Type" class="field-error"></span>
+                    <span asp-validation-for="Input.ClassificationId" class="field-error"></span>
                 </div>
+
                 <div class="field-group">
-                    <label class="field-label">Régime</label>
-                    <input class="field-input" type="text" asp-for="Input.Diet"/>
-                    <span asp-validation-for="Input.Diet" class="field-error"></span>
+                    <label class="field-label" asp-for="Input.DietId">Régime</label>
+                    <select class="field-input"
+                            asp-for="Input.DietId"
+                            asp-items="Model.Diets">
+                        <option value="">-- Choisir --</option>
+                    </select>
+                    <span asp-validation-for="Input.DietId" class="field-error"></span>
                 </div>
+
                 <div class="field-group">
                     <label class="field-label">Taille adulte (cm)</label>
                     <input class="field-input" type="number" asp-for="Input.Height"/>

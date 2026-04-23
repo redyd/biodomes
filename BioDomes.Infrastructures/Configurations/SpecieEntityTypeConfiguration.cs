@@ -24,11 +24,15 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
 
         builder.Property(specie => specie.UploadedImageId);
 
-        builder.Property(specie => specie.TypeLabel)
-            .IsRequired();
+        builder.HasOne(specie => specie.ClassificationEntity)
+            .WithMany()
+            .HasForeignKey(specie => specie.ClassificationId)
+            .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(specie => specie.DietLabel)
-            .IsRequired();
+        builder.HasOne(specie => specie.DietEntity)
+            .WithMany()
+            .HasForeignKey(specie => specie.DietId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(specie => specie.IsPublic)
             .IsRequired()
@@ -42,128 +46,126 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
 
     private static void SeedSpecies(EntityTypeBuilder<SpecieEntity> builder)
     {
-        builder.HasData(new List<SpecieEntity>
+        builder.HasData(
+            new SpecieEntity
             {
-                new()
-                {
-                    Slug = "lion",
-                    Name = "Lion",
-                    Height = 180,
-                    Weight = 150000,
-                    UploadedImageId = "3d128e91-b947-4bf7-b988-dc8ffd1de92f.jpg",
-                    TypeLabel = "Mammifère",
-                    DietLabel = "Carnivore",
-                    IsPublic = false,
-                    UserId = "user-1"
-                },
-                new()
-                {
-                    Slug = "boa",
-                    Name = "Boa",
-                    Height = 225,
-                    Weight = 13000,
-                    UploadedImageId = "47e0e461-066e-404f-8738-361d268f6219.jpg",
-                    TypeLabel = "Reptile",
-                    DietLabel = "Carnivore",
-                    IsPublic = true,
-                    UserId = "user-2"
-                },
-                new()
-                {
-                    Slug = "hetre",
-                    Name = "Hetre",
-                    Height = 600,
-                    Weight = 830000,
-                    UploadedImageId = "9f21e809-9eeb-4714-8cd0-14b78d14fb60.jpg",
-                    TypeLabel = "Plante",
-                    DietLabel = "Photosynthèse",
-                    IsPublic = false,
-                    UserId = "user-1"
-                },
-                new()
-                {
-                    Slug = "chene",
-                    Name = "Chene",
-                    Height = 2500,
-                    Weight = 2100000,
-                    UploadedImageId = (string?)null,
-                    TypeLabel = "Plante",
-                    DietLabel = "Photosynthèse",
-                    IsPublic = false,
-                    UserId = "user-2"
-                },
-                new()
-                {
-                    Slug = "mouche",
-                    Name = "Mouche",
-                    Height = 1,
-                    Weight = 1,
-                    UploadedImageId = "2b101f74-b1f0-4c18-a183-0331f7a4788c.jpg",
-                    TypeLabel = "Insecte",
-                    DietLabel = "Coprophage",
-                    IsPublic = false,
-                    UserId = "user-1"
-                },
-                new()
-                {
-                    Slug = "araignee",
-                    Name = "Araignée",
-                    Height = 4,
-                    Weight = 95,
-                    UploadedImageId = "623fbf44-7418-44d7-8098-6cc6c7122c27.jpg",
-                    TypeLabel = "Arachnides",
-                    DietLabel = "Carnivore",
-                    IsPublic = true,
-                    UserId = "user-1"
-                },
-                new()
-                {
-                    Slug = "hirondelle",
-                    Name = "Hirondelle",
-                    Height = 18,
-                    Weight = 45,
-                    UploadedImageId = (string?)null,
-                    TypeLabel = "Oiseau",
-                    DietLabel = "Carnivore",
-                    IsPublic = true,
-                    UserId = "user-1"
-                },
-                new()
-                {
-                    Slug = "lievre",
-                    Name = "Lièvre",
-                    Height = 50,
-                    Weight = 4000,
-                    UploadedImageId = "7f084f4d-de3c-4436-b359-6fdfd4b93ec8.jpg",
-                    TypeLabel = "Mammifère",
-                    DietLabel = "Herbivore",
-                    IsPublic = true,
-                    UserId = "user-2"
-                },
-                new()
-                {
-                    Slug = "paturin-des-pres",
-                    Name = "Pâturin des prés",
-                    Height = 23,
-                    Weight = 1,
-                    UploadedImageId = (string?)null,
-                    TypeLabel = "Plante",
-                    DietLabel = "Photosynthèse",
-                    IsPublic = false,
-                    UserId = "user-1"
-                },
-                new()
-                {
-                    Slug = "souris",
-                    Name = "Souris",
-                    Height = 9,
-                    Weight = 25,
-                    UploadedImageId = "7e6d0ba0-7be3-4f94-a929-e7c04d3e1d90.jpg",
-                    TypeLabel = "Mammifère",
-                    DietLabel = "Omnivore",
-                    IsPublic = true,
-                    UserId = "user-2"
-                }
+                Slug = "lion",
+                Name = "Lion",
+                Height = 180,
+                Weight = 150000,
+                UploadedImageId = "3d128e91-b947-4bf7-b988-dc8ffd1de92f.jpg",
+                ClassificationId = 1, // Mammifère
+                DietId = 1, // Carnivore
+                IsPublic = false,
+                UserId = "user-1"
+            },
+            new SpecieEntity
+            {
+                Slug = "boa",
+                Name = "Boa",
+                Height = 225,
+                Weight = 13000,
+                UploadedImageId = "47e0e461-066e-404f-8738-361d268f6219.jpg",
+                ClassificationId = 4, // Reptile
+                DietId = 1, // Carnivore
+                IsPublic = true,
+                UserId = "user-2"
+            },
+            new SpecieEntity
+            {
+                Slug = "hetre",
+                Name = "Hêtre",
+                Height = 600,
+                Weight = 830000,
+                UploadedImageId = "9f21e809-9eeb-4714-8cd0-14b78d14fb60.jpg",
+                ClassificationId = 16, // Plante
+                DietId = 7, // Photosynthèse
+                IsPublic = false,
+                UserId = "user-1"
+            },
+            new SpecieEntity
+            {
+                Slug = "chene",
+                Name = "Chêne",
+                Height = 2500,
+                Weight = 2100000,
+                UploadedImageId = null,
+                ClassificationId = 16,
+                DietId = 7,
+                IsPublic = false,
+                UserId = "user-2"
+            },
+            new SpecieEntity
+            {
+                Slug = "mouche",
+                Name = "Mouche",
+                Height = 1,
+                Weight = 1,
+                UploadedImageId = "2b101f74-b1f0-4c18-a183-0331f7a4788c.jpg",
+                ClassificationId = 8, // Insecte
+                DietId = 4, // Coprophages
+                IsPublic = false,
+                UserId = "user-1"
+            },
+            new SpecieEntity
+            {
+                Slug = "araignee",
+                Name = "Araignée",
+                Height = 4,
+                Weight = 95,
+                UploadedImageId = "623fbf44-7418-44d7-8098-6cc6c7122c27.jpg",
+                ClassificationId = 7, // Arachnides
+                DietId = 1, // Carnivore
+                IsPublic = true,
+                UserId = "user-1"
+            },
+            new SpecieEntity
+            {
+                Slug = "hirondelle",
+                Name = "Hirondelle",
+                Height = 18,
+                Weight = 45,
+                UploadedImageId = null,
+                ClassificationId = 2, // Oiseau
+                DietId = 1, // Carnivore
+                IsPublic = true,
+                UserId = "user-1"
+            },
+            new SpecieEntity
+            {
+                Slug = "lievre",
+                Name = "Lièvre",
+                Height = 50,
+                Weight = 4000,
+                UploadedImageId = "7f084f4d-de3c-4436-b359-6fdfd4b93ec8.jpg",
+                ClassificationId = 1, // Mammifère
+                DietId = 2, // Herbivore
+                IsPublic = true,
+                UserId = "user-2"
+            },
+            new SpecieEntity
+            {
+                Slug = "paturin-des-pres",
+                Name = "Pâturin des prés",
+                Height = 23,
+                Weight = 1,
+                UploadedImageId = null,
+                ClassificationId = 16,
+                DietId = 7,
+                IsPublic = false,
+                UserId = "user-1"
+            },
+            new SpecieEntity
+            {
+                Slug = "souris",
+                Name = "Souris",
+                Height = 9,
+                Weight = 25,
+                UploadedImageId = "7e6d0ba0-7be3-4f94-a929-e7c04d3e1d90.jpg",
+                ClassificationId = 1,
+                DietId = 3, // Omnivore
+                IsPublic = true,
+                UserId = "user-2"
             }
         );
     }

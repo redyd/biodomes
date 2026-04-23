@@ -255,14 +255,196 @@ namespace BioDomes.Infrastructures.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieClassification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("specie_classifications", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Label = "Mammifère"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Label = "Oiseau"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Label = "Poisson"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Label = "Reptile"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Label = "Amphibien"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Label = "Crustacé"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Label = "Arachnides"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Label = "Insecte"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Label = "Myriapode"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Label = "Mollusque"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Label = "Echinoderme"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Label = "Anélide"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Label = "Cnidaire"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Label = "Plathelminthe"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Label = "Porifère"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Label = "Plante"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Label = "Mousse"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Label = "Algue"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Label = "Lichen"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Label = "Champignon"
+                        });
+                });
+
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieDiet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("specie_diets", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Label = "Carnivore"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Label = "Herbivore"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Label = "Omnivore"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Label = "Coprophages"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Label = "Limivores"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Label = "Détritivores"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Label = "Autotrophie (Photosynthèse)"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Label = "Hétérotrophie"
+                        });
+                });
+
             modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieEntity", b =>
                 {
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("DietLabel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ClassificationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DietId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Height")
                         .HasColumnType("int");
@@ -277,10 +459,6 @@ namespace BioDomes.Infrastructures.Migrations
                         .HasMaxLength(75)
                         .HasColumnType("nvarchar(75)");
 
-                    b.Property<string>("TypeLabel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UploadedImageId")
                         .HasColumnType("nvarchar(max)");
 
@@ -293,6 +471,10 @@ namespace BioDomes.Infrastructures.Migrations
 
                     b.HasKey("Slug");
 
+                    b.HasIndex("ClassificationId");
+
+                    b.HasIndex("DietId");
+
                     b.HasIndex("Slug")
                         .IsUnique();
 
@@ -304,11 +486,11 @@ namespace BioDomes.Infrastructures.Migrations
                         new
                         {
                             Slug = "lion",
-                            DietLabel = "Carnivore",
+                            ClassificationId = 1,
+                            DietId = 1,
                             Height = 180,
                             IsPublic = false,
                             Name = "Lion",
-                            TypeLabel = "Mammifère",
                             UploadedImageId = "3d128e91-b947-4bf7-b988-dc8ffd1de92f.jpg",
                             UserId = "user-1",
                             Weight = 150000
@@ -316,11 +498,11 @@ namespace BioDomes.Infrastructures.Migrations
                         new
                         {
                             Slug = "boa",
-                            DietLabel = "Carnivore",
+                            ClassificationId = 4,
+                            DietId = 1,
                             Height = 225,
                             IsPublic = true,
                             Name = "Boa",
-                            TypeLabel = "Reptile",
                             UploadedImageId = "47e0e461-066e-404f-8738-361d268f6219.jpg",
                             UserId = "user-2",
                             Weight = 13000
@@ -328,11 +510,11 @@ namespace BioDomes.Infrastructures.Migrations
                         new
                         {
                             Slug = "hetre",
-                            DietLabel = "Photosynthèse",
+                            ClassificationId = 16,
+                            DietId = 7,
                             Height = 600,
                             IsPublic = false,
-                            Name = "Hetre",
-                            TypeLabel = "Plante",
+                            Name = "Hêtre",
                             UploadedImageId = "9f21e809-9eeb-4714-8cd0-14b78d14fb60.jpg",
                             UserId = "user-1",
                             Weight = 830000
@@ -340,22 +522,22 @@ namespace BioDomes.Infrastructures.Migrations
                         new
                         {
                             Slug = "chene",
-                            DietLabel = "Photosynthèse",
+                            ClassificationId = 16,
+                            DietId = 7,
                             Height = 2500,
                             IsPublic = false,
-                            Name = "Chene",
-                            TypeLabel = "Plante",
+                            Name = "Chêne",
                             UserId = "user-2",
                             Weight = 2100000
                         },
                         new
                         {
                             Slug = "mouche",
-                            DietLabel = "Coprophage",
+                            ClassificationId = 8,
+                            DietId = 4,
                             Height = 1,
                             IsPublic = false,
                             Name = "Mouche",
-                            TypeLabel = "Insecte",
                             UploadedImageId = "2b101f74-b1f0-4c18-a183-0331f7a4788c.jpg",
                             UserId = "user-1",
                             Weight = 1
@@ -363,11 +545,11 @@ namespace BioDomes.Infrastructures.Migrations
                         new
                         {
                             Slug = "araignee",
-                            DietLabel = "Carnivore",
+                            ClassificationId = 7,
+                            DietId = 1,
                             Height = 4,
                             IsPublic = true,
                             Name = "Araignée",
-                            TypeLabel = "Arachnides",
                             UploadedImageId = "623fbf44-7418-44d7-8098-6cc6c7122c27.jpg",
                             UserId = "user-1",
                             Weight = 95
@@ -375,22 +557,22 @@ namespace BioDomes.Infrastructures.Migrations
                         new
                         {
                             Slug = "hirondelle",
-                            DietLabel = "Carnivore",
+                            ClassificationId = 2,
+                            DietId = 1,
                             Height = 18,
                             IsPublic = true,
                             Name = "Hirondelle",
-                            TypeLabel = "Oiseau",
                             UserId = "user-1",
                             Weight = 45
                         },
                         new
                         {
                             Slug = "lievre",
-                            DietLabel = "Herbivore",
+                            ClassificationId = 1,
+                            DietId = 2,
                             Height = 50,
                             IsPublic = true,
                             Name = "Lièvre",
-                            TypeLabel = "Mammifère",
                             UploadedImageId = "7f084f4d-de3c-4436-b359-6fdfd4b93ec8.jpg",
                             UserId = "user-2",
                             Weight = 4000
@@ -398,22 +580,22 @@ namespace BioDomes.Infrastructures.Migrations
                         new
                         {
                             Slug = "paturin-des-pres",
-                            DietLabel = "Photosynthèse",
+                            ClassificationId = 16,
+                            DietId = 7,
                             Height = 23,
                             IsPublic = false,
                             Name = "Pâturin des prés",
-                            TypeLabel = "Plante",
                             UserId = "user-1",
                             Weight = 1
                         },
                         new
                         {
                             Slug = "souris",
-                            DietLabel = "Omnivore",
+                            ClassificationId = 1,
+                            DietId = 3,
                             Height = 9,
                             IsPublic = true,
                             Name = "Souris",
-                            TypeLabel = "Mammifère",
                             UploadedImageId = "7e6d0ba0-7be3-4f94-a929-e7c04d3e1d90.jpg",
                             UserId = "user-2",
                             Weight = 25
@@ -428,7 +610,8 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly>("Birthdate")
+                    b.Property<DateOnly?>("Birthdate")
+                        .IsRequired()
                         .HasColumnType("date");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -500,7 +683,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "1cb239c3-a7d3-4632-824a-5eda447d77a7",
+                            ConcurrencyStamp = "43ec93d7-0bc8-4f71-bda6-caa8b7a7daba",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -508,7 +691,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "dd3c3d7d-3eb0-4afb-a5a6-686014111591",
+                            SecurityStamp = "d58c1500-54f4-4d36-b9da-6e5c0eb85ebe",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -517,7 +700,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "c873a04c-c345-4f75-976c-f4a91e0a27e0",
+                            ConcurrencyStamp = "5def1c4e-7c52-4c86-b519-e13cc39f0994",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -525,7 +708,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "6d3c49d6-ee79-4035-a58c-f1fb431f4a16",
+                            SecurityStamp = "2f87cebb-3bee-4190-9a77-8402aff40512",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         });
@@ -754,11 +937,27 @@ namespace BioDomes.Infrastructures.Migrations
 
             modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieEntity", b =>
                 {
+                    b.HasOne("BioDomes.Infrastructures.Models.SpecieClassification", "ClassificationEntity")
+                        .WithMany()
+                        .HasForeignKey("ClassificationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BioDomes.Infrastructures.Models.SpecieDiet", "DietEntity")
+                        .WithMany()
+                        .HasForeignKey("DietId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("BioDomes.Infrastructures.Models.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ClassificationEntity");
+
+                    b.Navigation("DietEntity");
 
                     b.Navigation("User");
                 });

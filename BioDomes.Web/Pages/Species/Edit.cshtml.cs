@@ -8,13 +8,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Species;
 
-public class EditModel(ISpeciesRepository repository, IWebHostEnvironment environment) : AppPageModel(environment)
+public class EditModel(
+    ISpeciesRepository repository,
+    ISpecieAttributesRepository attributesRepository,
+    IWebHostEnvironment environment) : AppPageModel(environment)
 {
     [BindProperty] public SpeciesInputModel Input { get; set; } = new();
 
     public Specie? Specie { get; set; }
     public string? ImageUrl { get; set; }
     public bool IsAdmin { get; set; }
+
+    public List<Classification> Classifications { get; set; } = [];
+    public List<Diet> Diets { get; set; } = [];
 
     public async Task<IActionResult> OnGetAsync(string slug)
     {
@@ -40,13 +46,16 @@ public class EditModel(ISpeciesRepository repository, IWebHostEnvironment enviro
         IsAdmin = User.IsAdmin();
         Specie = specie;
 
+        Classifications = await attributesRepository.GetClassifications();
+        Diets = await attributesRepository.GetDiets();
+
         ImageUrl = specie.ImageUrl == null ? null : UseUploadedFromId(specie.ImageUrl);
 
         Input = new SpeciesInputModel
         {
             Name = specie.Name,
-            Type = specie.Type,
-            Diet = specie.Diet,
+            ClassificationId = specie.Classification.Id,
+            DietId = specie.Diet.Id,
             Height = specie.Height,
             Weight = specie.Weight,
             Public = specie.IsPublic
@@ -97,6 +106,8 @@ public class EditModel(ISpeciesRepository repository, IWebHostEnvironment enviro
     {
         if (!ModelState.IsValid)
         {
+            Classifications = await attributesRepository.GetClassifications();
+            Diets = await attributesRepository.GetDiets();
             return Page();
         }
 
@@ -104,8 +115,8 @@ public class EditModel(ISpeciesRepository repository, IWebHostEnvironment enviro
         {
             PreviousSlug = slug,
             Name = Input.Name,
-            Type = Input.Type,
-            Diet = Input.Diet,
+            ClassificationId = Input.ClassificationId,
+            DietId = Input.DietId,
             Height = Input.Height,
             Weight = Input.Weight
         };
