@@ -96,7 +96,7 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
             if (!isAdmin && entity.UserId != userId)
                 return Result<Specie>.Forbidden("Access denied.");
 
-            var visibility = false;
+            var visibility = entity.IsPublic;
             if (isAdmin && toUpdate.IsPublic is not null)
             {
                 visibility = (bool)toUpdate.IsPublic;
@@ -210,7 +210,10 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
     {
         try
         {
-            var entity = await context.Species.FirstOrDefaultAsync(s => s.Slug == slug);
+            var entity = await context.Species
+                .Include(s => s.DietEntity)
+                .Include(s => s.ClassificationEntity)
+                .FirstOrDefaultAsync(s => s.Slug == slug);
 
             if (entity is null)
                 return Result<Specie>.NotFound($"Specie '{slug}' not found.");
