@@ -2,6 +2,7 @@
 using BioDomes.Domains.Repository;
 using BioDomes.Domains.Requests;
 using BioDomes.Infrastructures.Mappers;
+using BioDomes.Infrastructures.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -61,14 +62,71 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         }
     }
 
-    public async Task<Result<Biome>> CreateEquipmentAsync(CreateBiomeRequest createRequest, string userId)
+    public async Task<Result<Biome>> CreateBiomeAsync(CreateBiomeRequest createRequest, string userId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var exist = await context.Biomes.AnyAsync(b => b.Name.ToLower() == createRequest.Name.ToLower());
+
+            if (exist)
+            {
+                return Result<Biome>.Conflict("A biome with this name already exist.");
+            }
+
+            var entity = new BiomeEntity
+            {
+                Name = createRequest.Name,
+                Temperature = createRequest.Temperature,
+                Humidity = createRequest.Humidity,
+                ImageUrl = createRequest.ImageUrl,
+                UserId = createRequest.UserId,
+            };
+
+            await context.Biomes.AddAsync(entity);
+            await context.SaveChangesAsync();
+            var created = await context.Biomes
+                .FirstAsync(b => b.Id == entity.Id);
+
+            return Result<Biome>.Ok(BiomeMapper.MapBiome(created));
+        }
+        catch (DbUpdateException ex) when (SqlServerError.IsUniqueConstraintViolation(ex))
+        {
+            return Result<Biome>.Conflict("A biome with this name already exists.");
+        }
+        catch (DbUpdateException ex) when (SqlServerError.IsForeignKeyViolation(ex))
+        {
+            return Result<Biome>.Failure("A referenced resource does not exist.");
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning($"Database error: {ex.Message}");
+            return Result<Biome>.Failure("Database error");
+        }
     }
 
     public async Task<Result<Biome>> UpdateAsync(UpdateBiomeRequest toUpdate, string? userId, bool isAdmin)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var entity = await context.Biomes
+                .FirstOrDefaultAsync(b => b.Id == toUpdate.Id);
+            
+            if (entity is null)
+                return Result<Biome>.NotFound("Biome not found");
+            
+            
+            if (!isAdmin && !entity.IsPublic && entity.UserId != userId)
+            {
+                return Result<Biome>.Forbidden("Access denied.");
+            }
+
+            return Result<Biome>.Ok(BiomeMapper.MapBiome(entity));
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning($"Database error: {ex.Message}");
+            return Result<Biome>.Failure("Database error");
+        }
     }
 
     public async Task<Result<Biome>> DeleteAsync(int id, string userId, bool isAdmin)

@@ -3,11 +3,14 @@ using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using BioDomes.Domains.Repository;
+using BioDomes.Domains.Requests;
+using BioDomes.Web.Extensions;
 
 namespace BioDomes.Web.Pages.Biomes;
 
 [Authorize]
-public class Add(IWebHostEnvironment environment) : AppPageModel(environment)
+public class Add(IWebHostEnvironment environment, IBiomeRepository repository) : AppPageModel(environment)
 {
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -27,11 +30,13 @@ public class Add(IWebHostEnvironment environment) : AppPageModel(environment)
         [Required(ErrorMessage = "L'humidité absolue est requise.")]
         [Range(0, double.MaxValue, ErrorMessage = "L'humidité doit être positive.")]
         public double? AbsoluteHumidity { get; set; }
+        
+        public string? ImageUrl { get; set; }
     }
 
     public void OnGet() { }
 
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid) return Page();
 
@@ -49,8 +54,28 @@ public class Add(IWebHostEnvironment environment) : AppPageModel(environment)
 
         var state = CalculateBiomeState(temp);
 
-        // TODO: sauvegarder en db
+        var userId = User.GetUserId();
+        if (userId == null)
+        {
+            return Forbid();
+        }
 
+        var createRequest = new CreateBiomeRequest
+        {
+            Name = Input.Name,
+            Temperature = Input.Temperature,
+            Humidity = Input.AbsoluteHumidity,
+            ImageUrl = Input.ImageUrl,
+            UserId = userId
+        };
+        
+        var result = await repository.CreateBiomeAsync(createRequest, userId);
+        if (!result.IsSuccess)
+        {
+            ErrorNotification($"Erreur dans la création du biome");
+            return Page();
+        }
+        
         SuccessNotification($"Biome créé avec succès ! État : {state}.");
         return RedirectToPage("/Biomes/Index");
     }
