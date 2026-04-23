@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BioDomes.Infrastructures.Migrations
 {
     [DbContext(typeof(BiodomeContext))]
-    [Migration("20260409101557_user")]
-    partial class user
+    [Migration("20260423093025_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,18 +34,32 @@ namespace BioDomes.Infrastructures.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("Humidity")
+                    b.Property<double?>("Humidity")
+                        .IsRequired()
                         .HasColumnType("float");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(75)
                         .HasColumnType("nvarchar(75)");
 
-                    b.Property<double>("Temperature")
+                    b.Property<double?>("Temperature")
+                        .IsRequired()
                         .HasColumnType("float");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("biomes", "dbo");
                 });
@@ -78,11 +92,20 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<int>("ProducedResourceId")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ConsumedResourceId");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.HasIndex("ProducedResourceId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("equipments", "dbo");
 
@@ -94,16 +117,18 @@ namespace BioDomes.Infrastructures.Migrations
                             Image = "ca0fbc00-841b-41bb-8329-b0c95931d24e.png",
                             IsPublic = false,
                             Name = "Générateur de lumière artificielle",
-                            ProducedResourceId = 1
+                            ProducedResourceId = 1,
+                            UserId = "user-1"
                         },
                         new
                         {
                             Id = 2,
                             ConsumedResourceId = 5,
                             Image = "e7a73200-4110-492e-ad32-e10c6654995b.png",
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Condenseur atmosphérique",
-                            ProducedResourceId = 2
+                            ProducedResourceId = 2,
+                            UserId = "user-1"
                         },
                         new
                         {
@@ -112,16 +137,18 @@ namespace BioDomes.Infrastructures.Migrations
                             Image = "2fa0bd7e-1425-4359-a841-9b6a59b1d3f6.png",
                             IsPublic = false,
                             Name = "Extracteur de CO2",
-                            ProducedResourceId = 6
+                            ProducedResourceId = 6,
+                            UserId = "user-1"
                         },
                         new
                         {
                             Id = 4,
                             ConsumedResourceId = 6,
                             Image = "bff55fcc-19e0-4c59-9575-6689dedb8d05.png",
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Module de photosynthèse",
-                            ProducedResourceId = 5
+                            ProducedResourceId = 5,
+                            UserId = "user-1"
                         },
                         new
                         {
@@ -130,16 +157,18 @@ namespace BioDomes.Infrastructures.Migrations
                             Image = "1056b6e4-fa44-4d5d-a309-13e7a7bd9999.png",
                             IsPublic = false,
                             Name = "Synthétiseur d'engrais",
-                            ProducedResourceId = 7
+                            ProducedResourceId = 7,
+                            UserId = "user-2"
                         },
                         new
                         {
                             Id = 6,
                             ConsumedResourceId = 12,
                             Image = "a430eda5-2206-4963-8f6e-c9731c0d6bef.png",
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Recycleur de biomasse",
-                            ProducedResourceId = 3
+                            ProducedResourceId = 3,
+                            UserId = "user-2"
                         },
                         new
                         {
@@ -148,16 +177,18 @@ namespace BioDomes.Infrastructures.Migrations
                             Image = "861decc8-a7e7-4b8c-8f31-76b3c09342b9.png",
                             IsPublic = false,
                             Name = "Filtre minéral",
-                            ProducedResourceId = 9
+                            ProducedResourceId = 9,
+                            UserId = "user-2"
                         },
                         new
                         {
                             Id = 8,
                             ConsumedResourceId = 2,
                             Image = "4fba83ed-a55f-4e1b-80b5-6829a696b7b3.png",
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Extracteur d'électrolytes",
-                            ProducedResourceId = 10
+                            ProducedResourceId = 10,
+                            UserId = "user-2"
                         });
                 });
 
@@ -270,6 +301,10 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<string>("UploadedImageId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("Weight")
                         .HasColumnType("int");
 
@@ -277,6 +312,8 @@ namespace BioDomes.Infrastructures.Migrations
 
                     b.HasIndex("Slug")
                         .IsUnique();
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("species", "dbo");
 
@@ -290,6 +327,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Name = "Lion",
                             TypeLabel = "Mammifère",
                             UploadedImageId = "3d128e91-b947-4bf7-b988-dc8ffd1de92f.jpg",
+                            UserId = "user-1",
                             Weight = 150000
                         },
                         new
@@ -297,10 +335,11 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "boa",
                             DietLabel = "Carnivore",
                             Height = 225,
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Boa",
                             TypeLabel = "Reptile",
                             UploadedImageId = "47e0e461-066e-404f-8738-361d268f6219.jpg",
+                            UserId = "user-2",
                             Weight = 13000
                         },
                         new
@@ -312,6 +351,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Name = "Hetre",
                             TypeLabel = "Plante",
                             UploadedImageId = "9f21e809-9eeb-4714-8cd0-14b78d14fb60.jpg",
+                            UserId = "user-1",
                             Weight = 830000
                         },
                         new
@@ -322,6 +362,7 @@ namespace BioDomes.Infrastructures.Migrations
                             IsPublic = false,
                             Name = "Chene",
                             TypeLabel = "Plante",
+                            UserId = "user-2",
                             Weight = 2100000
                         },
                         new
@@ -333,6 +374,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Name = "Mouche",
                             TypeLabel = "Insecte",
                             UploadedImageId = "2b101f74-b1f0-4c18-a183-0331f7a4788c.jpg",
+                            UserId = "user-1",
                             Weight = 1
                         },
                         new
@@ -340,10 +382,11 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "araignee",
                             DietLabel = "Carnivore",
                             Height = 4,
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Araignée",
                             TypeLabel = "Arachnides",
                             UploadedImageId = "623fbf44-7418-44d7-8098-6cc6c7122c27.jpg",
+                            UserId = "user-1",
                             Weight = 95
                         },
                         new
@@ -351,9 +394,10 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "hirondelle",
                             DietLabel = "Carnivore",
                             Height = 18,
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Hirondelle",
                             TypeLabel = "Oiseau",
+                            UserId = "user-1",
                             Weight = 45
                         },
                         new
@@ -361,10 +405,11 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "lievre",
                             DietLabel = "Herbivore",
                             Height = 50,
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Lièvre",
                             TypeLabel = "Mammifère",
                             UploadedImageId = "7f084f4d-de3c-4436-b359-6fdfd4b93ec8.jpg",
+                            UserId = "user-2",
                             Weight = 4000
                         },
                         new
@@ -375,6 +420,7 @@ namespace BioDomes.Infrastructures.Migrations
                             IsPublic = false,
                             Name = "Pâturin des prés",
                             TypeLabel = "Plante",
+                            UserId = "user-1",
                             Weight = 1
                         },
                         new
@@ -382,49 +428,125 @@ namespace BioDomes.Infrastructures.Migrations
                             Slug = "souris",
                             DietLabel = "Omnivore",
                             Height = 9,
-                            IsPublic = false,
+                            IsPublic = true,
                             Name = "Souris",
                             TypeLabel = "Mammifère",
                             UploadedImageId = "7e6d0ba0-7be3-4f94-a929-e7c04d3e1d90.jpg",
+                            UserId = "user-2",
                             Weight = 25
                         });
                 });
 
             modelBuilder.Entity("BioDomes.Infrastructures.Models.UserEntity", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateOnly>("Birthdate")
+                    b.Property<DateOnly?>("Birthdate")
+                        .IsRequired()
                         .HasColumnType("date");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
 
                     b.Property<string>("SearchOrganism")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
+                    b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("users", "dbo");
-                    
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "user-1",
+                            AccessFailedCount = 0,
+                            Birthdate = new DateOnly(1990, 1, 1),
+                            ConcurrencyStamp = "3884d28f-7c25-424c-81da-144699f38ef5",
+                            Email = "admin@biodomes.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@BIODOMES.COM",
+                            NormalizedUserName = "ADMIN",
+                            PhoneNumberConfirmed = false,
+                            SearchOrganism = "Saint Paul",
+                            SecurityStamp = "4cd9f21e-0a3f-4e08-9f83-bda454dd15b5",
+                            TwoFactorEnabled = false,
+                            UserName = "admin"
+                        },
+                        new
+                        {
+                            Id = "user-2",
+                            AccessFailedCount = 0,
+                            Birthdate = new DateOnly(1995, 6, 15),
+                            ConcurrencyStamp = "7464653e-0c62-40d7-bd18-c84e64242101",
+                            Email = "john@biodomes.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "JOHN@BIODOMES.COM",
+                            NormalizedUserName = "JOHN",
+                            PhoneNumberConfirmed = false,
+                            SearchOrganism = "Marie Thérèse",
+                            SecurityStamp = "61ae3a9e-aee5-4d4d-93bf-90453096d694",
+                            TwoFactorEnabled = false,
+                            UserName = "john"
+                        });
                 });
 
             modelBuilder.Entity("BiomeEntityEquipmentEntity", b =>
@@ -457,6 +579,181 @@ namespace BioDomes.Infrastructures.Migrations
                     b.ToTable("biomes_species", "dbo");
                 });
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", "dbo");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<string>", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IdentityRoles", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "admin-role-id",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        });
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", "dbo");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", "dbo");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", "dbo");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", "dbo");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", "dbo");
+                });
+
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeEntity", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BioDomes.Infrastructures.Models.EquipmentEntity", b =>
                 {
                     b.HasOne("BioDomes.Infrastructures.Models.EquipmentResourceEntity", "ConsumedResourceEntity")
@@ -471,9 +768,28 @@ namespace BioDomes.Infrastructures.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("ConsumedResourceEntity");
 
                     b.Navigation("ProducedResourceEntity");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieEntity", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BiomeEntityEquipmentEntity", b =>
@@ -502,6 +818,57 @@ namespace BioDomes.Infrastructures.Migrations
                     b.HasOne("BioDomes.Infrastructures.Models.SpecieEntity", null)
                         .WithMany()
                         .HasForeignKey("SpeciesSlug")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

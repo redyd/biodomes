@@ -24,7 +24,13 @@ public class BiomeEntityTypeConfiguration : IEntityTypeConfiguration<BiomeEntity
         
         builder.HasMany(e => e.Species)
             .WithMany(e => e.Biomes)
-            .UsingEntity(j => j.ToTable("biomes_species"));
+            .UsingEntity(j =>
+            {
+                j.ToTable("biomes_species");
+                j.HasOne(typeof(SpecieEntity))
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.NoAction); 
+            });
         
         builder
             .HasMany(b => b.Equipments)

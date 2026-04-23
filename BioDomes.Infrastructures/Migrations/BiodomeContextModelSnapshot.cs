@@ -31,18 +31,32 @@ namespace BioDomes.Infrastructures.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("Humidity")
+                    b.Property<double?>("Humidity")
+                        .IsRequired()
                         .HasColumnType("float");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(75)
                         .HasColumnType("nvarchar(75)");
 
-                    b.Property<double>("Temperature")
+                    b.Property<double?>("Temperature")
+                        .IsRequired()
                         .HasColumnType("float");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("biomes", "dbo");
                 });
@@ -428,7 +442,8 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly>("Birthdate")
+                    b.Property<DateOnly?>("Birthdate")
+                        .IsRequired()
                         .HasColumnType("date");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -500,7 +515,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "1cb239c3-a7d3-4632-824a-5eda447d77a7",
+                            ConcurrencyStamp = "3884d28f-7c25-424c-81da-144699f38ef5",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -508,7 +523,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "dd3c3d7d-3eb0-4afb-a5a6-686014111591",
+                            SecurityStamp = "4cd9f21e-0a3f-4e08-9f83-bda454dd15b5",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -517,7 +532,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "c873a04c-c345-4f75-976c-f4a91e0a27e0",
+                            ConcurrencyStamp = "7464653e-0c62-40d7-bd18-c84e64242101",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -525,7 +540,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "6d3c49d6-ee79-4035-a58c-f1fb431f4a16",
+                            SecurityStamp = "61ae3a9e-aee5-4d4d-93bf-90453096d694",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         });
@@ -723,6 +738,17 @@ namespace BioDomes.Infrastructures.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", "dbo");
+                });
+
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeEntity", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BioDomes.Infrastructures.Models.EquipmentEntity", b =>
