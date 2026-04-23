@@ -33,6 +33,7 @@ builder.Services.AddDefaultIdentity<UserEntity>(options => { options.SignIn.Requ
 
 builder.Services.AddScoped<ISpeciesRepository, SpeciesRepository>();
 builder.Services.AddScoped<IEquipmentRepository, EquipmentRepository>();
+builder.Services.AddScoped<IBiomeRepository, BiomeRepository>();
 builder.Services.AddScoped<ISpecieAttributesRepository, SpecieAttributesRepository>();
 
 var app = builder.Build();

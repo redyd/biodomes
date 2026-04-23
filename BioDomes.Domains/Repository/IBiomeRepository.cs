@@ -11,7 +11,7 @@ public interface IBiomeRepository
 
     Task<Result<Biome>> FindAsync(int id, string userId, bool isAdmin);
     
-    Task<Result<Biome>> CreateEquipmentAsync(CreateBiomeRequest createRequest, string userId);
+    Task<Result<Biome>> CreateBiomeAsync(CreateBiomeRequest createRequest, string userId);
 
     Task<Result<Biome>> UpdateAsync(UpdateBiomeRequest toUpdate, string? userId, bool isAdmin);
     
