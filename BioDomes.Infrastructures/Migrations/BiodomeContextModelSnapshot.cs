@@ -42,7 +42,13 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<double>("Temperature")
                         .HasColumnType("float");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("biomes", "dbo");
                 });
@@ -683,7 +689,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "43ec93d7-0bc8-4f71-bda6-caa8b7a7daba",
+                            ConcurrencyStamp = "3884d28f-7c25-424c-81da-144699f38ef5",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -691,7 +697,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "d58c1500-54f4-4d36-b9da-6e5c0eb85ebe",
+                            SecurityStamp = "4cd9f21e-0a3f-4e08-9f83-bda454dd15b5",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -700,7 +706,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "5def1c4e-7c52-4c86-b519-e13cc39f0994",
+                            ConcurrencyStamp = "7464653e-0c62-40d7-bd18-c84e64242101",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -708,7 +714,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "2f87cebb-3bee-4190-9a77-8402aff40512",
+                            SecurityStamp = "61ae3a9e-aee5-4d4d-93bf-90453096d694",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         });
