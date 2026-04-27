@@ -10,11 +10,67 @@
     <div class="container-title">
         <h1>Biomes</h1>
         <p>Les différents biomes</p>
-        <a class="btn-save" asp-page="/Biomes/Add">
-            Ajouter un nouveau biome
-        </a>
+        @if (Model.IsUserConnected)
+        {
+            <a class="btn-save" asp-page="/Biomes/Add">
+                Ajouter un nouveau biome
+            </a>
+        }
     </div>
 
-    <div class="cards-grid">
+    <div class="biomes-list">
+        @if (Model.Biomes is not null && Model.Biomes.Any())
+        {
+            foreach (var biome in Model.Biomes)
+            {
+                <div class="biome-row">
+                    <div class="biome-row-image">
+                        @if (!string.IsNullOrEmpty(biome.ImageUrl))
+                        {
+                            <img src="@biome.ImageUrl" alt="@biome.Name" />
+                        }
+                        else
+                        {
+                            <div class="biome-row-image-placeholder"></div>  
+                        }
+                        <span class="biome-state-badge biome-state-@biome.State?.ToLower()">@biome.State</span>
+                    </div>
+
+                    <div class="biome-row-body">
+                        <div class="biome-row-header">
+                            <h2 class="biome-row-name">@biome.Name</h2>
+                            @if (biome.IsPublic)
+                            {
+                                <span class="biome-badge-public">public</span>
+                            }
+                        </div>
+
+                        <div class="biome-row-stats">
+                            <div class="biome-stat">
+                                <span class="biome-stat-label">Température</span>
+                                <span class="biome-stat-value">@biome.Temperature °C</span>
+                            </div>
+                            <div class="biome-stat">
+                                <span class="biome-stat-label">Humidité</span>
+                                <span class="biome-stat-value">@biome.Humidity g/m³</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (biome.CanEdit)
+                    {
+                        <a class="biome-row-actions biome-row-edit"
+                           asp-page="/Biomes/Edit"
+                           asp-route-id="@biome.Id">
+                            Modifier →
+                        </a>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <p class="biomes-empty">Aucun biome disponible.</p>
+        }
     </div>
 </div>

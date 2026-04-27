@@ -15,7 +15,7 @@
         </div>
 
         <div class="edit-body">
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
 
                 <div class="field-group">
                     <label class="field-label">Nom du biome</label>
@@ -39,6 +39,12 @@
                     }
                 </div>
 
+                <div class="field-group">
+                    <label class="field-label">Image</label>
+                    <input class="field-input" type="file" asp-for="Input.ImageUrl" accept="image/*" />
+                    <span asp-validation-for="Input.ImageUrl" class="field-error"></span>
+                </div>
+                
                 <div class="edit-divider"></div>
 
                 <div class="edit-actions">

@@ -31,7 +31,7 @@ public class Add(IWebHostEnvironment environment, IBiomeRepository repository) :
         [Range(0, double.MaxValue, ErrorMessage = "L'humidité doit être positive.")]
         public double? AbsoluteHumidity { get; set; }
         
-        public string? ImageUrl { get; set; }
+        public IFormFile? ImageUrl { get; set; }
     }
 
     public void OnGet() { }
@@ -59,13 +59,15 @@ public class Add(IWebHostEnvironment environment, IBiomeRepository repository) :
         {
             return Forbid();
         }
+        
+        var imageName = Input.ImageUrl == null ? null : await SaveImage(Input.ImageUrl);
 
         var createRequest = new CreateBiomeRequest
         {
             Name = Input.Name,
             Temperature = Input.Temperature,
             Humidity = Input.AbsoluteHumidity,
-            ImageUrl = Input.ImageUrl,
+            ImageUrl = imageName,
             UserId = userId
         };
         

@@ -9,4 +9,11 @@ public class Biome
     public double? Humidity { get; set; }
     public required string? ImageUrl { get; set; }
     public bool IsPublic { get; set; }
+    
+    public string State => Temperature switch
+    {
+        < -20 or > 40 => "Critique",
+        < 0 or > 30   => "Instable",
+        _             => "Optimal"
+    };
 }

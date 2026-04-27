@@ -16,6 +16,7 @@ public class BiomePage(IBiomeRepository repository, IWebHostEnvironment environm
     public async Task OnGetAsync()
     {
         IsUserConnected = User.GetUserId() is not null;
+        
 
         var biomes = await repository.GetAllAsync(User.GetUserId(), User.IsAdmin());
         Biomes = biomes.Select(b => new BiomeView
@@ -24,10 +25,13 @@ public class BiomePage(IBiomeRepository repository, IWebHostEnvironment environm
             Name = b.Name,
             Temperature = b.Temperature,
             Humidity = b.Humidity,
-            ImageUrl = UseUploadedFromId(b.ImageUrl),
-            CanEdit = IsUserConnected && (User.IsAdmin() || b.CreatedBy == User.GetUserId())
+            ImageUrl = !string.IsNullOrWhiteSpace(b.ImageUrl) ? UseUploadedFromId(b.ImageUrl) : null,
+            CanEdit = IsUserConnected && (User.IsAdmin() || b.CreatedBy == User.GetUserId()),
+            IsPublic = IsUserConnected && b.IsPublic,
+            State = b.State,
         })
             .ToList();
 
     }
+
 }
