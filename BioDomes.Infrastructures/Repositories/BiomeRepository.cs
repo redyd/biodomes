@@ -45,7 +45,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         try
         {
             var entity = await context.Biomes
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(b => b.Id == id);
 
             if (entity is null)
                 return Result<Biome>.Failure($"Biome {id} not found");
@@ -120,6 +120,17 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
                 return Result<Biome>.Forbidden("Access denied.");
             }
 
+            entity.Name = toUpdate.Name;
+            entity.Temperature = toUpdate.Temperature;
+            entity.Humidity = toUpdate.Humidity;
+
+            if (toUpdate.ImageUrl is not null)
+                entity.ImageUrl = toUpdate.ImageUrl;
+
+            if (isAdmin && toUpdate.IsPublic.HasValue)
+                entity.IsPublic = toUpdate.IsPublic.Value;
+
+            await context.SaveChangesAsync();
             return Result<Biome>.Ok(BiomeMapper.MapBiome(entity));
         }
         catch (DbUpdateException ex)

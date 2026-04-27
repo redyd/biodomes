@@ -27,7 +27,7 @@ public class BiomePage(IBiomeRepository repository, IWebHostEnvironment environm
             Humidity = b.Humidity,
             ImageUrl = !string.IsNullOrWhiteSpace(b.ImageUrl) ? UseUploadedFromId(b.ImageUrl) : null,
             CanEdit = IsUserConnected && (User.IsAdmin() || b.CreatedBy == User.GetUserId()),
-            IsPublic = IsUserConnected && b.IsPublic,
+            IsPublic = true,
             State = b.State,
         })
             .ToList();

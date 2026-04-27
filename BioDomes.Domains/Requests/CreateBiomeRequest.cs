@@ -7,4 +7,5 @@ public class CreateBiomeRequest
     public double? Humidity { get; set; }
     public string? ImageUrl { get; set; }
     public required string UserId { get; set; }
+    public bool IsPublic  { get; set; }
 }

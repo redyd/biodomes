@@ -10,7 +10,7 @@ using BioDomes.Web.Extensions;
 namespace BioDomes.Web.Pages.Biomes;
 
 [Authorize]
-public class Add(IWebHostEnvironment environment, IBiomeRepository repository) : AppPageModel(environment)
+public class AddPage(IWebHostEnvironment environment, IBiomeRepository repository) : AppPageModel(environment)
 {
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -68,7 +68,8 @@ public class Add(IWebHostEnvironment environment, IBiomeRepository repository) :
             Temperature = Input.Temperature,
             Humidity = Input.AbsoluteHumidity,
             ImageUrl = imageName,
-            UserId = userId
+            UserId = userId,
+            IsPublic = true
         };
         
         var result = await repository.CreateBiomeAsync(createRequest, userId);
