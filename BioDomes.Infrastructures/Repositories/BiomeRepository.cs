@@ -80,6 +80,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
                 Humidity = createRequest.Humidity,
                 ImageUrl = createRequest.ImageUrl,
                 UserId = createRequest.UserId,
+                IsPublic = createRequest.IsPublic,
             };
 
             await context.Biomes.AddAsync(entity);
