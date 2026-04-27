@@ -31,15 +31,23 @@ namespace BioDomes.Infrastructures.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("Humidity")
+                    b.Property<double?>("Humidity")
+                        .IsRequired()
                         .HasColumnType("float");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(75)
                         .HasColumnType("nvarchar(75)");
 
-                    b.Property<double>("Temperature")
+                    b.Property<double?>("Temperature")
+                        .IsRequired()
                         .HasColumnType("float");
 
                     b.Property<string>("UserId")
@@ -912,6 +920,17 @@ namespace BioDomes.Infrastructures.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", "dbo");
+                });
+
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeEntity", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BioDomes.Infrastructures.Models.EquipmentEntity", b =>
