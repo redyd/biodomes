@@ -10,28 +10,14 @@ public class FoodChainRepository(BiodomeContext context) : IFoodChainRepository
 {
     public async Task<FoodChainGraph> GetFullGraphAsync()
     {
-        var relations = await context.SpecieFoodChains
-            .Include(r => r.Predator)
-            .ThenInclude(s => s.DietEntity)
-
-            .Include(r => r.Predator)
-            .ThenInclude(s => s.ClassificationEntity)
+        var allSpecies = await context.Species
+            .Include(s => s.DietEntity)
+            .Include(s => s.ClassificationEntity)
             .ThenInclude(c => c.EatenByDiets)
-
-            .Include(r => r.Prey)
-            .ThenInclude(s => s.DietEntity)
-
-            .Include(r => r.Prey)
-            .ThenInclude(s => s.ClassificationEntity)
-            .ThenInclude(c => c.EatenByDiets)
-
             .AsNoTracking()
             .ToListAsync();
 
- 
-        var speciesById = relations
-            .SelectMany(r => new[] { r.Predator, r.Prey })
-            .DistinctBy(s => s.Slug)
+        var nodes = allSpecies
             .Select(s => new FoodChainNode(
                 slug: s.Slug,
                 name: s.Name,
@@ -40,14 +26,49 @@ public class FoodChainRepository(BiodomeContext context) : IFoodChainRepository
             ))
             .ToList();
 
- 
-        var edges = relations
+        var edges = await context.SpecieFoodChains
             .Select(r => new FoodChainEdge(
-                predatorId: r.PredatorId,
-                preyId: r.PreyId
+                r.Predator.Slug,
+                r.Prey.Slug
             ))
-            .ToList();
- 
-        return new FoodChainGraph(speciesById, edges);
+            .AsNoTracking()
+            .ToListAsync();
+
+        return new FoodChainGraph(nodes, edges);
+    }
+
+    public async Task AddRelation(string predatorSlug, string preySlug)
+    {
+        var predator = await context.Species
+            .FirstOrDefaultAsync(s => s.Slug == predatorSlug);
+        
+        var prey = await context.Species
+            .FirstOrDefaultAsync(s => s.Slug == preySlug);
+
+        if (predator == null || prey == null)
+        {
+            throw new Exception("Prédateur ou proie introuvable");
+        }
+
+        var relation = new SpecieFoodChain
+        {
+            PredatorId = predator.Slug,
+            PreyId = prey.Slug
+        };
+
+        context.SpecieFoodChains.Add(relation);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task DeleteRelation(string predatorSlug, string preySlug)
+    {
+        var relation = await context.SpecieFoodChains
+            .FirstOrDefaultAsync(r => r.Predator.Slug == predatorSlug && r.Prey.Slug == preySlug);
+
+        if (relation != null)
+        {
+            context.SpecieFoodChains.Remove(relation);
+            await context.SaveChangesAsync();
+        }
     }
 }

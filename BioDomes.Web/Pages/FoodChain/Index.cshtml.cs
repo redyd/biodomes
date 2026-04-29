@@ -1,5 +1,6 @@
 using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
+using BioDomes.Web.Dtos;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,16 @@ public class Index(IWebHostEnvironment environment, IFoodChainRepository repo, I
         Graph = await repo.GetFullGraphAsync();
 
         return Page();
+    }
+
+    public async Task OnPostAddRelation([FromBody] NodeActionDto action)
+    {
+        await repo.AddRelation(action.PredatorSlug, action.PreySlug);
+    }
+
+    public async Task OnPostRemoveRelation([FromBody] NodeActionDto action)
+    {
+        await repo.DeleteRelation(action.PredatorSlug, action.PreySlug);
     }
     
     public async Task<IActionResult> OnPostNodeClicked([FromBody] NodeClickDto node)

@@ -10,10 +10,18 @@ public class FoodChainGraph
         Nodes = nodes;
         Edges = edges;
     }
-    
-    public IReadOnlyList<FoodChainEdge> PreyOf(string predatorSlug) => Edges
-        .Where(e => e.PredatorId == predatorSlug)
-        .ToList();
+
+    public IReadOnlyList<FoodChainNode> PreyOf(string predatorSlug)
+    {
+        var preyIds = Edges
+            .Where(e => e.PredatorId == predatorSlug)
+            .Select(e => e.PreyId)
+            .ToHashSet();
+
+        return Nodes
+            .Where(n => preyIds.Contains(n.Slug))
+            .ToList();
+    }
 
     public IReadOnlyList<FoodChainNode> AvailablePreyFor(string predatorSlug)
     {

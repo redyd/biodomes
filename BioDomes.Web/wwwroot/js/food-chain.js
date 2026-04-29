@@ -5,41 +5,89 @@ function getAntiForgeryToken() {
 
 const name = document.querySelector('#title');
 const diet = document.querySelector('#diet');
+
+const avTitle = document.querySelector('#available-title');
+const exTitle = document.querySelector('#existing-title');
 const available = document.querySelector('#available');
+const existing = document.querySelector('#existing');
 
 function onSpecieSelect(data) {
     name.textContent = data.name;
     diet.textContent = data.classification.label;
-    renderAvailablePrey(data.available);
+
+    document.querySelector('#diet-badge').style.display = 'inline-block';
+
+    renderAvailablePrey(data.available, data.slug);
+    renderExistingPrey(data.preys, data.slug);
 }
 
-function renderAvailablePrey(preys) {
-    // reset
-    available.innerHTML = '';
-
+function renderExistingPrey(preys, rootSpecie) {
+    existing.innerHTML = '';
     if (!preys || preys.length === 0) {
-        const empty = document.createElement('li');
-        empty.textContent = 'Aucune proie disponible';
-        empty.className = 'text-muted';
-        available.appendChild(empty);
+        exTitle.textContent = 'Chaîne isolée';
+        exTitle.style.color = 'var(--text-muted)';
         return;
     }
-    
-    const header = document.createElement('p');
-    header.textContent = "Proies disponible:";
-    available.appendChild(header);
 
-    // insert
+    exTitle.textContent = "Proies actuelles";
+    exTitle.style.color = 'var(--text-bright)';
+
     for (const p of preys) {
         const li = document.createElement('li');
+        li.innerHTML = `
+            <div class="d-flex flex-column">
+                <span>${p.name}</span>
+                <span class="specie-meta">${p.classification.label}</span>
+            </div>
+            <button class="btn-action btn-remove" title="Supprimer le lien" 
+                    onclick="handleAction('${rootSpecie}', '${p.slug}', 'remove')">×</button>
+        `;
+        existing.appendChild(li);
+    }
+}
 
-        li.textContent = `${p.name} (${p.classification.label})`;
-        li.dataset.slug = p.slug;
+function renderAvailablePrey(preys, rootSpecie) {
+    available.innerHTML = '';
+    if (!preys || preys.length === 0) {
+        avTitle.textContent = 'Aucune proie compatible';
+        avTitle.style.color = 'var(--text-muted)';
+        return;
+    }
 
-        li.classList.add('list-group-item', 'bg-transparent', 'text-light');
+    avTitle.textContent = "Suggestions de proies";
+    avTitle.style.color = 'var(--text-bright)';
 
+    for (const p of preys) {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <div class="d-flex flex-column">
+                <span>${p.name}</span>
+                <span class="specie-meta">${p.classification.label}</span>
+            </div>
+            <button class="btn-action btn-add" title="Ajouter le lien" 
+                    onclick="handleAction('${rootSpecie}', '${p.slug}', 'add')">+</button>
+        `;
         available.appendChild(li);
     }
+}
+
+function handleAction(predator, prey, action) {
+    const url = action === 'add' ? '/food-chain?handler=AddRelation' : '/food-chain?handler=RemoveRelation';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': getAntiForgeryToken()
+        },
+        body: JSON.stringify({ predatorSlug: predator, preySlug: prey })
+    })
+        .then(res => {
+            if (res.ok) {
+                location.reload();
+            }
+        })
+        .catch(err => console.error("Erreur d'action:", err));
 }
 
 (function () {
