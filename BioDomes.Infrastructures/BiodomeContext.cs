@@ -15,6 +15,7 @@ public class BiodomeContext(DbContextOptions<BiodomeContext> options) : Identity
     public DbSet<EquipmentResourceEntity> EquipmentResources { get; set; }
     public DbSet<SpecieClassification> SpecieClassifications { get; set; }
     public DbSet<SpecieDiet> SpecieDiets { get; set; }
+    public DbSet<SpecieFoodChain> SpecieFoodChains { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -31,5 +32,6 @@ public class BiodomeContext(DbContextOptions<BiodomeContext> options) : Identity
         builder.ApplyConfiguration(new SpecieClassificationTypeConfiguration());
         builder.ApplyConfiguration(new SpecieDietTypeConfiguration());
         builder.ApplyConfiguration(new SpecieEntityTypeConfiguration());
+        builder.ApplyConfiguration(new SpecieFoodChainTypeConfiguration());
     }
 }

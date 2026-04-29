@@ -279,8 +279,7 @@ namespace BioDomes.Infrastructures.Migrations
 
                     b.Property<string>("Label")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -616,6 +615,88 @@ namespace BioDomes.Infrastructures.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieFoodChain", b =>
+                {
+                    b.Property<string>("PredatorId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PreyId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("PredatorId", "PreyId");
+
+                    b.HasIndex("PreyId");
+
+                    b.ToTable("specie_food_chains", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            PredatorId = "lievre",
+                            PreyId = "paturin-des-pres"
+                        },
+                        new
+                        {
+                            PredatorId = "lievre",
+                            PreyId = "hetre"
+                        },
+                        new
+                        {
+                            PredatorId = "souris",
+                            PreyId = "paturin-des-pres"
+                        },
+                        new
+                        {
+                            PredatorId = "souris",
+                            PreyId = "mouche"
+                        },
+                        new
+                        {
+                            PredatorId = "araignee",
+                            PreyId = "mouche"
+                        },
+                        new
+                        {
+                            PredatorId = "hirondelle",
+                            PreyId = "araignee"
+                        },
+                        new
+                        {
+                            PredatorId = "boa",
+                            PreyId = "souris"
+                        },
+                        new
+                        {
+                            PredatorId = "boa",
+                            PreyId = "hirondelle"
+                        },
+                        new
+                        {
+                            PredatorId = "lion",
+                            PreyId = "lievre"
+                        },
+                        new
+                        {
+                            PredatorId = "lion",
+                            PreyId = "souris"
+                        },
+                        new
+                        {
+                            PredatorId = "souris",
+                            PreyId = "chene"
+                        },
+                        new
+                        {
+                            PredatorId = "hirondelle",
+                            PreyId = "mouche"
+                        },
+                        new
+                        {
+                            PredatorId = "araignee",
+                            PreyId = "souris"
+                        });
+                });
+
             modelBuilder.Entity("BioDomes.Infrastructures.Models.UserEntity", b =>
                 {
                     b.Property<string>("Id")
@@ -697,7 +778,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "3884d28f-7c25-424c-81da-144699f38ef5",
+                            ConcurrencyStamp = "9e64884f-cb1d-4dfb-b7a8-907a54bd70d2",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -705,7 +786,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "4cd9f21e-0a3f-4e08-9f83-bda454dd15b5",
+                            SecurityStamp = "ff73410c-b8f2-43d8-8f46-4a489125828b",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -714,7 +795,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "7464653e-0c62-40d7-bd18-c84e64242101",
+                            ConcurrencyStamp = "b392696f-d498-40dd-bde5-165c17c7d893",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -722,7 +803,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "61ae3a9e-aee5-4d4d-93bf-90453096d694",
+                            SecurityStamp = "e962a629-cf2d-411c-bb79-879f420ff69d",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         });
@@ -751,7 +832,12 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<string>("SpeciesSlug")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("SpecieEntitySlug")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("BiomesId", "SpeciesSlug");
+
+                    b.HasIndex("SpecieEntitySlug");
 
                     b.HasIndex("SpeciesSlug");
 
@@ -922,6 +1008,223 @@ namespace BioDomes.Infrastructures.Migrations
                     b.ToTable("AspNetUserTokens", "dbo");
                 });
 
+            modelBuilder.Entity("classification_eaten_by_diet", b =>
+                {
+                    b.Property<int>("classification_id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("diet_id")
+                        .HasColumnType("int");
+
+                    b.HasKey("classification_id", "diet_id");
+
+                    b.HasIndex("diet_id");
+
+                    b.ToTable("classification_eaten_by_diet", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            classification_id = 1,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 1,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 2,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 2,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 3,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 3,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 4,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 4,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 5,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 5,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 6,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 6,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 7,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 7,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 8,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 8,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 9,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 9,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 10,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 10,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 11,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 11,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 12,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 12,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 13,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 13,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 14,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 14,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 15,
+                            diet_id = 1
+                        },
+                        new
+                        {
+                            classification_id = 15,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 16,
+                            diet_id = 2
+                        },
+                        new
+                        {
+                            classification_id = 16,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 17,
+                            diet_id = 2
+                        },
+                        new
+                        {
+                            classification_id = 17,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 18,
+                            diet_id = 2
+                        },
+                        new
+                        {
+                            classification_id = 18,
+                            diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 19,
+                            diet_id = 6
+                        },
+                        new
+                        {
+                            classification_id = 19,
+                            diet_id = 2
+                        },
+                        new
+                        {
+                            classification_id = 20,
+                            diet_id = 6
+                        },
+                        new
+                        {
+                            classification_id = 20,
+                            diet_id = 3
+                        });
+                });
+
             modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeEntity", b =>
                 {
                     b.HasOne("BioDomes.Infrastructures.Models.UserEntity", "User")
@@ -987,6 +1290,25 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieFoodChain", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.SpecieEntity", "Predator")
+                        .WithMany("Preys")
+                        .HasForeignKey("PredatorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BioDomes.Infrastructures.Models.SpecieEntity", "Prey")
+                        .WithMany("Predators")
+                        .HasForeignKey("PreyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Predator");
+
+                    b.Navigation("Prey");
+                });
+
             modelBuilder.Entity("BiomeEntityEquipmentEntity", b =>
                 {
                     b.HasOne("BioDomes.Infrastructures.Models.BiomeEntity", null)
@@ -1009,6 +1331,11 @@ namespace BioDomes.Infrastructures.Migrations
                         .HasForeignKey("BiomesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("BioDomes.Infrastructures.Models.SpecieEntity", null)
+                        .WithMany()
+                        .HasForeignKey("SpecieEntitySlug")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("BioDomes.Infrastructures.Models.SpecieEntity", null)
                         .WithMany()
@@ -1066,6 +1393,28 @@ namespace BioDomes.Infrastructures.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("classification_eaten_by_diet", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.SpecieClassification", null)
+                        .WithMany()
+                        .HasForeignKey("classification_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BioDomes.Infrastructures.Models.SpecieDiet", null)
+                        .WithMany()
+                        .HasForeignKey("diet_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieEntity", b =>
+                {
+                    b.Navigation("Predators");
+
+                    b.Navigation("Preys");
                 });
 #pragma warning restore 612, 618
         }

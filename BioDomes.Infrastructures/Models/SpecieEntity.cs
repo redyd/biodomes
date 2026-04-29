@@ -22,4 +22,8 @@ public class SpecieEntity
 
     public int ClassificationId { get; set; }
     public SpecieClassification ClassificationEntity { get; set; }
+    
+    // food chain
+    public List<SpecieFoodChain> Preys { get; set; } = new();
+    public List<SpecieFoodChain> Predators { get; set; } = new();
 }
