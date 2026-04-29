@@ -61,22 +61,6 @@ namespace BioDomes.Infrastructures.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "biomes",
-                schema: "dbo",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(75)", maxLength: 75, nullable: false),
-                    Temperature = table.Column<double>(type: "float", nullable: false),
-                    Humidity = table.Column<double>(type: "float", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_biomes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "equipment_resources",
                 schema: "dbo",
                 columns: table => new
@@ -223,6 +207,32 @@ namespace BioDomes.Infrastructures.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "biomes",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(75)", maxLength: 75, nullable: false),
+                    Temperature = table.Column<double>(type: "float", nullable: false),
+                    Humidity = table.Column<double>(type: "float", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsPublic = table.Column<bool>(type: "bit", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_biomes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_biomes_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "dbo",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "species",
                 schema: "dbo",
                 columns: table => new
@@ -313,7 +323,7 @@ namespace BioDomes.Infrastructures.Migrations
                         principalSchema: "dbo",
                         principalTable: "species",
                         principalColumn: "Slug",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -349,8 +359,8 @@ namespace BioDomes.Infrastructures.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "Birthdate", "ConcurrencyStamp", "Email", "EmailConfirmed", "ImageUrl", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SearchOrganism", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "user-1", 0, new DateOnly(1990, 1, 1), "1cb239c3-a7d3-4632-824a-5eda447d77a7", "admin@biodomes.com", true, null, false, null, "ADMIN@BIODOMES.COM", "ADMIN", null, null, false, "Saint Paul", "dd3c3d7d-3eb0-4afb-a5a6-686014111591", false, "admin" },
-                    { "user-2", 0, new DateOnly(1995, 6, 15), "c873a04c-c345-4f75-976c-f4a91e0a27e0", "john@biodomes.com", true, null, false, null, "JOHN@BIODOMES.COM", "JOHN", null, null, false, "Marie Thérèse", "6d3c49d6-ee79-4035-a58c-f1fb431f4a16", false, "john" }
+                    { "user-1", 0, new DateOnly(1990, 1, 1), "3884d28f-7c25-424c-81da-144699f38ef5", "admin@biodomes.com", true, null, false, null, "ADMIN@BIODOMES.COM", "ADMIN", null, null, false, "Saint Paul", "4cd9f21e-0a3f-4e08-9f83-bda454dd15b5", false, "admin" },
+                    { "user-2", 0, new DateOnly(1995, 6, 15), "7464653e-0c62-40d7-bd18-c84e64242101", "john@biodomes.com", true, null, false, null, "JOHN@BIODOMES.COM", "JOHN", null, null, false, "Marie Thérèse", "61ae3a9e-aee5-4d4d-93bf-90453096d694", false, "john" }
                 });
 
             migrationBuilder.InsertData(
@@ -525,6 +535,12 @@ namespace BioDomes.Infrastructures.Migrations
                 schema: "dbo",
                 table: "biome_equipments",
                 column: "EquipmentsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_biomes_UserId",
+                schema: "dbo",
+                table: "biomes",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_biomes_species_SpeciesSlug",
