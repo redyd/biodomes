@@ -34,15 +34,21 @@
                         <a class="nav-link text-dark @Html.IsActive("/Species")" asp-area="" asp-page="/Species/Index">Especes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark @Html.IsActive("/Equipments")" asp-area="" asp-page="/Equipments/Index">Equipements</a>
+                        <a class="nav-link text-dark @Html.IsActive("/Equipments")" asp-area=""
+                           asp-page="/Equipments/Index">Equipements</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark @Html.IsActive("/FoodChain")" asp-area=""
+                           asp-page="/FoodChain/Index">Chaine alimentaire</a>
                     </li>
                 </ul>
-                
+
                 <ul class="navbar-nav">
                     @if (SignInManager.IsSignedIn(User))
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-dark @Html.IsActive("/Account")" asp-area="" asp-page="/Account/Index">@User.Identity!.Name</a>
+                            <a class="nav-link text-dark @Html.IsActive("/Account")" asp-area=""
+                               asp-page="/Account/Index">@User.Identity!.Name</a>
                         </li>
                         <li class="nav-item">
                             <form method="post" asp-area="Identity" asp-page="/Account/Logout">
@@ -53,10 +59,12 @@
                     else
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-dark @Html.IsActive("/Account/Login")" asp-area="Identity" asp-page="/Account/Login">Connexion</a>
+                            <a class="nav-link text-dark @Html.IsActive("/Account/Login")" asp-area="Identity"
+                               asp-page="/Account/Login">Connexion</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark @Html.IsActive("/Account/Register")" asp-area="Identity" asp-page="/Account/Register">Inscription</a>
+                            <a class="nav-link text-dark @Html.IsActive("/Account/Register")" asp-area="Identity"
+                               asp-page="/Account/Register">Inscription</a>
                         </li>
                     }
                 </ul>
@@ -66,10 +74,8 @@
 </header>
 
 <main role="main">
-    <div class="container">
-        <partial name="_Notification"/>
-        @RenderBody()
-    </div>
+    <partial name="_Notification"/>
+    @RenderBody()
 </main>
 
 <script>

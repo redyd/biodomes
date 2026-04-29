@@ -1,0 +1,36 @@
+@page "/food-chain"
+@using BioDomes.Web.Extensions
+@model BioDomes.Web.Pages.FoodChain.Index
+
+@{
+    Layout = "Shared/_Layout";
+    ViewData["Title"] = "Chaine alimentaire";
+}
+
+<div class="container-fluid vh-100 p-0">
+    <div class="d-flex h-100">
+
+        <div class="flex-grow-1 h-100">
+            <div id="cy" class="h-100 w-100"></div>
+        </div>
+
+        @if (User.IsAdmin())
+        {
+            <div class="border-start p-3" style="width: 320px; background: var(--surface);">
+
+                <h5 class="text-light" id="title">Aucune espèce sélectionnée</h5>
+                <p id="diet"></p>
+                <ul id="available"></ul>
+            </div>
+        }
+
+    </div>
+</div>
+
+<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+
+<script>
+    window.foodChainData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Graph));
+</script>
+
+<script src="~/js/food-chain.js"></script>
