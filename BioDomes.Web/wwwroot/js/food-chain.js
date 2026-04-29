@@ -72,7 +72,7 @@ function renderAvailablePrey(preys, rootSpecie) {
 }
 
 function handleAction(predator, prey, action) {
-    const url = action === 'add' ? '/food-chain?handler=AddRelation' : '/food-chain?handler=RemoveRelation';
+    const url = action === 'add' ? '?handler=AddRelation' : '?handler=RemoveRelation';
 
     fetch(url, {
         method: 'POST',
@@ -203,7 +203,7 @@ function handleAction(predator, prey, action) {
     cy.on('tap', 'node', function (evt) {
         const node = evt.target;
 
-        fetch('/food-chain?handler=NodeClicked', {
+        fetch('?handler=NodeClicked', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
