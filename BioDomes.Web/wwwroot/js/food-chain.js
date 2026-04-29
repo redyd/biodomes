@@ -195,8 +195,7 @@ function handleAction(predator, prey, action) {
             directed: true,
             padding: 40,
             spacingFactor: 1.7,
-            animate: true,
-            animationDuration: 400
+            animate: false,
         }
     });
     
