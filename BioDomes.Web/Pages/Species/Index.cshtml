@@ -6,22 +6,24 @@
     ViewData["Title"] = "Espèces";
 }
 
-<div class="main-container">
-    <div class="container-title">
-        <h1>Espèces</h1>
-        <p>Liste des espèces disponibles dans le biodôme</p>
-        @if (Model.IsUserConnected)
-        {
-            <a class="btn-save" asp-page="/Species/Add">
-                Ajouter une nouvelle espece
-            </a>
-        }
-    </div>
+<div class="container">
+    <div class="main-container">
+        <div class="container-title">
+            <h1>Espèces</h1>
+            <p>Liste des espèces disponibles dans le biodôme</p>
+            @if (Model.IsUserConnected)
+            {
+                <a class="btn-save" asp-page="/Species/Add">
+                    Ajouter une nouvelle espece
+                </a>
+            }
+        </div>
 
-    <div class="cards-grid">
-        @foreach (var species in Model.SpeciesList)
-        {
-            <partial name="_SpeciesCardPartial" model="species"/>
-        }
+        <div class="cards-grid">
+            @foreach (var species in Model.SpeciesList)
+            {
+                <partial name="_SpeciesCardPartial" model="species"/>
+            }
+        </div>
     </div>
 </div>

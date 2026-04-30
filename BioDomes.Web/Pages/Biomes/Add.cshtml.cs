@@ -1,11 +1,12 @@
-﻿using BioDomes.Infrastructures.Models;
-using BioDomes.Web.PageModels;
+﻿using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Domains.Requests;
 using BioDomes.Web.Extensions;
+using BioDomes.Web.InputModel;
 
 namespace BioDomes.Web.Pages.Biomes;
 
@@ -13,46 +14,26 @@ namespace BioDomes.Web.Pages.Biomes;
 public class AddPage(IWebHostEnvironment environment, IBiomeRepository repository) : AppPageModel(environment)
 {
     [BindProperty]
-    public InputModel Input { get; set; } = new();
+    public BiomeInputModel Input { get; set; } = new();
     
     public string? Humidity { get; set; }
     
-    public string BiomeState { get; set; } = string.Empty;
-
-    public class InputModel
-    {
-        [Required(ErrorMessage = "Le nom du biome est requis")]
-        public string Name { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "La température est requise.")]
-        public double? Temperature { get; set; }
-
-        [Required(ErrorMessage = "L'humidité absolue est requise.")]
-        [Range(0, double.MaxValue, ErrorMessage = "L'humidité doit être positive.")]
-        public double? AbsoluteHumidity { get; set; }
-        
-        public IFormFile? ImageUrl { get; set; }
-    }
 
     public void OnGet() { }
 
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid) return Page();
+        var temp = Input.Temperature;
+        var humidity = Input.AbsoluteHumidity;
+        var rule = new HumidityRule(temp, humidity);
 
-        var temp = Input.Temperature!.Value;
-        var humidity = Input.AbsoluteHumidity!.Value;
-
-        var maxHumidity = CalculateMaxHumidity(temp);
-
-        if (humidity > maxHumidity)
+        if (!rule.IsValid)
         {
-            ErrorNotification($"Un biome avec une température de {temp}° a une humidité max de {maxHumidity:F2} g/m³.");
-            Humidity = $"Humidité maximale autorisée pour {temp}° : {maxHumidity:F2} g/m³";
+            ErrorNotification($"Un biome avec une température de {temp}° a une humidité max de {rule.MaxHumidity:F2} g/m³.");
+            Humidity = $"Humidité maximale autorisée pour {temp}° : {rule.MaxHumidity:F2} g/m³";
             return Page();
         }
-
-        var state = CalculateBiomeState(temp);
 
         var userId = User.GetUserId();
         if (userId == null)
@@ -68,7 +49,6 @@ public class AddPage(IWebHostEnvironment environment, IBiomeRepository repositor
             Temperature = Input.Temperature,
             Humidity = Input.AbsoluteHumidity,
             ImageUrl = imageName,
-            UserId = userId,
             IsPublic = true
         };
         
@@ -79,17 +59,9 @@ public class AddPage(IWebHostEnvironment environment, IBiomeRepository repositor
             return Page();
         }
         
-        SuccessNotification($"Biome créé avec succès ! État : {state}.");
+        var value = result.Value!;
+        
+        SuccessNotification($"Biome créé avec succès ! État : {value.State}.");
         return RedirectToPage("/Biomes/Index");
     }
-
-    private static double CalculateMaxHumidity(double temperature) =>
-        216.7 * 6.112 * Math.Exp(17.67 * temperature / (temperature + 243.5)) / (temperature + 273.15);
-
-    private static string CalculateBiomeState(double temperature) => temperature switch
-    {
-        < -20 or > 40 => "Critique",
-        < 0 or > 30   => "Instable",
-        _              => "Optimal"
-    };
 }

@@ -40,7 +40,25 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         }
     }
 
-    public async Task<Result<Biome>> FindAsync(int id, string userId, bool isAdmin)
+    public async Task<Result<string>> GetCreatorAsync(int biomeId)
+    {
+        try
+        {
+            var biome = await context.Biomes.Include(b => b.User)
+                .FirstOrDefaultAsync(b => b.Id == biomeId);
+
+            return biome?.User.UserName is null 
+                ? Result<string>.NotFound("Biome not found") 
+                : Result<string>.Ok(biome.User.UserName);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning($"Database error: {ex.Message}");
+            return Result<string>.Failure("Database error");
+        }
+    }
+
+    public async Task<Result<Biome>> FindAsync(int id, string? userId, bool isAdmin)
     {
         try
         {
@@ -48,12 +66,16 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
                 .FirstOrDefaultAsync(b => b.Id == id);
 
             if (entity is null)
-                return Result<Biome>.Failure($"Biome {id} not found");
+            {
+                return Result<Biome>.NotFound($"Biome {id} not found");
+            }
 
-            if (!isAdmin && entity.UserId != userId)
-                return Result<Biome>.Forbidden("Access denied.");
+            if (entity.IsPublic || entity.UserId == userId || isAdmin)
+            {
+                return Result<Biome>.Ok(BiomeMapper.MapBiome(entity));
+            }
 
-            return Result<Biome>.Ok(BiomeMapper.MapBiome(entity));
+            return Result<Biome>.Forbidden("Access denied.");
         }
         catch (DbUpdateException ex)
         {
@@ -79,7 +101,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
                 Temperature = createRequest.Temperature,
                 Humidity = createRequest.Humidity,
                 ImageUrl = createRequest.ImageUrl,
-                UserId = createRequest.UserId,
+                UserId = userId,
                 IsPublic = createRequest.IsPublic,
             };
 
@@ -111,11 +133,11 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         {
             var entity = await context.Biomes
                 .FirstOrDefaultAsync(b => b.Id == toUpdate.Id);
-            
+
             if (entity is null)
                 return Result<Biome>.NotFound("Biome not found");
-            
-            
+
+
             if (!isAdmin && !entity.IsPublic && entity.UserId != userId)
             {
                 return Result<Biome>.Forbidden("Access denied.");

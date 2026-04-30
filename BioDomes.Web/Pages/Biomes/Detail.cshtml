@@ -1,0 +1,161 @@
+@page "/biomes/{id:int}"
+@model Detail
+
+@{
+    Layout = "Shared/_Layout";
+    ViewData["Title"] = Model.Biome.Name;
+}
+
+<div class="container">
+    <div class="main-container">
+        <section>
+            <div class="container-title">
+                <div class="d-flex justify-content-center align-items-center gap-3 flex-row">
+                    <h1>@Model.Biome.Name</h1>
+                    <span class="biome-state biome-state-@Model.Biome.State.ToLower()">
+                        @Model.Biome.State
+                    </span>
+                </div>
+                <p>Créé par "@Model.Creator"</p>
+                <a class="btn-save" asp-page="/Biomes/Edit" asp-route-id="@Model.Biome.Id">Modifier les informations</a>
+            </div>
+            <img class="img-header" src="@Model.Biome.ImageUrl" alt="@Model.Biome.Name"/>
+        </section>
+    </div>
+</div>
+<hr class="mb-0"/>
+<div class="container-fluid min-vh-100 p-0" id="title-section">
+    <div class="d-flex align-items-stretch h-100">
+        @* info *@
+        <aside class="sidebar-info border-end p-4">
+            <div class="mb-5">
+                <span class="text-uppercase text-muted small fw-bold"
+                      style="">Informations</span>
+                <h2 class="text-bright mt-2 mb-1" id="title">Paramètres & état</h2>
+            </div>
+
+            <section class="mb-5">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="point point-primary"></div>
+                    <h6 class="text-bright m-0" id="existing-title">Conditions environnementales</h6>
+                </div>
+                <ul class="list-unstyled d-flex flex-column gap-2">
+                    <li class="li-info-card">
+                        <div class="d-flex flex-column">
+                            <span>@Model.Biome.Temperature °C</span>
+                            <span class="specie-meta">Température actuelle</span>
+                        </div>
+                    </li>
+                    <li class="li-info-card">
+                        <div class="d-flex flex-column">
+                            <span>@Model.Biome.Humidity g/m³</span>
+                            <span class="specie-meta">Humidité actuelle</span>
+                        </div>
+                    </li>
+                    <li class="li-info-card">
+                        <div class="d-flex flex-column">
+                            <span>@Model.Biome.MaxHumidity.ToString("0.##") g/m³</span>
+                            <span class="specie-meta">Humidité maximum</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="d-flex justify-content-between mb-1 mt-2">
+                            <span class="specie-meta">Saturation d'humidité</span>
+                            <span class="specie-meta">@Model.Biome.HumidityPercent.ToString("0")%</span>
+                        </div>
+                        <div class="progress" style="height: 6px; background-color: rgba(255,255,255,0.1);">
+                            <div class="progress-bar bg-primary"
+                                 role="progressbar"
+                                 style="width: @Model.Biome.HumidityPercent.ToString("0")%"
+                                 aria-valuenow="@Model.Biome.HumidityPercent"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="point point-secondary"></div>
+                    <h6 class="text-bright m-0" id="available-title">Diagnostiques</h6>
+                </div>
+                <ul class="list-unstyled d-flex flex-column gap-2">
+                    <li class="li-info-card">
+                        <div class="d-flex flex-column">
+                            <span>@Model.Biome.State</span>
+                            <span class="specie-meta">État thermique</span>
+                        </div>
+                    </li>
+                    <li class="li-info-card">
+                        <div class="d-flex flex-column">
+                            <span>Equilibré</span>
+                            <span class="specie-meta">État trophique</span>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="point point-primary"></div>
+                    <h6 class="text-bright m-0" id="available-title">Suggestions</h6>
+                </div>
+                <ul class="list-unstyled d-flex flex-column gap-2">
+                    <li class="li-info-card">
+                        <div class="d-flex flex-column">
+                            <span>2 espèces n'ont pas de source de nourriture</span>
+                            <span class="specie-meta">Ajouter un mammifère</span>
+                        </div>
+                        <button class="btn-action btn-add p-1" title="Effectuer l'action"> ✓</button>
+                        <button class="btn-action btn-remove p-1" title="Ignorer la suggestion"> ×</button>
+                    </li>
+                    <li class="li-info-card">
+                        <div class="d-flex flex-column">
+                            <span>Aucun extracteur d'oxygène disponible</span>
+                            <span class="specie-meta">Ajouter un extracteur d'oxygène</span>
+                        </div>
+                        <button class="btn-action btn-add p-1" title="Effectuer l'action"> ✓</button>
+                        <button class="btn-action btn-remove p-1" title="Ignorer la suggestion"> ×</button>
+                    </li>
+                </ul>
+            </section>
+        </aside>
+
+        @* graph *@
+        <div class="flex-grow-1 h-auto mt-3">
+            <div class="container-title">
+                <a href="#title-section" class="large-title">Détail</a>
+            </div>
+            <div id="cy" class="h-auto w-100"></div>
+        </div>
+
+        @* gestion *@
+        <aside class="sidebar-info border-start p-4">
+            <div class="mb-5">
+                <span class="text-uppercase text-muted small fw-bold">Gestions</span>
+                <h2 class="text-bright mt-2 mb-1" id="title">Espèces & équipements</h2>
+            </div>
+
+            <section class="mb-5">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="point point-primary"></div>
+                    <h6 class="text-bright m-0" id="existing-title">Les espèces</h6>
+                </div>
+                <ul class="list-unstyled d-flex flex-column gap-2">
+                </ul>
+            </section>
+
+            <section>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="point point-secondary"></div>
+                    <h6 class="text-bright m-0" id="available-title">Les équipements</h6>
+                </div>
+                <ul class="list-unstyled d-flex flex-column gap-2">
+                </ul>
+            </section>
+        </aside>
+
+    </div>
+</div>

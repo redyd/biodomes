@@ -34,6 +34,7 @@ function renderExistingPrey(preys, rootSpecie) {
 
     for (const p of preys) {
         const li = document.createElement('li');
+        li.className = "li-info-card";
         li.innerHTML = `
             <div class="d-flex flex-column">
                 <span>${p.name}</span>
@@ -59,6 +60,7 @@ function renderAvailablePrey(preys, rootSpecie) {
 
     for (const p of preys) {
         const li = document.createElement('li');
+        li.className = "li-info-card";
         li.innerHTML = `
             <div class="d-flex flex-column">
                 <span>${p.name}</span>
@@ -92,6 +94,7 @@ function handleAction(predator, prey, action) {
 
 (function () {
     const data = window.foodChainData;
+    const isAdmin = window.isAdmin;
 
     if (!data) {
         console.error("foodChainData is missing");
@@ -199,25 +202,28 @@ function handleAction(predator, prey, action) {
         }
     });
     
-    cy.on('tap', 'node', function (evt) {
-        const node = evt.target;
+    if (isAdmin) {
+        cy.on('tap', 'node', function (evt) {
+            const node = evt.target;
 
-        fetch('?handler=NodeClicked', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': getAntiForgeryToken()
-            },
-            body: JSON.stringify({
-                slug: node.id()
+            fetch('?handler=NodeClicked', {
+
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': getAntiForgeryToken()
+                },
+                body: JSON.stringify({
+                    slug: node.id()
+                })
             })
-        })
-            .then(res => res.json())
-            .then(data => {
-                console.log(JSON.stringify(data));
-                onSpecieSelect(data);
-            })
-    });
+                .then(res => res.json())
+                .then(data => {
+                    console.log(JSON.stringify(data));
+                    onSpecieSelect(data);
+                })
+        });
+    }
 
     setTimeout(() => {
         cy.resize();
