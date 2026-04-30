@@ -7,11 +7,11 @@
     ViewData["Title"] = "Chaine alimentaire";
 }
 
-<div class="container-fluid vh-100 p-0">
-    <div class="d-flex h-100">
+<div class="min-vh-100 p-0 d-block">
+    <div class="d-flex">
 
-        <div class="flex-grow-1 h-100">
-            <div id="cy" class="h-100 w-100"></div>
+        <div class="flex-grow-1">
+            <div id="cy" class="w-100 min-vh-100"></div>
         </div>
 
         @if (User.IsAdmin())

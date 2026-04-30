@@ -31,8 +31,7 @@ namespace BioDomes.Infrastructures.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double?>("Humidity")
-                        .IsRequired()
+                    b.Property<double>("Humidity")
                         .HasColumnType("float");
 
                     b.Property<string>("ImageUrl")
@@ -46,8 +45,7 @@ namespace BioDomes.Infrastructures.Migrations
                         .HasMaxLength(75)
                         .HasColumnType("nvarchar(75)");
 
-                    b.Property<double?>("Temperature")
-                        .IsRequired()
+                    b.Property<double>("Temperature")
                         .HasColumnType("float");
 
                     b.Property<string>("UserId")
@@ -59,6 +57,26 @@ namespace BioDomes.Infrastructures.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("biomes", "dbo");
+                });
+
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeSpecieEntity", b =>
+                {
+                    b.Property<int>("BiomeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SpecieSlug")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Count")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.HasKey("BiomeId", "SpecieSlug");
+
+                    b.HasIndex("SpecieSlug");
+
+                    b.ToTable("biomes_species", "dbo");
                 });
 
             modelBuilder.Entity("BioDomes.Infrastructures.Models.EquipmentEntity", b =>
@@ -778,7 +796,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "9e64884f-cb1d-4dfb-b7a8-907a54bd70d2",
+                            ConcurrencyStamp = "21d126cc-90a6-4c9e-b881-1af503f3455f",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -786,7 +804,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "ff73410c-b8f2-43d8-8f46-4a489125828b",
+                            SecurityStamp = "aeeb86a2-b3ff-40ce-ba07-f4ddd7784f04",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -795,7 +813,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "b392696f-d498-40dd-bde5-165c17c7d893",
+                            ConcurrencyStamp = "62c1a059-d97d-488e-a26d-364f7f86101e",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -803,7 +821,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "e962a629-cf2d-411c-bb79-879f420ff69d",
+                            SecurityStamp = "c37f5475-3ad7-4f90-ad39-bc2f08eb6363",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         });
@@ -822,26 +840,6 @@ namespace BioDomes.Infrastructures.Migrations
                     b.HasIndex("EquipmentsId");
 
                     b.ToTable("biome_equipments", "dbo");
-                });
-
-            modelBuilder.Entity("BiomeEntitySpecieEntity", b =>
-                {
-                    b.Property<int>("BiomesId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SpeciesSlug")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SpecieEntitySlug")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("BiomesId", "SpeciesSlug");
-
-                    b.HasIndex("SpecieEntitySlug");
-
-                    b.HasIndex("SpeciesSlug");
-
-                    b.ToTable("biomes_species", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1236,6 +1234,25 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeSpecieEntity", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.BiomeEntity", "Biome")
+                        .WithMany("BiomeSpecies")
+                        .HasForeignKey("BiomeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BioDomes.Infrastructures.Models.SpecieEntity", "Specie")
+                        .WithMany("BiomeSpecies")
+                        .HasForeignKey("SpecieSlug")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Biome");
+
+                    b.Navigation("Specie");
+                });
+
             modelBuilder.Entity("BioDomes.Infrastructures.Models.EquipmentEntity", b =>
                 {
                     b.HasOne("BioDomes.Infrastructures.Models.EquipmentResourceEntity", "ConsumedResourceEntity")
@@ -1324,26 +1341,6 @@ namespace BioDomes.Infrastructures.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BiomeEntitySpecieEntity", b =>
-                {
-                    b.HasOne("BioDomes.Infrastructures.Models.BiomeEntity", null)
-                        .WithMany()
-                        .HasForeignKey("BiomesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BioDomes.Infrastructures.Models.SpecieEntity", null)
-                        .WithMany()
-                        .HasForeignKey("SpecieEntitySlug")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("BioDomes.Infrastructures.Models.SpecieEntity", null)
-                        .WithMany()
-                        .HasForeignKey("SpeciesSlug")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1410,8 +1407,15 @@ namespace BioDomes.Infrastructures.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeEntity", b =>
+                {
+                    b.Navigation("BiomeSpecies");
+                });
+
             modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieEntity", b =>
                 {
+                    b.Navigation("BiomeSpecies");
+
                     b.Navigation("Predators");
 
                     b.Navigation("Preys");

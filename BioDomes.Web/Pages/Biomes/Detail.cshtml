@@ -17,15 +17,18 @@
                     </span>
                 </div>
                 <p>Créé par "@Model.Creator"</p>
-                <a class="btn-save" asp-page="/Biomes/Edit" asp-route-id="@Model.Biome.Id">Modifier les informations</a>
+                @if (Model.Biome.CanEdit)
+                {
+                    <a class="btn-save" asp-page="/Biomes/Edit" asp-route-id="@Model.Biome.Id">Modifier les informations</a>
+                }
             </div>
             <img class="img-header" src="@Model.Biome.ImageUrl" alt="@Model.Biome.Name"/>
         </section>
     </div>
 </div>
 <hr class="mb-0"/>
-<div class="container-fluid min-vh-100 p-0" id="title-section">
-    <div class="d-flex align-items-stretch h-100">
+<div class="min-vh-100 p-0 d-block" id="title-section">
+    <div class="d-flex">
         @* info *@
         <aside class="sidebar-info border-end p-4">
             <div class="mb-5">
@@ -90,45 +93,48 @@
                     </li>
                     <li class="li-info-card">
                         <div class="d-flex flex-column">
-                            <span>Equilibré</span>
+                            <span>xxx</span>
                             <span class="specie-meta">État trophique</span>
                         </div>
                     </li>
                 </ul>
             </section>
 
-            <section>
-                <div class="d-flex align-items-center mb-3">
-                    <div class="point point-primary"></div>
-                    <h6 class="text-bright m-0" id="available-title">Suggestions</h6>
-                </div>
-                <ul class="list-unstyled d-flex flex-column gap-2">
-                    <li class="li-info-card">
-                        <div class="d-flex flex-column">
-                            <span>2 espèces n'ont pas de source de nourriture</span>
-                            <span class="specie-meta">Ajouter un mammifère</span>
-                        </div>
-                        <button class="btn-action btn-add p-1" title="Effectuer l'action"> ✓</button>
-                        <button class="btn-action btn-remove p-1" title="Ignorer la suggestion"> ×</button>
-                    </li>
-                    <li class="li-info-card">
-                        <div class="d-flex flex-column">
-                            <span>Aucun extracteur d'oxygène disponible</span>
-                            <span class="specie-meta">Ajouter un extracteur d'oxygène</span>
-                        </div>
-                        <button class="btn-action btn-add p-1" title="Effectuer l'action"> ✓</button>
-                        <button class="btn-action btn-remove p-1" title="Ignorer la suggestion"> ×</button>
-                    </li>
-                </ul>
-            </section>
+            @if (Model.Biome.CanEdit)
+            {
+                <section>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="point point-primary"></div>
+                        <h6 class="text-bright m-0" id="available-title">Suggestions</h6>
+                    </div>
+                    <ul class="list-unstyled d-flex flex-column gap-2">
+                        <li class="li-info-card">
+                            <div class="d-flex flex-column">
+                                <span>2 espèces n'ont pas de source de nourriture</span>
+                                <span class="specie-meta">Ajouter un mammifère</span>
+                            </div>
+                            <button class="btn-action btn-add p-1" title="Effectuer l'action"> ✓</button>
+                            <button class="btn-action btn-remove p-1" title="Ignorer la suggestion"> ×</button>
+                        </li>
+                        <li class="li-info-card">
+                            <div class="d-flex flex-column">
+                                <span>Aucun extracteur d'oxygène disponible</span>
+                                <span class="specie-meta">Ajouter un extracteur d'oxygène</span>
+                            </div>
+                            <button class="btn-action btn-add p-1" title="Effectuer l'action"> ✓</button>
+                            <button class="btn-action btn-remove p-1" title="Ignorer la suggestion"> ×</button>
+                        </li>
+                    </ul>
+                </section>
+            }
         </aside>
 
         @* graph *@
-        <div class="flex-grow-1 h-auto mt-3">
+        <div class="flex-grow-1 mt-3">
             <div class="container-title">
                 <a href="#title-section" class="large-title">Détail</a>
             </div>
-            <div id="cy" class="h-auto w-100"></div>
+            <div id="cy" class="w-100 min-vh-100"></div>
         </div>
 
         @* gestion *@

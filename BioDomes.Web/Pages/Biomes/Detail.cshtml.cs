@@ -7,41 +7,53 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Biomes;
 
-public class Detail(IWebHostEnvironment environment, IBiomeRepository biomeRepo, ILogger<Detail> logger)
+public class Detail(IWebHostEnvironment environment, IBiomeRepository biomeRepo, IFoodChainRepository foodChainRepo)
     : AppPageModel(environment)
 {
     public BiomeView Biome { get; set; } = null!;
+    public FoodChainGraph FoodChain { get; set; } = null!;
     public string Creator { get; set; } = string.Empty;
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
         var userId = User.GetUserId();
-        var result = await biomeRepo.FindAsync(id, userId, User.IsAdmin());
 
-        if (!result.IsSuccess || result.Value is null)
+        var biomeResult = await biomeRepo.FindAsync(id, userId, User.IsAdmin());
+        if (!biomeResult.IsSuccess || biomeResult.Value is null)
         {
-            return result.ToPageResult(this);
+            return biomeResult.ToPageResult(this);
         }
 
-        var b = result.Value;
-
-        var creator = await biomeRepo.GetCreatorAsync(b.Id);
-
-        if (!creator.IsSuccess || creator.Value is null)
+        var creatorResult = await biomeRepo.GetCreatorAsync(biomeResult.Value.Id);
+        if (!creatorResult.IsSuccess || creatorResult.Value is null)
         {
-            return creator.ToPageResult(this);
+            return creatorResult.ToPageResult(this);
+        }
+
+
+        Creator = creatorResult.Value;
+        Biome = BuildBiomeView(biomeResult.Value, userId);
+        
+        var graphResult = await foodChainRepo.GetFullGraphForBiomeAsync(Biome.Id);
+        if (!graphResult.IsSuccess || graphResult.Value is null)
+        {
+            return graphResult.ToPageResult(this);
         }
         
-        Creator = creator.Value;
+        FoodChain = graphResult.Value;
 
+        return Page();
+    }
+
+    private BiomeView BuildBiomeView(Biome b, string? userId)
+    {
         var rule = new HumidityRule(b.Temperature, b.Humidity);
 
         var humidityPercent = rule.MaxHumidity > 0
-            ? (b.Humidity / rule.MaxHumidity) * 100
+            ? b.Humidity / rule.MaxHumidity * 100
             : 0;
 
-
-        Biome = new BiomeView
+        return new BiomeView
         {
             Id = b.Id,
             Name = b.Name,
@@ -56,7 +68,5 @@ public class Detail(IWebHostEnvironment environment, IBiomeRepository biomeRepo,
             MaxHumidity = rule.MaxHumidity,
             HumidityPercent = Math.Min(humidityPercent, 100)
         };
-
-        return Page();
     }
 }

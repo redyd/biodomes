@@ -37,8 +37,6 @@ public class Index(IWebHostEnvironment environment, IFoodChainRepository repo, I
         var preys = graph.PreyOf(node.Slug);
         var available = graph.AvailablePreyFor(node.Slug);
 
-        logger.LogInformation("CLICKED {@Slug}", node.Slug);
-
         return new JsonResult(new
         {
             slug = specie?.Slug,

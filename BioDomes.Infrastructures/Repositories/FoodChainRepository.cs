@@ -14,6 +14,7 @@ public class FoodChainRepository(BiodomeContext context) : IFoodChainRepository
             .Include(s => s.DietEntity)
             .Include(s => s.ClassificationEntity)
             .ThenInclude(c => c.EatenByDiets)
+            .Include(s => s.BiomeSpecies)
             .AsNoTracking()
             .ToListAsync();
 
@@ -22,7 +23,8 @@ public class FoodChainRepository(BiodomeContext context) : IFoodChainRepository
                 slug: s.Slug,
                 name: s.Name,
                 diet: SpecieMapper.MapDiet(s.DietEntity),
-                classification: SpecieMapper.MapClassification(s.ClassificationEntity)
+                classification: SpecieMapper.MapClassification(s.ClassificationEntity),
+                count: s.BiomeSpecies.Sum(bs => bs.Count)
             ))
             .ToList();
 
@@ -35,6 +37,38 @@ public class FoodChainRepository(BiodomeContext context) : IFoodChainRepository
             .ToListAsync();
 
         return new FoodChainGraph(nodes, edges);
+    }
+
+    public async Task<Result<FoodChainGraph>> GetFullGraphForBiomeAsync(int biomeId)
+    {
+        var allSpecies = await context.Species
+            .Where(s => s.BiomeSpecies.Any(b => b.BiomeId == biomeId))
+            .Include(s => s.DietEntity)
+            .Include(s => s.ClassificationEntity)
+            .ThenInclude(s => s.EatenByDiets)
+            .Include(s => s.BiomeSpecies)
+            .AsNoTracking()
+            .ToListAsync();
+
+        var nodes = allSpecies
+            .Select(s => new FoodChainNode(
+                slug: s.Slug,
+                name: s.Name,
+                diet: SpecieMapper.MapDiet(s.DietEntity),
+                classification: SpecieMapper.MapClassification(s.ClassificationEntity),
+                count: s.BiomeSpecies.SingleOrDefault(bs => bs.BiomeId == biomeId)?.Count ?? 0
+            ))
+            .ToList();
+
+        var edges = await context.SpecieFoodChains
+            .Where(r =>
+                r.Predator.BiomeSpecies.Any(b => b.BiomeId == biomeId) &&
+                r.Prey.BiomeSpecies.Any(b => b.BiomeId == biomeId))
+            .Select(r => new FoodChainEdge(r.Predator.Slug, r.Prey.Slug))
+            .AsNoTracking()
+            .ToListAsync();
+
+        return Result<FoodChainGraph>.Ok(new FoodChainGraph(nodes, edges));
     }
 
     public async Task AddRelation(string predatorSlug, string preySlug)

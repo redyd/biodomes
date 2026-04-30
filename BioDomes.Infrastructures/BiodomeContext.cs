@@ -33,5 +33,6 @@ public class BiodomeContext(DbContextOptions<BiodomeContext> options) : Identity
         builder.ApplyConfiguration(new SpecieDietTypeConfiguration());
         builder.ApplyConfiguration(new SpecieEntityTypeConfiguration());
         builder.ApplyConfiguration(new SpecieFoodChainTypeConfiguration());
+        builder.ApplyConfiguration(new BiomeSpecieEntityTypeConfiguration());
     }
 }
