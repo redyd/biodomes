@@ -19,7 +19,8 @@
                 <p>Créé par "@Model.Creator"</p>
                 @if (Model.Biome.CanEdit)
                 {
-                    <a class="btn-save" asp-page="/Biomes/Edit" asp-route-id="@Model.Biome.Id">Modifier les informations</a>
+                    <a class="btn-save" asp-page="/Biomes/Edit" asp-route-id="@Model.Biome.Id">Modifier les
+                        informations</a>
                 }
             </div>
             <img class="img-header" src="@Model.Biome.ImageUrl" alt="@Model.Biome.Name"/>
@@ -27,10 +28,10 @@
     </div>
 </div>
 <hr class="mb-0"/>
-<div class="min-vh-100 p-0 d-block" id="title-section">
-    <div class="d-flex">
+<div class="p-0 d-block" id="title-section">
+    <div class="d-flex layout-columns">
         @* info *@
-        <aside class="sidebar-info border-end p-4">
+        <aside class="sidebar-info p-4">
             <div class="mb-5">
                 <span class="text-uppercase text-muted small fw-bold"
                       style="">Informations</span>
@@ -134,11 +135,11 @@
             <div class="container-title">
                 <a href="#title-section" class="large-title">Détail</a>
             </div>
-            <div id="cy" class="w-100 min-vh-100"></div>
+            <div id="cy"></div>
         </div>
 
         @* gestion *@
-        <aside class="sidebar-info border-start p-4">
+        <aside class="sidebar-info p-4">
             <div class="mb-5">
                 <span class="text-uppercase text-muted small fw-bold">Gestions</span>
                 <h2 class="text-bright mt-2 mb-1" id="title">Espèces & équipements</h2>
@@ -150,6 +151,31 @@
                     <h6 class="text-bright m-0" id="existing-title">Les espèces</h6>
                 </div>
                 <ul class="list-unstyled d-flex flex-column gap-2">
+                    @foreach (var specie in Model.FoodChain.Nodes)
+                    {
+                        <li class="li-info-card">
+                            <div class="d-flex flex-column">
+                                <span>@specie.Name</span>
+                                <span class="specie-meta">@specie.Classification</span>
+                            </div>
+                            <button class="btn-action btn-remove" title="Supprimer le lien">×</button>
+                        </li>
+                    }
+                    @if (Model.FoodChain.Nodes.Count == 0)
+                    {
+                        <li class="li-info-card">
+                            <div class="d-flex flex-column">
+                                <span>Commencez à ajouter des espèces</span>
+                                <span class="specie-meta">Aucune espèce</span>
+                            </div>
+                            <button
+                                class="btn-action btn-add"
+                                title="Ajouter votre première espèce"
+                                onclick="document.getElementById('add-species-dialog').showModal()">
+                                +
+                            </button>
+                        </li>
+                    }
                 </ul>
             </section>
 
@@ -165,3 +191,40 @@
 
     </div>
 </div>
+
+<dialog id="add-species-dialog">
+    <div class="edit-card">
+        <div class="edit-header">
+            <p class="edit-breadcrumb">Biodômes · @Model.Biome.Name</p>
+            <h1 class="edit-title">Ajouter des espèces</h1>
+        </div>
+        
+        <form method="dialog" class="edit-body">
+            
+            @* <div class="field-group"> *@
+            @*     <label class="field-label" asp-for="Input.ClassificationId">Classification</label> *@
+            @*     <select class="field-input" *@
+            @*             asp-for="Input.ClassificationId" *@
+            @*             asp-items="Model.Classifications"> *@
+            @*         <option value="">-- Choisir --</option> *@
+            @*     </select> *@
+            @*     <span asp-validation-for="Input.ClassificationId" class="field-error"></span> *@
+            @* </div> *@
+            @* *@
+            @* <div class="field-group"> *@
+            @*     <label class="field-label">Quantité</label> *@
+            @*     <input class="field-input" type="number" step="1" asp-for="" /> *@
+            @*     <span asp-validation-for="" class="field-error"></span> *@
+            @* </div> *@
+
+            <div class="edit-divider"></div>
+
+            <div class="edit-actions">
+                <button type="button" class="btn-cancel" onclick="document.getElementById('add-species-dialog').close()">
+                    Annuler
+                </button>
+                <button class="btn-save" type="submit" name="action" value="save">Ajouter</button>
+            </div>
+        </form>
+    </div>
+</dialog>

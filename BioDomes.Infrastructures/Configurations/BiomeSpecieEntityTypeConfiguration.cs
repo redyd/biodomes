@@ -10,7 +10,7 @@ public class BiomeSpecieEntityTypeConfiguration : IEntityTypeConfiguration<Biome
     {
         builder.ToTable("biomes_species");
         
-        builder.HasKey(bs => new { bs.BiomeId, bs.SpecieId });
+        builder.HasKey(bs => bs.Id);
 
         builder.HasOne(bs => bs.Biome)
             .WithMany(b => b.BiomeSpecies)
@@ -22,8 +22,8 @@ public class BiomeSpecieEntityTypeConfiguration : IEntityTypeConfiguration<Biome
             .HasForeignKey(bs => bs.SpecieId)
             .OnDelete(DeleteBehavior.NoAction);
         
-        builder.Property(bs => bs.Count)
-            .IsRequired()
-            .HasDefaultValue(1);
+        builder.Property(bs => bs.Inserted)
+            .HasDefaultValueSql("getdate()")
+            .ValueGeneratedOnAdd();
     }
 }

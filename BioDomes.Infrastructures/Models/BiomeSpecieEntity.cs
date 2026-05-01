@@ -2,8 +2,8 @@ namespace BioDomes.Infrastructures.Models;
 
 public class BiomeSpecieEntity
 {
-    public int Count { get; set; }
-    
+    public int Id { get; set; }
+    public DateTime Inserted { get; set; }
     // relation
     public int BiomeId { get; set; }
     public BiomeEntity Biome { get; set; }

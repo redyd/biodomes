@@ -38,6 +38,33 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
         }
     }
 
+    public async Task<Result<Dictionary<int, Specie>>> FindAllAsDictAsync(string? userId, bool isAdmin)
+    {
+        try
+        {
+            var query = context
+                .Species
+                .Include(e => e.DietEntity)
+                .Include(e => e.ClassificationEntity)
+                .AsQueryable();
+
+            if (!isAdmin)
+            {
+                query = query.Where(e =>
+                    e.IsPublic
+                    || (userId != null && e.UserId == userId));
+            }
+
+            var result = await query.ToDictionaryAsync(s => s.Id, SpecieMapper.MapSpecie);
+            return Result<Dictionary<int, Specie>>.Ok(result);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning($"Database error: {ex.Message}");
+            return Result<Dictionary<int, Specie>>.Failure("Database error");
+        }
+    }
+
     public async Task<Result<int>> CountAsync()
     {
         try

@@ -17,4 +17,6 @@ public interface IBiomeRepository
     Task<Result<Biome>> UpdateAsync(UpdateBiomeRequest toUpdate, string? userId, bool isAdmin);
     
     Task<Result<Biome>> DeleteAsync(int id, string userId, bool isAdmin);
+    
+    Task AddSpecie(AddSpecieToBiomeRequest request, int biomeId);
 }

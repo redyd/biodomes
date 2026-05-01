@@ -1085,11 +1085,20 @@ body {
 
 .sidebar-info {
     width: 300px;
+    height: calc(100vh - 70px);
+    overflow-y: auto;
     background: var(--surface);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
     flex-shrink: 0;
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-bright) transparent;
+}
+
+.layout-columns {
+    height: calc(100vh - 70px);
+    overflow: hidden;
+    position: sticky;
+    top: 70px;
 }
 
 .btn-action {
@@ -1171,6 +1180,36 @@ a {
 
 .bg-primary {
     background-color: var(--bs-primary) !important;
+}
+
+dialog {
+    /* taille & position */
+    width: min(520px, 90vw);
+    max-height: 85vh;
+    overflow-y: auto;
+    margin: auto;
+
+    /* surface */
+    background: var(--panel);
+    border: 0;
+    border-radius: var(--radius-lg);
+
+    /* typo */
+    color: var(--text-bright);
+    font-family: var(--sans);
+
+    /* ombre teal subtile */
+    box-shadow: var(--shadow-teal), 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+dialog::backdrop {
+    background: rgba(6, 13, 15, 0.85); /* --void avec opacité */
+    backdrop-filter: blur(4px);
+}
+
+#cy {
+    height: calc(100vh - 70px);
+    width: 100%;
 }
 
 /* Responsive */

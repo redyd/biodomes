@@ -24,7 +24,7 @@ public class FoodChainRepository(BiodomeContext context) : IFoodChainRepository
                 name: s.Name,
                 diet: SpecieMapper.MapDiet(s.DietEntity),
                 classification: SpecieMapper.MapClassification(s.ClassificationEntity),
-                count: s.BiomeSpecies.Sum(bs => bs.Count)
+                count: s.BiomeSpecies.Count
             ))
             .ToList();
 
@@ -56,7 +56,7 @@ public class FoodChainRepository(BiodomeContext context) : IFoodChainRepository
                 name: s.Name,
                 diet: SpecieMapper.MapDiet(s.DietEntity),
                 classification: SpecieMapper.MapClassification(s.ClassificationEntity),
-                count: s.BiomeSpecies.SingleOrDefault(bs => bs.BiomeId == biomeId)?.Count ?? 0
+                count: s.BiomeSpecies.Count(bs => bs.BiomeId == biomeId)
             ))
             .ToList();
 

@@ -6,6 +6,7 @@ namespace BioDomes.Domains.Repository;
 public interface ISpeciesRepository
 {
     Task<Result<List<Specie>>> FindAllAsync(string? userId, bool isAdmin);
+    Task<Result<Dictionary<int, Specie>>> FindAllAsDictAsync(string? userId, bool isAdmin);
 
     Task<Result<int>> CountAsync();
 

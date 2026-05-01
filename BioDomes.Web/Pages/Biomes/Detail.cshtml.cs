@@ -1,6 +1,7 @@
 using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Web.Extensions;
+using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
 using BioDomes.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ public class Detail(IWebHostEnvironment environment, IBiomeRepository biomeRepo,
     public BiomeView Biome { get; set; } = null!;
     public FoodChainGraph FoodChain { get; set; } = null!;
     public string Creator { get; set; } = string.Empty;
+    public AddBiomeSpecieInputModel Input { get; set; } = new();
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -33,15 +35,16 @@ public class Detail(IWebHostEnvironment environment, IBiomeRepository biomeRepo,
 
         Creator = creatorResult.Value;
         Biome = BuildBiomeView(biomeResult.Value, userId);
-        
+
         var graphResult = await foodChainRepo.GetFullGraphForBiomeAsync(Biome.Id);
         if (!graphResult.IsSuccess || graphResult.Value is null)
         {
             return graphResult.ToPageResult(this);
         }
-        
+
         FoodChain = graphResult.Value;
 
+        Input = new AddBiomeSpecieInputModel();
         return Page();
     }
 

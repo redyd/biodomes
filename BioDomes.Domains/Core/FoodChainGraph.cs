@@ -4,11 +4,27 @@ public class FoodChainGraph
 {
     public IReadOnlyList<FoodChainNode> Nodes { get; }
     public IReadOnlyList<FoodChainEdge> Edges { get; }
- 
+
     public FoodChainGraph(IReadOnlyList<FoodChainNode> nodes, IReadOnlyList<FoodChainEdge> edges)
     {
         Nodes = nodes;
         Edges = edges;
+    }
+
+    /// <summary>
+    /// Retourne le nombre de fois qu'un id d'une espèce se retrouve dans les liens (specieId - count)
+    /// </summary>
+    /// <returns></returns>
+    public Dictionary<int, int> CountRelations()
+    {
+        var dict = new Dictionary<int, int>();
+
+        foreach (var node in Nodes)
+        {
+            dict[node.SpecieId] = Edges.Count(edge => edge.PreyId == node.SpecieId || edge.PredatorId == node.SpecieId);
+        }
+
+        return dict;
     }
 
     public IReadOnlyList<FoodChainNode> PreyOf(int predatorId)

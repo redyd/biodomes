@@ -187,4 +187,20 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
             return Result<Biome>.Failure("Database error");
         }
     }
+
+    public async Task AddSpecie(AddSpecieToBiomeRequest request, int biomeId)
+    {
+        var allToAdd = new List<BiomeSpecieEntity>();
+        for (var c = 0; c < request.Count; c++)
+        {
+            allToAdd.Add(new BiomeSpecieEntity
+            {
+                BiomeId = biomeId,
+                SpecieId = request.SpecieId,
+            });
+        }
+
+        await context.BiomeSpecies.AddRangeAsync(allToAdd);
+        await context.SaveChangesAsync();
+    }
 }
