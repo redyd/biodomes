@@ -17,8 +17,8 @@ function onSpecieSelect(data) {
 
     document.querySelector('#diet-badge').style.display = 'inline-block';
 
-    renderAvailablePrey(data.available, data.slug);
-    renderExistingPrey(data.preys, data.slug);
+    renderAvailablePrey(data.available, data.id);
+    renderExistingPrey(data.preys, data.id);
 }
 
 function renderExistingPrey(preys, rootSpecie) {
@@ -41,7 +41,7 @@ function renderExistingPrey(preys, rootSpecie) {
                 <span class="specie-meta">${p.classification.label}</span>
             </div>
             <button class="btn-action btn-remove" title="Supprimer le lien" 
-                    onclick="handleAction('${rootSpecie}', '${p.slug}', 'remove')">×</button>
+                    onclick="handleAction('${rootSpecie}', '${p.specieId}', 'remove')">×</button>
         `;
         existing.appendChild(li);
     }
@@ -67,7 +67,7 @@ function renderAvailablePrey(preys, rootSpecie) {
                 <span class="specie-meta">${p.classification.label}</span>
             </div>
             <button class="btn-action btn-add" title="Ajouter le lien" 
-                    onclick="handleAction('${rootSpecie}', '${p.slug}', 'add')">+</button>
+                    onclick="handleAction('${rootSpecie}', '${p.specieId}', 'add')">+</button>
         `;
         available.appendChild(li);
     }
@@ -82,7 +82,7 @@ function handleAction(predator, prey, action) {
             'Content-Type': 'application/json',
             'RequestVerificationToken': getAntiForgeryToken()
         },
-        body: JSON.stringify({ predatorSlug: predator, preySlug: prey })
+        body: JSON.stringify({ predatorId: parseInt(predator), preyId: parseInt(prey) })
     })
         .then(res => {
             if (res.ok) {
@@ -107,7 +107,7 @@ function handleAction(predator, prey, action) {
     const elements = [
         ...nodes.map(n => ({
             data: {
-                id: n.Slug,
+                id: n.SpecieId,
                 label: `${n.Name}\n${n.Diet.Label}`
             }
         })),
@@ -213,9 +213,7 @@ function handleAction(predator, prey, action) {
                     'Content-Type': 'application/json',
                     'RequestVerificationToken': getAntiForgeryToken()
                 },
-                body: JSON.stringify({
-                    slug: node.id()
-                })
+                body: JSON.stringify({ specieId: parseInt(node.id()) })
             })
                 .then(res => res.json())
                 .then(data => {

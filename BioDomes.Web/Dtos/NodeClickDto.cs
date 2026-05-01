@@ -1,6 +1,6 @@
-namespace BioDomes.Web.InputModel;
+namespace BioDomes.Web.Dtos;
 
 public class NodeClickDto
 {
-    public required string Slug { get; set; }
+    public required int SpecieId { get; set; }
 }

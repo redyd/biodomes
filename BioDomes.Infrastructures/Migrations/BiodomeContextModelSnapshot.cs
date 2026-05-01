@@ -64,17 +64,17 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<int>("BiomeId")
                         .HasColumnType("int");
 
-                    b.Property<string>("SpecieSlug")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("SpecieId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Count")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(1);
 
-                    b.HasKey("BiomeId", "SpecieSlug");
+                    b.HasKey("BiomeId", "SpecieId");
 
-                    b.HasIndex("SpecieSlug");
+                    b.HasIndex("SpecieId");
 
                     b.ToTable("biomes_species", "dbo");
                 });
@@ -468,8 +468,11 @@ namespace BioDomes.Infrastructures.Migrations
 
             modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieEntity", b =>
                 {
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ClassificationId")
                         .HasColumnType("int");
@@ -487,8 +490,13 @@ namespace BioDomes.Infrastructures.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(75)
-                        .HasColumnType("nvarchar(75)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("UploadedImageId")
                         .HasColumnType("nvarchar(max)");
@@ -500,11 +508,14 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<int>("Weight")
                         .HasColumnType("int");
 
-                    b.HasKey("Slug");
+                    b.HasKey("Id");
 
                     b.HasIndex("ClassificationId");
 
                     b.HasIndex("DietId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
 
                     b.HasIndex("Slug")
                         .IsUnique();
@@ -516,117 +527,127 @@ namespace BioDomes.Infrastructures.Migrations
                     b.HasData(
                         new
                         {
-                            Slug = "lion",
+                            Id = 1,
                             ClassificationId = 1,
                             DietId = 1,
                             Height = 180,
                             IsPublic = false,
                             Name = "Lion",
+                            Slug = "lion",
                             UploadedImageId = "3d128e91-b947-4bf7-b988-dc8ffd1de92f.jpg",
                             UserId = "user-1",
                             Weight = 150000
                         },
                         new
                         {
-                            Slug = "boa",
+                            Id = 2,
                             ClassificationId = 4,
                             DietId = 1,
                             Height = 225,
                             IsPublic = true,
                             Name = "Boa",
+                            Slug = "boa",
                             UploadedImageId = "47e0e461-066e-404f-8738-361d268f6219.jpg",
                             UserId = "user-2",
                             Weight = 13000
                         },
                         new
                         {
-                            Slug = "hetre",
+                            Id = 3,
                             ClassificationId = 16,
                             DietId = 7,
                             Height = 600,
                             IsPublic = false,
                             Name = "Hêtre",
+                            Slug = "hetre",
                             UploadedImageId = "9f21e809-9eeb-4714-8cd0-14b78d14fb60.jpg",
                             UserId = "user-1",
                             Weight = 830000
                         },
                         new
                         {
-                            Slug = "chene",
+                            Id = 4,
                             ClassificationId = 16,
                             DietId = 7,
                             Height = 2500,
                             IsPublic = false,
                             Name = "Chêne",
+                            Slug = "chene",
                             UserId = "user-2",
                             Weight = 2100000
                         },
                         new
                         {
-                            Slug = "mouche",
+                            Id = 5,
                             ClassificationId = 8,
                             DietId = 4,
                             Height = 1,
                             IsPublic = false,
                             Name = "Mouche",
+                            Slug = "mouche",
                             UploadedImageId = "2b101f74-b1f0-4c18-a183-0331f7a4788c.jpg",
                             UserId = "user-1",
                             Weight = 1
                         },
                         new
                         {
-                            Slug = "araignee",
+                            Id = 6,
                             ClassificationId = 7,
                             DietId = 1,
                             Height = 4,
                             IsPublic = true,
                             Name = "Araignée",
+                            Slug = "araignee",
                             UploadedImageId = "623fbf44-7418-44d7-8098-6cc6c7122c27.jpg",
                             UserId = "user-1",
                             Weight = 95
                         },
                         new
                         {
-                            Slug = "hirondelle",
+                            Id = 7,
                             ClassificationId = 2,
                             DietId = 1,
                             Height = 18,
                             IsPublic = true,
                             Name = "Hirondelle",
+                            Slug = "hirondelle",
                             UserId = "user-1",
                             Weight = 45
                         },
                         new
                         {
-                            Slug = "lievre",
+                            Id = 8,
                             ClassificationId = 1,
                             DietId = 2,
                             Height = 50,
                             IsPublic = true,
                             Name = "Lièvre",
+                            Slug = "lievre",
                             UploadedImageId = "7f084f4d-de3c-4436-b359-6fdfd4b93ec8.jpg",
                             UserId = "user-2",
                             Weight = 4000
                         },
                         new
                         {
-                            Slug = "paturin-des-pres",
+                            Id = 9,
                             ClassificationId = 16,
                             DietId = 7,
                             Height = 23,
                             IsPublic = false,
                             Name = "Pâturin des prés",
+                            Slug = "paturin-des-pres",
                             UserId = "user-1",
                             Weight = 1
                         },
                         new
                         {
-                            Slug = "souris",
+                            Id = 10,
                             ClassificationId = 1,
                             DietId = 3,
                             Height = 9,
                             IsPublic = true,
                             Name = "Souris",
+                            Slug = "souris",
                             UploadedImageId = "7e6d0ba0-7be3-4f94-a929-e7c04d3e1d90.jpg",
                             UserId = "user-2",
                             Weight = 25
@@ -635,11 +656,11 @@ namespace BioDomes.Infrastructures.Migrations
 
             modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieFoodChain", b =>
                 {
-                    b.Property<string>("PredatorId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("PredatorId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("PreyId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("PreyId")
+                        .HasColumnType("int");
 
                     b.HasKey("PredatorId", "PreyId");
 
@@ -650,68 +671,68 @@ namespace BioDomes.Infrastructures.Migrations
                     b.HasData(
                         new
                         {
-                            PredatorId = "lievre",
-                            PreyId = "paturin-des-pres"
+                            PredatorId = 6,
+                            PreyId = 4
                         },
                         new
                         {
-                            PredatorId = "lievre",
-                            PreyId = "hetre"
+                            PredatorId = 6,
+                            PreyId = 9
                         },
                         new
                         {
-                            PredatorId = "souris",
-                            PreyId = "paturin-des-pres"
+                            PredatorId = 10,
+                            PreyId = 9
                         },
                         new
                         {
-                            PredatorId = "souris",
-                            PreyId = "mouche"
+                            PredatorId = 10,
+                            PreyId = 8
                         },
                         new
                         {
-                            PredatorId = "araignee",
-                            PreyId = "mouche"
+                            PredatorId = 1,
+                            PreyId = 8
                         },
                         new
                         {
-                            PredatorId = "hirondelle",
-                            PreyId = "araignee"
+                            PredatorId = 5,
+                            PreyId = 1
                         },
                         new
                         {
-                            PredatorId = "boa",
-                            PreyId = "souris"
+                            PredatorId = 2,
+                            PreyId = 10
                         },
                         new
                         {
-                            PredatorId = "boa",
-                            PreyId = "hirondelle"
+                            PredatorId = 2,
+                            PreyId = 5
                         },
                         new
                         {
-                            PredatorId = "lion",
-                            PreyId = "lievre"
+                            PredatorId = 7,
+                            PreyId = 6
                         },
                         new
                         {
-                            PredatorId = "lion",
-                            PreyId = "souris"
+                            PredatorId = 7,
+                            PreyId = 10
                         },
                         new
                         {
-                            PredatorId = "souris",
-                            PreyId = "chene"
+                            PredatorId = 10,
+                            PreyId = 3
                         },
                         new
                         {
-                            PredatorId = "hirondelle",
-                            PreyId = "mouche"
+                            PredatorId = 5,
+                            PreyId = 8
                         },
                         new
                         {
-                            PredatorId = "araignee",
-                            PreyId = "souris"
+                            PredatorId = 1,
+                            PreyId = 10
                         });
                 });
 
@@ -796,7 +817,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "21d126cc-90a6-4c9e-b881-1af503f3455f",
+                            ConcurrencyStamp = "6e38db7b-1af9-44cf-b4e2-143c2d9289fd",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -804,7 +825,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "aeeb86a2-b3ff-40ce-ba07-f4ddd7784f04",
+                            SecurityStamp = "5e9203b5-cfb3-4a18-989d-4f52b7fe4288",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -813,7 +834,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "62c1a059-d97d-488e-a26d-364f7f86101e",
+                            ConcurrencyStamp = "66696b49-8cba-410d-a0a8-53a621dc9318",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -821,7 +842,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "c37f5475-3ad7-4f90-ad39-bc2f08eb6363",
+                            SecurityStamp = "bcc8c646-7249-44eb-aac0-27f13251bd4b",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         });
@@ -1244,7 +1265,7 @@ namespace BioDomes.Infrastructures.Migrations
 
                     b.HasOne("BioDomes.Infrastructures.Models.SpecieEntity", "Specie")
                         .WithMany("BiomeSpecies")
-                        .HasForeignKey("SpecieSlug")
+                        .HasForeignKey("SpecieId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 

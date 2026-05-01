@@ -8,6 +8,7 @@ public static class SpecieMapper
     public static Specie MapSpecie(SpecieEntity specie)
         => new()
         {
+            Id =  specie.Id,
             CreatedBy = specie.UserId,
             Name = specie.Name,
             Classification = MapClassification(specie.ClassificationEntity),

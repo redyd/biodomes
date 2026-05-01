@@ -81,17 +81,21 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
     {
         try
         {
-            if (await context.Species.AnyAsync(s =>
-                    s.Slug != toUpdate.PreviousSlug &&
-                    s.Name.ToLower() == toUpdate.Name.ToLower()))
+            var allName = await context.Species
+                .Where(s => s.Id != toUpdate.Id)
+                .Select(s => s.Name)
+                .ToListAsync();
+            
+            var updateKebab = toUpdate.Name.ToKebabCase();
+            if (allName.Any(n => n.ToKebabCase() == updateKebab))
             {
                 return Result<Specie>.Conflict($"Une espèce nommée '{toUpdate.Name}' existe déjà.");
             }
 
-            var entity = await context.Species.FirstOrDefaultAsync(s => s.Slug == toUpdate.PreviousSlug);
+            var entity = await context.Species.FirstOrDefaultAsync(s => s.Id == toUpdate.Id);
 
             if (entity is null)
-                return Result<Specie>.NotFound($"Specie '{toUpdate.PreviousSlug}' not found.");
+                return Result<Specie>.NotFound($"Specie '{toUpdate.Name}' not found.");
 
             if (!isAdmin && entity.UserId != userId)
                 return Result<Specie>.Forbidden("Access denied.");
@@ -102,30 +106,8 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
                 visibility = (bool)toUpdate.IsPublic;
             }
 
-            // if slugs are different
-            if (entity.Slug != toUpdate.Slug)
-            {
-                var replacement = new SpecieEntity
-                {
-                    UserId = entity.UserId,
-                    Slug = toUpdate.Slug,
-                    Name = toUpdate.Name,
-                    ClassificationId = toUpdate.ClassificationId,
-                    DietId = toUpdate.DietId,
-                    Height = toUpdate.Height,
-                    Weight = toUpdate.Weight,
-                    UploadedImageId = toUpdate.ImageUrl ?? entity.UploadedImageId,
-                    IsPublic = visibility
-                };
-
-                context.Species.Remove(entity);
-                await context.Species.AddAsync(replacement);
-                await context.SaveChangesAsync();
-
-                return await FindBySlugAsync(replacement.Slug, userId, isAdmin);
-            }
-
             entity.Name = toUpdate.Name;
+            entity.Slug = toUpdate.Name.ToKebabCase();
             entity.ClassificationId = toUpdate.ClassificationId;
             entity.DietId = toUpdate.DietId;
             entity.Height = toUpdate.Height;
@@ -139,7 +121,13 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
 
             await context.SaveChangesAsync();
 
-            return await FindBySlugAsync(entity.Slug, userId, isAdmin);
+            var specie = await context.Species
+                .Include(s => s.DietEntity)
+                .Include(s => s.ClassificationEntity)
+                .ThenInclude(ce => ce.EatenByDiets)
+                .FirstAsync(s => s.Id == toUpdate.Id);
+            
+            return Result<Specie>.Ok(SpecieMapper.MapSpecie(specie));
         }
         catch (DbUpdateException ex) when (SqlServerError.IsUniqueConstraintViolation(ex) ||
                                            SqlServerError.IsPrimaryKeyViolation(ex))
@@ -157,25 +145,23 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
     {
         try
         {
-            var slug = toAdd.Name.ToKebabCase();
-
-            var exists = await context.Species.AnyAsync(s => s.Slug == slug);
-
-            if (exists)
-            {
-                return Result<Specie>.Conflict("Specie already exists");
-            }
-
             if (userId is null)
             {
                 return Result<Specie>.Forbidden("You should be authenticate to add a specie");
             }
-
+            
+            var allName = await context.Species.Select(s => s.Name).ToListAsync();
+            var updateKebab = toAdd.Name.ToKebabCase();
+            if (allName.Any(n => n.ToKebabCase() == updateKebab))
+            {
+                return Result<Specie>.Conflict($"Une espèce nommée '{toAdd.Name}' existe déjà.");
+            }
+            
             var entity = new SpecieEntity
             {
                 UserId = userId,
-                Slug = slug,
                 Name = toAdd.Name,
+                Slug = toAdd.Name.ToKebabCase(),
                 ClassificationId = toAdd.ClassificationId,
                 DietId = toAdd.DietId,
                 Height = toAdd.Height,
@@ -191,7 +177,7 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
                 .Species
                 .Include(s => s.DietEntity)
                 .Include(s => s.ClassificationEntity)
-                .FirstAsync(s => s.Slug == entity.Slug);
+                .FirstAsync(s => s.Id == entity.Id);
             return Result<Specie>.Ok(SpecieMapper.MapSpecie(specie));
         }
         catch (DbUpdateException ex) when (SqlServerError.IsUniqueConstraintViolation(ex) ||
@@ -206,17 +192,17 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
         }
     }
 
-    public async Task<Result<Specie>> DeleteAsync(string slug, string? userId, bool isAdmin)
+    public async Task<Result<Specie>> DeleteAsync(int specieId, string? userId, bool isAdmin)
     {
         try
         {
             var entity = await context.Species
                 .Include(s => s.DietEntity)
                 .Include(s => s.ClassificationEntity)
-                .FirstOrDefaultAsync(s => s.Slug == slug);
+                .FirstOrDefaultAsync(s => s.Id == specieId);
 
             if (entity is null)
-                return Result<Specie>.NotFound($"Specie '{slug}' not found.");
+                return Result<Specie>.NotFound($"Specie '{specieId}' not found.");
 
             if (!isAdmin && entity.UserId != userId)
                 return Result<Specie>.Forbidden("Access denied.");

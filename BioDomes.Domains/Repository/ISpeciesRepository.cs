@@ -15,5 +15,5 @@ public interface ISpeciesRepository
 
     Task<Result<Specie>> AddAsync(CreateSpecieRequest toAdd, string? userId);
 
-    Task<Result<Specie>> DeleteAsync(string slug, string? userId, bool isAdmin);
+    Task<Result<Specie>> DeleteAsync(int specieId, string? userId, bool isAdmin);
 }

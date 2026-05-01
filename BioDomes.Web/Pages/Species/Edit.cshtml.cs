@@ -83,15 +83,15 @@ public class EditModel(
 
         return action switch
         {
-            "delete" => await PerformDelete(slug, userId, specie),
-            "save" => await PerformUpdate(slug, userId, specie),
+            "delete" => await PerformDelete(userId, specie),
+            "save" => await PerformUpdate(userId, specie),
             _ => Page()
         };
     }
 
-    private async Task<IActionResult> PerformDelete(string slug, string userId, Specie specie)
+    private async Task<IActionResult> PerformDelete(string userId, Specie specie)
     {
-        await repository.DeleteAsync(slug, userId, User.IsAdmin());
+        await repository.DeleteAsync(specie.Id, userId, User.IsAdmin());
 
         if (!string.IsNullOrEmpty(specie.ImageUrl))
         {
@@ -102,7 +102,7 @@ public class EditModel(
         return RedirectToPage("/Species/Index");
     }
 
-    private async Task<IActionResult> PerformUpdate(string slug, string userId, Specie specie)
+    private async Task<IActionResult> PerformUpdate(string userId, Specie specie)
     {
         if (!ModelState.IsValid)
         {
@@ -113,7 +113,7 @@ public class EditModel(
 
         var updatedSpecie = new UpdateSpecieRequest
         {
-            PreviousSlug = slug,
+            Id = specie.Id,
             Name = Input.Name,
             ClassificationId = Input.ClassificationId,
             DietId = Input.DietId,

@@ -71,6 +71,10 @@ public class AddModel(
             if (result.Status == ResultStatus.Conflict)
             {
                 ErrorNotification("Une espèce avec ce nom existe déjà");
+                if (imageName is not null)
+                {
+                    DeleteImage(imageName);
+                }
                 await LoadSelectLists();
                 return Page();
             }

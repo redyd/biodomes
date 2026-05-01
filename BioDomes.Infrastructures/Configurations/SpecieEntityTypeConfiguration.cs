@@ -10,10 +10,17 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
     {
         builder.ToTable("species");
 
-        builder.HasKey(specie => specie.Slug);
+        builder.HasKey(specie => specie.Id);
+
+        builder.Property(specie => specie.Slug)
+            .HasMaxLength(50)
+            .IsRequired();
+
+        builder.HasIndex(specie => specie.Slug)
+            .IsUnique();
 
         builder.Property(specie => specie.Name)
-            .HasMaxLength(75)
+            .HasMaxLength(50)
             .IsRequired();
 
         builder.Property(specie => specie.Height)
@@ -38,7 +45,7 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
             .IsRequired()
             .HasDefaultValue(false);
 
-        builder.HasIndex(specie => specie.Slug)
+        builder.HasIndex(specie => specie.Id)
             .IsUnique();
 
         SeedSpecies(builder);
@@ -49,8 +56,9 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
         builder.HasData(
             new SpecieEntity
             {
-                Slug = "lion",
+                Id = 1,
                 Name = "Lion",
+                Slug = "lion",
                 Height = 180,
                 Weight = 150000,
                 UploadedImageId = "3d128e91-b947-4bf7-b988-dc8ffd1de92f.jpg",
@@ -61,8 +69,9 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
             },
             new SpecieEntity
             {
-                Slug = "boa",
+                Id = 2,
                 Name = "Boa",
+                Slug = "boa",
                 Height = 225,
                 Weight = 13000,
                 UploadedImageId = "47e0e461-066e-404f-8738-361d268f6219.jpg",
@@ -73,8 +82,9 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
             },
             new SpecieEntity
             {
-                Slug = "hetre",
+                Id = 3,
                 Name = "Hêtre",
+                Slug = "hetre",
                 Height = 600,
                 Weight = 830000,
                 UploadedImageId = "9f21e809-9eeb-4714-8cd0-14b78d14fb60.jpg",
@@ -85,8 +95,9 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
             },
             new SpecieEntity
             {
-                Slug = "chene",
+                Id = 4,
                 Name = "Chêne",
+                Slug = "chene",
                 Height = 2500,
                 Weight = 2100000,
                 UploadedImageId = null,
@@ -97,8 +108,9 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
             },
             new SpecieEntity
             {
-                Slug = "mouche",
+                Id = 5,
                 Name = "Mouche",
+                Slug = "mouche",
                 Height = 1,
                 Weight = 1,
                 UploadedImageId = "2b101f74-b1f0-4c18-a183-0331f7a4788c.jpg",
@@ -109,8 +121,9 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
             },
             new SpecieEntity
             {
-                Slug = "araignee",
+                Id = 6,
                 Name = "Araignée",
+                Slug = "araignee",
                 Height = 4,
                 Weight = 95,
                 UploadedImageId = "623fbf44-7418-44d7-8098-6cc6c7122c27.jpg",
@@ -121,8 +134,9 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
             },
             new SpecieEntity
             {
-                Slug = "hirondelle",
+                Id = 7,
                 Name = "Hirondelle",
+                Slug = "hirondelle",
                 Height = 18,
                 Weight = 45,
                 UploadedImageId = null,
@@ -133,8 +147,9 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
             },
             new SpecieEntity
             {
-                Slug = "lievre",
+                Id = 8,
                 Name = "Lièvre",
+                Slug = "lievre",
                 Height = 50,
                 Weight = 4000,
                 UploadedImageId = "7f084f4d-de3c-4436-b359-6fdfd4b93ec8.jpg",
@@ -145,8 +160,9 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
             },
             new SpecieEntity
             {
-                Slug = "paturin-des-pres",
+                Id = 9,
                 Name = "Pâturin des prés",
+                Slug = "paturin-des-pres",
                 Height = 23,
                 Weight = 1,
                 UploadedImageId = null,
@@ -157,8 +173,9 @@ public class SpecieEntityTypeConfiguration : IEntityTypeConfiguration<SpecieEnti
             },
             new SpecieEntity
             {
-                Slug = "souris",
+                Id = 10,
                 Name = "Souris",
+                Slug = "souris",
                 Height = 9,
                 Weight = 25,
                 UploadedImageId = "7e6d0ba0-7be3-4f94-a929-e7c04d3e1d90.jpg",

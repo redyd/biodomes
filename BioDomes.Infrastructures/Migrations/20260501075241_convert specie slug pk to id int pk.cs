@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BioDomes.Infrastructures.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class convertspecieslugpktoidintpk : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -87,6 +87,34 @@ namespace BioDomes.Infrastructures.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_IdentityRoles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "specie_classifications",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Label = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_specie_classifications", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "specie_diets",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Label = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_specie_diets", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -233,33 +261,6 @@ namespace BioDomes.Infrastructures.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "species",
-                schema: "dbo",
-                columns: table => new
-                {
-                    Slug = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(75)", maxLength: 75, nullable: false),
-                    Height = table.Column<int>(type: "int", nullable: false),
-                    Weight = table.Column<int>(type: "int", nullable: false),
-                    UploadedImageId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TypeLabel = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DietLabel = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsPublic = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_species", x => x.Slug);
-                    table.ForeignKey(
-                        name: "FK_species_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalSchema: "dbo",
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "equipments",
                 schema: "dbo",
                 columns: table => new
@@ -300,30 +301,73 @@ namespace BioDomes.Infrastructures.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "biomes_species",
+                name: "classification_eaten_by_diet",
                 schema: "dbo",
                 columns: table => new
                 {
-                    BiomesId = table.Column<int>(type: "int", nullable: false),
-                    SpeciesSlug = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    classification_id = table.Column<int>(type: "int", nullable: false),
+                    diet_id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_biomes_species", x => new { x.BiomesId, x.SpeciesSlug });
+                    table.PrimaryKey("PK_classification_eaten_by_diet", x => new { x.classification_id, x.diet_id });
                     table.ForeignKey(
-                        name: "FK_biomes_species_biomes_BiomesId",
-                        column: x => x.BiomesId,
+                        name: "FK_classification_eaten_by_diet_specie_classifications_classification_id",
+                        column: x => x.classification_id,
                         principalSchema: "dbo",
-                        principalTable: "biomes",
+                        principalTable: "specie_classifications",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_biomes_species_species_SpeciesSlug",
-                        column: x => x.SpeciesSlug,
+                        name: "FK_classification_eaten_by_diet_specie_diets_diet_id",
+                        column: x => x.diet_id,
                         principalSchema: "dbo",
-                        principalTable: "species",
-                        principalColumn: "Slug",
-                        onDelete: ReferentialAction.NoAction);
+                        principalTable: "specie_diets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "species",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Slug = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Height = table.Column<int>(type: "int", nullable: false),
+                    Weight = table.Column<int>(type: "int", nullable: false),
+                    UploadedImageId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsPublic = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DietId = table.Column<int>(type: "int", nullable: false),
+                    ClassificationId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_species", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_species_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "dbo",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_species_specie_classifications_ClassificationId",
+                        column: x => x.ClassificationId,
+                        principalSchema: "dbo",
+                        principalTable: "specie_classifications",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_species_specie_diets_DietId",
+                        column: x => x.DietId,
+                        principalSchema: "dbo",
+                        principalTable: "specie_diets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -353,14 +397,68 @@ namespace BioDomes.Infrastructures.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "biomes_species",
+                schema: "dbo",
+                columns: table => new
+                {
+                    BiomeId = table.Column<int>(type: "int", nullable: false),
+                    SpecieId = table.Column<int>(type: "int", nullable: false),
+                    Count = table.Column<int>(type: "int", nullable: false, defaultValue: 1)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_biomes_species", x => new { x.BiomeId, x.SpecieId });
+                    table.ForeignKey(
+                        name: "FK_biomes_species_biomes_BiomeId",
+                        column: x => x.BiomeId,
+                        principalSchema: "dbo",
+                        principalTable: "biomes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_biomes_species_species_SpecieId",
+                        column: x => x.SpecieId,
+                        principalSchema: "dbo",
+                        principalTable: "species",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "specie_food_chains",
+                schema: "dbo",
+                columns: table => new
+                {
+                    PredatorId = table.Column<int>(type: "int", nullable: false),
+                    PreyId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_specie_food_chains", x => new { x.PredatorId, x.PreyId });
+                    table.ForeignKey(
+                        name: "FK_specie_food_chains_species_PredatorId",
+                        column: x => x.PredatorId,
+                        principalSchema: "dbo",
+                        principalTable: "species",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_specie_food_chains_species_PreyId",
+                        column: x => x.PreyId,
+                        principalSchema: "dbo",
+                        principalTable: "species",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.InsertData(
                 schema: "dbo",
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "Birthdate", "ConcurrencyStamp", "Email", "EmailConfirmed", "ImageUrl", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SearchOrganism", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "user-1", 0, new DateOnly(1990, 1, 1), "3884d28f-7c25-424c-81da-144699f38ef5", "admin@biodomes.com", true, null, false, null, "ADMIN@BIODOMES.COM", "ADMIN", null, null, false, "Saint Paul", "4cd9f21e-0a3f-4e08-9f83-bda454dd15b5", false, "admin" },
-                    { "user-2", 0, new DateOnly(1995, 6, 15), "7464653e-0c62-40d7-bd18-c84e64242101", "john@biodomes.com", true, null, false, null, "JOHN@BIODOMES.COM", "JOHN", null, null, false, "Marie Thérèse", "61ae3a9e-aee5-4d4d-93bf-90453096d694", false, "john" }
+                    { "user-1", 0, new DateOnly(1990, 1, 1), "6e38db7b-1af9-44cf-b4e2-143c2d9289fd", "admin@biodomes.com", true, null, false, null, "ADMIN@BIODOMES.COM", "ADMIN", null, null, false, "Saint Paul", "5e9203b5-cfb3-4a18-989d-4f52b7fe4288", false, "admin" },
+                    { "user-2", 0, new DateOnly(1995, 6, 15), "66696b49-8cba-410d-a0a8-53a621dc9318", "john@biodomes.com", true, null, false, null, "JOHN@BIODOMES.COM", "JOHN", null, null, false, "Marie Thérèse", "bcc8c646-7249-44eb-aac0-27f13251bd4b", false, "john" }
                 });
 
             migrationBuilder.InsertData(
@@ -387,6 +485,98 @@ namespace BioDomes.Infrastructures.Migrations
                     { 10, "Magnésium" },
                     { 11, "Énergie" },
                     { 12, "Matière organique" }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "dbo",
+                table: "specie_classifications",
+                columns: new[] { "Id", "Label" },
+                values: new object[,]
+                {
+                    { 1, "Mammifère" },
+                    { 2, "Oiseau" },
+                    { 3, "Poisson" },
+                    { 4, "Reptile" },
+                    { 5, "Amphibien" },
+                    { 6, "Crustacé" },
+                    { 7, "Arachnides" },
+                    { 8, "Insecte" },
+                    { 9, "Myriapode" },
+                    { 10, "Mollusque" },
+                    { 11, "Echinoderme" },
+                    { 12, "Anélide" },
+                    { 13, "Cnidaire" },
+                    { 14, "Plathelminthe" },
+                    { 15, "Porifère" },
+                    { 16, "Plante" },
+                    { 17, "Mousse" },
+                    { 18, "Algue" },
+                    { 19, "Lichen" },
+                    { 20, "Champignon" }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "dbo",
+                table: "specie_diets",
+                columns: new[] { "Id", "Label" },
+                values: new object[,]
+                {
+                    { 1, "Carnivore" },
+                    { 2, "Herbivore" },
+                    { 3, "Omnivore" },
+                    { 4, "Coprophages" },
+                    { 5, "Limivores" },
+                    { 6, "Détritivores" },
+                    { 7, "Autotrophie (Photosynthèse)" },
+                    { 8, "Hétérotrophie" }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "dbo",
+                table: "classification_eaten_by_diet",
+                columns: new[] { "classification_id", "diet_id" },
+                values: new object[,]
+                {
+                    { 1, 1 },
+                    { 1, 3 },
+                    { 2, 1 },
+                    { 2, 3 },
+                    { 3, 1 },
+                    { 3, 3 },
+                    { 4, 1 },
+                    { 4, 3 },
+                    { 5, 1 },
+                    { 5, 3 },
+                    { 6, 1 },
+                    { 6, 3 },
+                    { 7, 1 },
+                    { 7, 3 },
+                    { 8, 1 },
+                    { 8, 3 },
+                    { 9, 1 },
+                    { 9, 3 },
+                    { 10, 1 },
+                    { 10, 3 },
+                    { 11, 1 },
+                    { 11, 3 },
+                    { 12, 1 },
+                    { 12, 3 },
+                    { 13, 1 },
+                    { 13, 3 },
+                    { 14, 1 },
+                    { 14, 3 },
+                    { 15, 1 },
+                    { 15, 3 },
+                    { 16, 2 },
+                    { 16, 3 },
+                    { 17, 2 },
+                    { 17, 3 },
+                    { 18, 2 },
+                    { 18, 3 },
+                    { 19, 2 },
+                    { 19, 6 },
+                    { 20, 3 },
+                    { 20, 6 }
                 });
 
             migrationBuilder.InsertData(
@@ -440,49 +630,69 @@ namespace BioDomes.Infrastructures.Migrations
             migrationBuilder.InsertData(
                 schema: "dbo",
                 table: "species",
-                columns: new[] { "Slug", "DietLabel", "Height", "IsPublic", "Name", "TypeLabel", "UploadedImageId", "UserId", "Weight" },
+                columns: new[] { "Id", "ClassificationId", "DietId", "Height", "Name", "Slug", "UploadedImageId", "UserId", "Weight" },
+                values: new object[] { 1, 1, 1, 180, "Lion", "lion", "3d128e91-b947-4bf7-b988-dc8ffd1de92f.jpg", "user-1", 150000 });
+
+            migrationBuilder.InsertData(
+                schema: "dbo",
+                table: "species",
+                columns: new[] { "Id", "ClassificationId", "DietId", "Height", "IsPublic", "Name", "Slug", "UploadedImageId", "UserId", "Weight" },
+                values: new object[] { 2, 4, 1, 225, true, "Boa", "boa", "47e0e461-066e-404f-8738-361d268f6219.jpg", "user-2", 13000 });
+
+            migrationBuilder.InsertData(
+                schema: "dbo",
+                table: "species",
+                columns: new[] { "Id", "ClassificationId", "DietId", "Height", "Name", "Slug", "UploadedImageId", "UserId", "Weight" },
                 values: new object[,]
                 {
-                    { "araignee", "Carnivore", 4, true, "Araignée", "Arachnides", "623fbf44-7418-44d7-8098-6cc6c7122c27.jpg", "user-1", 95 },
-                    { "boa", "Carnivore", 225, true, "Boa", "Reptile", "47e0e461-066e-404f-8738-361d268f6219.jpg", "user-2", 13000 }
+                    { 3, 16, 7, 600, "Hêtre", "hetre", "9f21e809-9eeb-4714-8cd0-14b78d14fb60.jpg", "user-1", 830000 },
+                    { 4, 16, 7, 2500, "Chêne", "chene", null, "user-2", 2100000 },
+                    { 5, 8, 4, 1, "Mouche", "mouche", "2b101f74-b1f0-4c18-a183-0331f7a4788c.jpg", "user-1", 1 }
                 });
 
             migrationBuilder.InsertData(
                 schema: "dbo",
                 table: "species",
-                columns: new[] { "Slug", "DietLabel", "Height", "Name", "TypeLabel", "UploadedImageId", "UserId", "Weight" },
+                columns: new[] { "Id", "ClassificationId", "DietId", "Height", "IsPublic", "Name", "Slug", "UploadedImageId", "UserId", "Weight" },
                 values: new object[,]
                 {
-                    { "chene", "Photosynthèse", 2500, "Chene", "Plante", null, "user-2", 2100000 },
-                    { "hetre", "Photosynthèse", 600, "Hetre", "Plante", "9f21e809-9eeb-4714-8cd0-14b78d14fb60.jpg", "user-1", 830000 }
+                    { 6, 7, 1, 4, true, "Araignée", "araignee", "623fbf44-7418-44d7-8098-6cc6c7122c27.jpg", "user-1", 95 },
+                    { 7, 2, 1, 18, true, "Hirondelle", "hirondelle", null, "user-1", 45 },
+                    { 8, 1, 2, 50, true, "Lièvre", "lievre", "7f084f4d-de3c-4436-b359-6fdfd4b93ec8.jpg", "user-2", 4000 }
                 });
 
             migrationBuilder.InsertData(
                 schema: "dbo",
                 table: "species",
-                columns: new[] { "Slug", "DietLabel", "Height", "IsPublic", "Name", "TypeLabel", "UploadedImageId", "UserId", "Weight" },
-                values: new object[,]
-                {
-                    { "hirondelle", "Carnivore", 18, true, "Hirondelle", "Oiseau", null, "user-1", 45 },
-                    { "lievre", "Herbivore", 50, true, "Lièvre", "Mammifère", "7f084f4d-de3c-4436-b359-6fdfd4b93ec8.jpg", "user-2", 4000 }
-                });
+                columns: new[] { "Id", "ClassificationId", "DietId", "Height", "Name", "Slug", "UploadedImageId", "UserId", "Weight" },
+                values: new object[] { 9, 16, 7, 23, "Pâturin des prés", "paturin-des-pres", null, "user-1", 1 });
 
             migrationBuilder.InsertData(
                 schema: "dbo",
                 table: "species",
-                columns: new[] { "Slug", "DietLabel", "Height", "Name", "TypeLabel", "UploadedImageId", "UserId", "Weight" },
-                values: new object[,]
-                {
-                    { "lion", "Carnivore", 180, "Lion", "Mammifère", "3d128e91-b947-4bf7-b988-dc8ffd1de92f.jpg", "user-1", 150000 },
-                    { "mouche", "Coprophage", 1, "Mouche", "Insecte", "2b101f74-b1f0-4c18-a183-0331f7a4788c.jpg", "user-1", 1 },
-                    { "paturin-des-pres", "Photosynthèse", 23, "Pâturin des prés", "Plante", null, "user-1", 1 }
-                });
+                columns: new[] { "Id", "ClassificationId", "DietId", "Height", "IsPublic", "Name", "Slug", "UploadedImageId", "UserId", "Weight" },
+                values: new object[] { 10, 1, 3, 9, true, "Souris", "souris", "7e6d0ba0-7be3-4f94-a929-e7c04d3e1d90.jpg", "user-2", 25 });
 
             migrationBuilder.InsertData(
                 schema: "dbo",
-                table: "species",
-                columns: new[] { "Slug", "DietLabel", "Height", "IsPublic", "Name", "TypeLabel", "UploadedImageId", "UserId", "Weight" },
-                values: new object[] { "souris", "Omnivore", 9, true, "Souris", "Mammifère", "7e6d0ba0-7be3-4f94-a929-e7c04d3e1d90.jpg", "user-2", 25 });
+                table: "specie_food_chains",
+                columns: new[] { "PredatorId", "PreyId" },
+                values: new object[,]
+                {
+                    { 1, 8 },
+                    { 1, 10 },
+                    { 2, 5 },
+                    { 2, 10 },
+                    { 5, 1 },
+                    { 5, 8 },
+                    { 6, 4 },
+                    { 6, 9 },
+                    { 7, 6 },
+                    { 7, 10 },
+                    { 10, 3 },
+                    { 10, 8 },
+                    { 10, 9 }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -543,10 +753,16 @@ namespace BioDomes.Infrastructures.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_biomes_species_SpeciesSlug",
+                name: "IX_biomes_species_SpecieId",
                 schema: "dbo",
                 table: "biomes_species",
-                column: "SpeciesSlug");
+                column: "SpecieId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_classification_eaten_by_diet_diet_id",
+                schema: "dbo",
+                table: "classification_eaten_by_diet",
+                column: "diet_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_equipments_ConsumedResourceId",
@@ -572,6 +788,31 @@ namespace BioDomes.Infrastructures.Migrations
                 schema: "dbo",
                 table: "equipments",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_specie_food_chains_PreyId",
+                schema: "dbo",
+                table: "specie_food_chains",
+                column: "PreyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_species_ClassificationId",
+                schema: "dbo",
+                table: "species",
+                column: "ClassificationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_species_DietId",
+                schema: "dbo",
+                table: "species",
+                column: "DietId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_species_Id",
+                schema: "dbo",
+                table: "species",
+                column: "Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_species_Slug",
@@ -619,7 +860,15 @@ namespace BioDomes.Infrastructures.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
+                name: "classification_eaten_by_diet",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
                 name: "IdentityRoles",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "specie_food_chains",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
@@ -644,6 +893,14 @@ namespace BioDomes.Infrastructures.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "specie_classifications",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "specie_diets",
                 schema: "dbo");
         }
     }
