@@ -1,5 +1,7 @@
 using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
+using BioDomes.Domains.Requests;
+using BioDomes.Domains.Services;
 using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
@@ -8,13 +10,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Biomes;
 
-public class Detail(IWebHostEnvironment environment, IBiomeRepository biomeRepo, IFoodChainRepository foodChainRepo)
+public class Detail(
+    IWebHostEnvironment environment,
+    IBiomeRepository biomeRepo,
+    IFoodChainRepository foodChainRepo,
+    ISpecieRecommendation recommendation,
+    ILogger<Detail> logger)
     : AppPageModel(environment)
 {
+    [BindProperty] public AddBiomeSpecieInputModel Input { get; set; } = new();
     public BiomeView Biome { get; set; } = null!;
     public FoodChainGraph FoodChain { get; set; } = null!;
+    public List<Recommendation<Specie>> Recommendations { get; set; } = null!;
     public string Creator { get; set; } = string.Empty;
-    public AddBiomeSpecieInputModel Input { get; set; } = new();
+    public bool ReopenAddSpecieDialog { get; set; }
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -32,11 +41,10 @@ public class Detail(IWebHostEnvironment environment, IBiomeRepository biomeRepo,
             return creatorResult.ToPageResult(this);
         }
 
-
         Creator = creatorResult.Value;
         Biome = BuildBiomeView(biomeResult.Value, userId);
 
-        var graphResult = await foodChainRepo.GetFullGraphForBiomeAsync(Biome.Id);
+        var graphResult = await foodChainRepo.GetFullGraphForBiomeAsync(Biome.Id, User.GetUserId(), User.IsAdmin());
         if (!graphResult.IsSuccess || graphResult.Value is null)
         {
             return graphResult.ToPageResult(this);
@@ -45,7 +53,37 @@ public class Detail(IWebHostEnvironment environment, IBiomeRepository biomeRepo,
         FoodChain = graphResult.Value;
 
         Input = new AddBiomeSpecieInputModel();
+        Recommendations =
+            await recommendation.RecommendationToAddForBiome(User.GetUserId(), User.IsAdmin(), id, FoodChain);
         return Page();
+    }
+
+    public async Task<IActionResult> OnPostAddSpecieAsync(int id)
+    {
+        if (!ModelState.IsValid || Input.SpecieId is null || Input.Count is null)
+        {
+            var loadResult = await LoadPageDataAsync(id);
+            ReopenAddSpecieDialog = true;
+            if (loadResult != null) return loadResult;
+            return Page();
+        }
+
+        logger.LogInformation("ADDING SPECIE");
+        await biomeRepo.AddSpecie(new AddSpecieToBiomeRequest
+        {
+            SpecieId = (int)Input.SpecieId,
+            Count = (int)Input.Count,
+        }, id);
+
+        SuccessNotification("Espèce ajoutée avec succès");
+        return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { id }, fragment: "title-section");
+    }
+
+    public async Task<IActionResult> OnPostExecuteActionAsync(string actionId, int biomeId)
+    {
+        await recommendation.PerformAction(actionId);
+        return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { id = biomeId },
+            fragment: "title-section");
     }
 
     private BiomeView BuildBiomeView(Biome b, string? userId)
@@ -71,5 +109,29 @@ public class Detail(IWebHostEnvironment environment, IBiomeRepository biomeRepo,
             MaxHumidity = rule.MaxHumidity,
             HumidityPercent = Math.Min(humidityPercent, 100)
         };
+    }
+
+    private async Task<IActionResult?> LoadPageDataAsync(int id)
+    {
+        var userId = User.GetUserId();
+
+        var biomeResult = await biomeRepo.FindAsync(id, userId, User.IsAdmin());
+        if (!biomeResult.IsSuccess || biomeResult.Value is null)
+            return biomeResult.ToPageResult(this);
+
+        var creatorResult = await biomeRepo.GetCreatorAsync(biomeResult.Value.Id);
+        if (!creatorResult.IsSuccess || creatorResult.Value is null)
+            return creatorResult.ToPageResult(this);
+
+        Creator = creatorResult.Value;
+        Biome = BuildBiomeView(biomeResult.Value, userId);
+
+        var graphResult = await foodChainRepo.GetFullGraphForBiomeAsync(Biome.Id, userId, User.IsAdmin());
+        if (!graphResult.IsSuccess || graphResult.Value is null)
+            return graphResult.ToPageResult(this);
+
+        FoodChain = graphResult.Value;
+        Recommendations = await recommendation.RecommendationToAddForBiome(userId, User.IsAdmin(), id, FoodChain);
+        return null;
     }
 }

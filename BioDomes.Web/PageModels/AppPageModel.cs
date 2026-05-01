@@ -8,7 +8,7 @@ public abstract class AppPageModel(IWebHostEnvironment environment) : PageModel
     public static string BasePathForUploads = Path.Combine("img", "uploads");
     public static string BasePathForDefault = Path.Combine("img", "defaults");
 
-    protected string UseUploadedFromId(string fileName)
+    public string UseUploadedFromId(string fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
         {

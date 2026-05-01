@@ -10,6 +10,17 @@ public class FoodChainGraph
         Nodes = nodes;
         Edges = edges;
     }
+    
+    public IReadOnlyList<FoodChainNode> NoPreySpecies()
+    {
+        var predatorIds = Edges
+            .Select(e => e.PredatorId)
+            .ToHashSet();
+
+        return Nodes
+            .Where(n => !predatorIds.Contains(n.SpecieId))
+            .ToList();
+    }
 
     /// <summary>
     /// Retourne le nombre de fois qu'un id d'une espèce se retrouve dans les liens (specieId - count)

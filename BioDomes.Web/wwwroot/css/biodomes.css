@@ -38,16 +38,16 @@
     padding: 0;
 }
 
-html {
+html, dialog {
     font-size: 16px;
     scroll-behavior: smooth;
 }
 
-html::-webkit-scrollbar {
+html::-webkit-scrollbar, dialog::-webkit-scrollbar {
     width: 6px;
 }
 
-html::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb, dialog::-webkit-scrollbar-thumb {
     background: var(--border-bright);
     border-radius: 10px;
 }
@@ -519,6 +519,16 @@ footer a:hover {
 .edit-card {
     width: 100%;
     max-width: 580px;
+    background: var(--panel);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+    box-shadow: 0 0 60px rgba(0, 210, 180, 0.04);
+}
+
+.large-edit-card {
+    width: 100%;
     background: var(--panel);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
@@ -1184,7 +1194,7 @@ a {
 
 dialog {
     /* taille & position */
-    width: min(520px, 90vw);
+    width: min(75%, 90vw);
     max-height: 85vh;
     overflow-y: auto;
     margin: auto;
@@ -1210,6 +1220,60 @@ dialog::backdrop {
 #cy {
     height: calc(100vh - 70px);
     width: 100%;
+}
+
+.suggestion-group-label {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 1rem 0 0.4rem;
+}
+
+.suggestion-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.suggestion-card {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    color: var(--text-mid);
+    background: var(--surface);
+    transition: border-color var(--transition), background var(--transition), color var(--transition);
+    white-space: nowrap;
+}
+
+.suggestion-card:hover {
+    border-color: var(--border-bright);
+    color: var(--text-bright);
+}
+
+.suggestion-card:has(input:checked) {
+    border-color: var(--teal);
+    background: var(--teal-dim);
+    color: var(--text-bright);
+}
+
+.suggestion-card-img {
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.suggestion-name {
+    font-family: var(--mono);
+    font-size: 0.82rem;
 }
 
 /* Responsive */

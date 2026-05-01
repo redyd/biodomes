@@ -1,4 +1,5 @@
 @page "/biomes/{id:int}"
+@using BioDomes.Domains.Core
 @model Detail
 
 @{
@@ -109,22 +110,23 @@
                         <h6 class="text-bright m-0" id="available-title">Suggestions</h6>
                     </div>
                     <ul class="list-unstyled d-flex flex-column gap-2">
-                        <li class="li-info-card">
-                            <div class="d-flex flex-column">
-                                <span>2 espèces n'ont pas de source de nourriture</span>
-                                <span class="specie-meta">Ajouter un mammifère</span>
-                            </div>
-                            <button class="btn-action btn-add p-1" title="Effectuer l'action"> ✓</button>
-                            <button class="btn-action btn-remove p-1" title="Ignorer la suggestion"> ×</button>
-                        </li>
-                        <li class="li-info-card">
-                            <div class="d-flex flex-column">
-                                <span>Aucun extracteur d'oxygène disponible</span>
-                                <span class="specie-meta">Ajouter un extracteur d'oxygène</span>
-                            </div>
-                            <button class="btn-action btn-add p-1" title="Effectuer l'action"> ✓</button>
-                            <button class="btn-action btn-remove p-1" title="Ignorer la suggestion"> ×</button>
-                        </li>
+                        @foreach (var rec in Model.Recommendations.Where(r => r.Type < RecommendationType.Bad))
+                        {
+                            <li class="li-info-card">
+                                <div class="d-flex flex-column">
+                                    <span>@rec.Message</span>
+                                    <span class="specie-meta">@rec.Label</span>
+                                </div>
+                                <form method="post" asp-page-handler="ExecuteAction">
+                                    <input type="hidden" name="actionId" value="@rec.ActionId"/>
+                                    <input type="hidden" name="biomeId" value="@Model.Biome.Id"/>
+                                    <button type="submit" class="btn-action btn-add p-1">✓</button>
+                                </form>
+                                <button class="btn-action btn-remove p-1 btn-suggestion-del" data-id="@rec.ActionId"
+                                        title="Ignorer la suggestion"> ×
+                                </button>
+                            </li>
+                        }
                     </ul>
                 </section>
             }
@@ -151,12 +153,26 @@
                     <h6 class="text-bright m-0" id="existing-title">Les espèces</h6>
                 </div>
                 <ul class="list-unstyled d-flex flex-column gap-2">
+                    @if (Model.FoodChain.Nodes.Count > 0)
+                    {
+                        <li class="li-info-card">
+                            <div class="d-flex flex-column">
+                                <span>Ajouter une espèce</span>
+                            </div>
+                            <button
+                                class="btn-action btn-add"
+                                title="Ajouter une nouvelle espèce"
+                                onclick="document.getElementById('add-species-dialog').showModal()">
+                                +
+                            </button>
+                        </li>
+                    }
                     @foreach (var specie in Model.FoodChain.Nodes)
                     {
                         <li class="li-info-card">
                             <div class="d-flex flex-column">
                                 <span>@specie.Name</span>
-                                <span class="specie-meta">@specie.Classification</span>
+                                <span class="specie-meta">@specie.Classification.Label</span>
                             </div>
                             <button class="btn-action btn-remove" title="Supprimer le lien">×</button>
                         </li>
@@ -193,34 +209,50 @@
 </div>
 
 <dialog id="add-species-dialog">
-    <div class="edit-card">
+    <div class="large-edit-card">
         <div class="edit-header">
             <p class="edit-breadcrumb">Biodômes · @Model.Biome.Name</p>
-            <h1 class="edit-title">Ajouter des espèces</h1>
+            <h1 class="edit-title">Ajouter une espèces</h1>
         </div>
-        
-        <form method="dialog" class="edit-body">
-            
-            @* <div class="field-group"> *@
-            @*     <label class="field-label" asp-for="Input.ClassificationId">Classification</label> *@
-            @*     <select class="field-input" *@
-            @*             asp-for="Input.ClassificationId" *@
-            @*             asp-items="Model.Classifications"> *@
-            @*         <option value="">-- Choisir --</option> *@
-            @*     </select> *@
-            @*     <span asp-validation-for="Input.ClassificationId" class="field-error"></span> *@
-            @* </div> *@
-            @* *@
-            @* <div class="field-group"> *@
-            @*     <label class="field-label">Quantité</label> *@
-            @*     <input class="field-input" type="number" step="1" asp-for="" /> *@
-            @*     <span asp-validation-for="" class="field-error"></span> *@
-            @* </div> *@
+
+        <form method="post" asp-page-handler="AddSpecie" class="edit-body">
+
+            <div class="field-group">
+                @foreach (var group in Model
+                              .Recommendations
+                              .GroupBy(r => r.Type)
+                              .OrderBy(g => g.Key))
+                {
+                    <p class="suggestion-group-label">@group.Key</p>
+                    <div class="suggestion-group">
+                        @foreach (var specie in group.Select(r => r.Involved))
+                        {
+                            <label class="suggestion-card">
+                                <input type="radio" asp-for="Input.SpecieId" value="@specie.Id" hidden/>
+                                @if (!string.IsNullOrWhiteSpace(specie.ImageUrl))
+                                {
+                                    <img class="suggestion-card-img" src="@Model.UseUploadedFromId(specie.ImageUrl)" alt="@specie.Name"/>
+                                }
+                                <span class="suggestion-name">@specie.Name</span>
+                            </label>
+                        }
+                    </div>
+                }
+
+                <span asp-validation-for="Input.SpecieId" class="field-error"></span>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">Quantité</label>
+                <input class="field-input" type="number" step="1" asp-for="Input.Count"/>
+                <span asp-validation-for="Input.Count" class="field-error"></span>
+            </div>
 
             <div class="edit-divider"></div>
 
             <div class="edit-actions">
-                <button type="button" class="btn-cancel" onclick="document.getElementById('add-species-dialog').close()">
+                <button type="button" class="btn-cancel"
+                        onclick="document.getElementById('add-species-dialog').close()">
                     Annuler
                 </button>
                 <button class="btn-save" type="submit" name="action" value="save">Ajouter</button>
@@ -228,3 +260,12 @@
         </form>
     </div>
 </dialog>
+
+@if (Model.ReopenAddSpecieDialog)
+{
+    <script>
+        document.getElementById('add-species-dialog').showModal();
+    </script>
+}
+
+<script src="~/js/biome-detail.js"></script>

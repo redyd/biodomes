@@ -1,6 +1,7 @@
 using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Web.Dtos;
+using BioDomes.Web.Extensions;
 using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +14,13 @@ public class Index(IWebHostEnvironment environment, IFoodChainRepository repo)
 
     public async Task<IActionResult> OnGetAsync()
     {
-        Graph = await repo.GetFullGraphAsync();
+        var result = await repo.GetFullGraphAsync(User.GetUserId(), User.IsAdmin());
+        if (!result.IsSuccess || result.Value is null)
+        {
+            return result.ToPageResult(this);
+        }
+        
+        Graph = result.Value!;
 
         return Page();
     }
@@ -30,7 +37,12 @@ public class Index(IWebHostEnvironment environment, IFoodChainRepository repo)
     
     public async Task<IActionResult> OnPostNodeClicked([FromBody] NodeClickDto node)
     {
-        var graph = await repo.GetFullGraphAsync();
+        var result = await repo.GetFullGraphAsync(User.GetUserId(), User.IsAdmin());
+        if (!result.IsSuccess || result.Value is null)
+        {
+            return result.ToPageResult(this);
+        }
+        var graph = result.Value!;
         var specie = graph.Nodes.FirstOrDefault(x => x.SpecieId == node.SpecieId);
         var preys = graph.PreyOf(node.SpecieId);
         var available = graph.AvailablePreyFor(node.SpecieId);
