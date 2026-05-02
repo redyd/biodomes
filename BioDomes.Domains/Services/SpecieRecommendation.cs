@@ -111,7 +111,7 @@ public class SpecieRecommendation(
 
         if (action == "add-biome-specie")
         {
-            await biomeRepo.AddSpecie(new AddSpecieToBiomeRequest
+            await biomeRepo.AddSpecie(new SpecieToBiomeRequest
             {
                 SpecieId = args["specie"],
                 Count = args["count"]

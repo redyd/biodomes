@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BioDomes.Web.InputModel;
 
-public class AddBiomeSpecieInputModel
+public class BiomeSpecieInputModel
 {
     [Required(ErrorMessage = "Une espèce est requise")]
     public int? SpecieId { get; set; }

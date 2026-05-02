@@ -188,7 +188,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         }
     }
 
-    public async Task AddSpecie(AddSpecieToBiomeRequest request, int biomeId)
+    public async Task AddSpecie(SpecieToBiomeRequest request, int biomeId)
     {
         var allToAdd = new List<BiomeSpecieEntity>();
         for (var c = 0; c < request.Count; c++)
@@ -201,6 +201,18 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         }
 
         await context.BiomeSpecies.AddRangeAsync(allToAdd);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task RemoveSpecie(SpecieToBiomeRequest request, int biomeId)
+    {
+        var existing = await context.BiomeSpecies
+            .Where(bs => bs.BiomeId == biomeId && bs.SpecieId == request.SpecieId)
+            .ToListAsync();
+
+        var toRemove = existing.Take(request.Count).ToList();
+
+        context.BiomeSpecies.RemoveRange(toRemove);
         await context.SaveChangesAsync();
     }
 }

@@ -18,5 +18,6 @@ public interface IBiomeRepository
     
     Task<Result<Biome>> DeleteAsync(int id, string userId, bool isAdmin);
     
-    Task AddSpecie(AddSpecieToBiomeRequest request, int biomeId);
+    Task AddSpecie(SpecieToBiomeRequest request, int biomeId);
+    Task RemoveSpecie(SpecieToBiomeRequest request, int biomeId);
 }

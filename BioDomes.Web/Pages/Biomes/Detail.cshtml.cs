@@ -18,7 +18,7 @@ public class Detail(
     ILogger<Detail> logger)
     : AppPageModel(environment)
 {
-    [BindProperty] public AddBiomeSpecieInputModel Input { get; set; } = new();
+    [BindProperty] public BiomeSpecieInputModel Input { get; set; } = new();
     public BiomeView Biome { get; set; } = null!;
     public FoodChainGraph FoodChain { get; set; } = null!;
     public List<Recommendation<Specie>> Recommendations { get; set; } = null!;
@@ -27,34 +27,10 @@ public class Detail(
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
-        var userId = User.GetUserId();
+        var loadResult = await LoadPageDataAsync(id);
+        if (loadResult != null) return loadResult;
 
-        var biomeResult = await biomeRepo.FindAsync(id, userId, User.IsAdmin());
-        if (!biomeResult.IsSuccess || biomeResult.Value is null)
-        {
-            return biomeResult.ToPageResult(this);
-        }
-
-        var creatorResult = await biomeRepo.GetCreatorAsync(biomeResult.Value.Id);
-        if (!creatorResult.IsSuccess || creatorResult.Value is null)
-        {
-            return creatorResult.ToPageResult(this);
-        }
-
-        Creator = creatorResult.Value;
-        Biome = BuildBiomeView(biomeResult.Value, userId);
-
-        var graphResult = await foodChainRepo.GetFullGraphForBiomeAsync(Biome.Id, User.GetUserId(), User.IsAdmin());
-        if (!graphResult.IsSuccess || graphResult.Value is null)
-        {
-            return graphResult.ToPageResult(this);
-        }
-
-        FoodChain = graphResult.Value;
-
-        Input = new AddBiomeSpecieInputModel();
-        Recommendations =
-            await recommendation.RecommendationToAddForBiome(User.GetUserId(), User.IsAdmin(), id, FoodChain);
+        Input = new BiomeSpecieInputModel();
         return Page();
     }
 
@@ -69,7 +45,7 @@ public class Detail(
         }
 
         logger.LogInformation("ADDING SPECIE");
-        await biomeRepo.AddSpecie(new AddSpecieToBiomeRequest
+        await biomeRepo.AddSpecie(new SpecieToBiomeRequest
         {
             SpecieId = (int)Input.SpecieId,
             Count = (int)Input.Count,
@@ -77,6 +53,26 @@ public class Detail(
 
         SuccessNotification("Espèce ajoutée avec succès");
         return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { id }, fragment: "title-section");
+    }
+    
+    public async Task<IActionResult> OnPostRemoveSpecieAsync(int id)
+    {
+        if (!ModelState.IsValid || Input.SpecieId is null || Input.Count is null)
+        {
+            var loadResult = await LoadPageDataAsync(id);
+            if (loadResult != null) return loadResult;
+            return Page();
+        }
+
+        await biomeRepo.RemoveSpecie(new SpecieToBiomeRequest
+        {
+            SpecieId = (int)Input.SpecieId,
+            Count    = (int)Input.Count,
+        }, id);
+
+        SuccessNotification("Espèce retirée avec succès");
+        return RedirectToPage(pageName: null, pageHandler: null,
+            routeValues: new { id }, fragment: "title-section");
     }
 
     public async Task<IActionResult> OnPostExecuteActionAsync(string actionId, int biomeId)

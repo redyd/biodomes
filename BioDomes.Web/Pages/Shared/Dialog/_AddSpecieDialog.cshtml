@@ -1,0 +1,55 @@
+@model BioDomes.Web.Pages.Biomes.Detail
+
+<dialog id="add-species-dialog">
+    <div class="large-edit-card">
+        <div class="edit-header">
+            <p class="edit-breadcrumb">Biodômes · @Model.Biome.Name</p>
+            <h1 class="edit-title">Ajouter une espèce</h1>
+        </div>
+
+        <form method="post" asp-page-handler="AddSpecie" class="edit-body">
+
+            <div class="field-group">
+                @foreach (var group in Model.Recommendations
+                              .GroupBy(r => r.Type)
+                              .OrderBy(g => g.Key))
+                {
+                    <p class="suggestion-group-label">@group.Key</p>
+                    <div class="suggestion-group">
+                        @foreach (var specie in group.Select(r => r.Involved))
+                        {
+                            <label class="suggestion-card">
+                                <input type="radio" asp-for="Input.SpecieId" value="@specie.Id" hidden/>
+                                @if (!string.IsNullOrWhiteSpace(specie.ImageUrl))
+                                {
+                                    <img class="suggestion-card-img"
+                                         src="@Model.UseUploadedFromId(specie.ImageUrl)"
+                                         alt="@specie.Name"/>
+                                }
+                                <span class="suggestion-name">@specie.Name</span>
+                            </label>
+                        }
+                    </div>
+                }
+                <span asp-validation-for="Input.SpecieId" class="field-error"></span>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">Quantité</label>
+                <input class="field-input" type="number" step="1" min="1" asp-for="Input.Count"/>
+                <span asp-validation-for="Input.Count" class="field-error"></span>
+            </div>
+
+            <div class="edit-divider"></div>
+
+            <div class="edit-actions">
+                <button type="button" class="btn-cancel"
+                        onclick="document.getElementById('add-species-dialog').close()">
+                    Annuler
+                </button>
+                <button class="btn-save" type="submit">Ajouter</button>
+            </div>
+
+        </form>
+    </div>
+</dialog>

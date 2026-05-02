@@ -18,6 +18,21 @@ removeSuggestionsBtns.forEach(btn => {
     });
 });
 
+function openRemoveDialog(btn) {
+    const id = btn.dataset.specieId;
+    const name = btn.dataset.specieName;
+    const count = btn.dataset.specieCount;
+
+    document.getElementById('remove-specie-name').textContent = name;
+    document.getElementById('remove-specie-count').textContent = count;
+    document.getElementById('remove-specie-id-input').value = id;
+    document.getElementById('remove-max').textContent = count;
+    document.getElementById('remove-count-input').max = count;
+    document.getElementById('remove-count-input').value = 1;
+
+    document.getElementById('remove-species-dialog').showModal();
+}
+
 (function () {
     const data = window.foodChainData;
 
@@ -25,7 +40,7 @@ removeSuggestionsBtns.forEach(btn => {
         console.error("foodChainData is missing");
         return;
     }
-    
+
     console.log(data);
 
     const nodes = data.Nodes || [];
@@ -57,15 +72,15 @@ removeSuggestionsBtns.forEach(btn => {
             {
                 selector: 'node',
                 style: {
-                    'width': function(ele) {
+                    'width': function (ele) {
                         const count = ele.data('count') || 0;
                         return Math.min(60 + (count * 4), 140) + 'px';
                     },
-                    'height': function(ele) {
+                    'height': function (ele) {
                         const count = ele.data('count') || 0;
                         return Math.min(60 + (count * 4), 140) + 'px';
                     },
-                    'font-size': function(ele) {
+                    'font-size': function (ele) {
                         const count = ele.data('count') || 0;
                         return Math.min(12 + (count * 0.5), 18) + 'px';
                     },
