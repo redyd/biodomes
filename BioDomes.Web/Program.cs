@@ -1,4 +1,5 @@
 using BioDomes.Domains.Repository;
+using BioDomes.Domains.Services;
 using BioDomes.Infrastructures;
 using BioDomes.Infrastructures.Models;
 using BioDomes.Infrastructures.Repositories;
@@ -30,12 +31,13 @@ builder.Services.AddDefaultIdentity<UserEntity>(options => { options.SignIn.Requ
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<BiodomeContext>();
 
-
 builder.Services.AddScoped<ISpeciesRepository, SpeciesRepository>();
 builder.Services.AddScoped<IEquipmentRepository, EquipmentRepository>();
 builder.Services.AddScoped<IBiomeRepository, BiomeRepository>();
 builder.Services.AddScoped<ISpecieAttributesRepository, SpecieAttributesRepository>();
 builder.Services.AddScoped<IFoodChainRepository, FoodChainRepository>();
+
+builder.Services.AddScoped<IBiomeAnalyzer, BiomeAnalyzer>();
 
 var app = builder.Build();
 

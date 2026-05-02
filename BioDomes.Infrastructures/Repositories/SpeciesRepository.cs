@@ -11,7 +11,7 @@ namespace BioDomes.Infrastructures.Repositories;
 
 public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository> logger) : ISpeciesRepository
 {
-    public async Task<Result<List<Specie>>> FindAllAsync(string? userId, bool isAdmin)
+    public async Task<ResultT<List<Specie>>> FindAllAsync(string? userId, bool isAdmin)
     {
         try
         {
@@ -29,30 +29,58 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
             }
 
             var result = await query.ToListAsync();
-            return Result<List<Specie>>.Ok(result.Select(SpecieMapper.MapSpecie).ToList());
+            return ResultT<List<Specie>>.Ok(result.Select(SpecieMapper.MapSpecie).ToList());
         }
         catch (Exception ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<List<Specie>>.Failure("Database error");
+            return ResultT<List<Specie>>.Failure("Database error");
         }
     }
 
-    public async Task<Result<int>> CountAsync()
+    public async Task<ResultT<Dictionary<int, Specie>>> FindAllAsDictAsync(string? userId, bool isAdmin)
+    {
+        try
+        {
+            var query = context
+                .Species
+                .Include(e => e.DietEntity)
+                .Include(e => e.ClassificationEntity)
+                .ThenInclude(e => e.EatenByDiets)
+                .AsQueryable();
+
+            if (!isAdmin)
+            {
+                query = query.Where(e =>
+                    e.IsPublic
+                    || (userId != null && e.UserId == userId));
+            }
+
+            var result = await query.ToDictionaryAsync(s => s.Id, SpecieMapper.MapSpecie);
+            return ResultT<Dictionary<int, Specie>>.Ok(result);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning($"Database error: {ex.Message}");
+            return ResultT<Dictionary<int, Specie>>.Failure("Database error");
+        }
+    }
+
+    public async Task<ResultT<int>> CountAsync()
     {
         try
         {
             var count = await context.Species.CountAsync();
-            return Result<int>.Ok(count);
+            return ResultT<int>.Ok(count);
         }
         catch (Exception ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<int>.Failure("Database error");
+            return ResultT<int>.Failure("Database error");
         }
     }
 
-    public async Task<Result<Specie>> FindBySlugAsync(string slug, string? userId, bool isAdmin)
+    public async Task<ResultT<Specie>> FindBySlugAsync(string slug, string? userId, bool isAdmin)
     {
         try
         {
@@ -63,38 +91,42 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
                 .FirstOrDefaultAsync(e => e.Slug == slug);
 
             if (result is null)
-                return Result<Specie>.NotFound("Specie not found");
+                return ResultT<Specie>.NotFound("Specie not found");
 
             if (!isAdmin && !result.IsPublic && result.UserId != userId)
-                return Result<Specie>.Forbidden("User not authorized to access this specie");
+                return ResultT<Specie>.Forbidden("User not authorized to access this specie");
 
-            return Result<Specie>.Ok(SpecieMapper.MapSpecie(result));
+            return ResultT<Specie>.Ok(SpecieMapper.MapSpecie(result));
         }
         catch (Exception ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<Specie>.Failure("Database error");
+            return ResultT<Specie>.Failure("Database error");
         }
     }
 
-    public async Task<Result<Specie>> UpdateAsync(UpdateSpecieRequest toUpdate, string? userId, bool isAdmin)
+    public async Task<ResultT<Specie>> UpdateAsync(UpdateSpecieRequest toUpdate, string? userId, bool isAdmin)
     {
         try
         {
-            if (await context.Species.AnyAsync(s =>
-                    s.Slug != toUpdate.PreviousSlug &&
-                    s.Name.ToLower() == toUpdate.Name.ToLower()))
+            var allName = await context.Species
+                .Where(s => s.Id != toUpdate.Id)
+                .Select(s => s.Name)
+                .ToListAsync();
+            
+            var updateKebab = toUpdate.Name.ToKebabCase();
+            if (allName.Any(n => n.ToKebabCase() == updateKebab))
             {
-                return Result<Specie>.Conflict($"Une espèce nommée '{toUpdate.Name}' existe déjà.");
+                return ResultT<Specie>.Conflict($"Une espèce nommée '{toUpdate.Name}' existe déjà.");
             }
 
-            var entity = await context.Species.FirstOrDefaultAsync(s => s.Slug == toUpdate.PreviousSlug);
+            var entity = await context.Species.FirstOrDefaultAsync(s => s.Id == toUpdate.Id);
 
             if (entity is null)
-                return Result<Specie>.NotFound($"Specie '{toUpdate.PreviousSlug}' not found.");
+                return ResultT<Specie>.NotFound($"Specie '{toUpdate.Name}' not found.");
 
             if (!isAdmin && entity.UserId != userId)
-                return Result<Specie>.Forbidden("Access denied.");
+                return ResultT<Specie>.Forbidden("Access denied.");
 
             var visibility = entity.IsPublic;
             if (isAdmin && toUpdate.IsPublic is not null)
@@ -102,30 +134,8 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
                 visibility = (bool)toUpdate.IsPublic;
             }
 
-            // if slugs are different
-            if (entity.Slug != toUpdate.Slug)
-            {
-                var replacement = new SpecieEntity
-                {
-                    UserId = entity.UserId,
-                    Slug = toUpdate.Slug,
-                    Name = toUpdate.Name,
-                    ClassificationId = toUpdate.ClassificationId,
-                    DietId = toUpdate.DietId,
-                    Height = toUpdate.Height,
-                    Weight = toUpdate.Weight,
-                    UploadedImageId = toUpdate.ImageUrl ?? entity.UploadedImageId,
-                    IsPublic = visibility
-                };
-
-                context.Species.Remove(entity);
-                await context.Species.AddAsync(replacement);
-                await context.SaveChangesAsync();
-
-                return await FindBySlugAsync(replacement.Slug, userId, isAdmin);
-            }
-
             entity.Name = toUpdate.Name;
+            entity.Slug = toUpdate.Name.ToKebabCase();
             entity.ClassificationId = toUpdate.ClassificationId;
             entity.DietId = toUpdate.DietId;
             entity.Height = toUpdate.Height;
@@ -139,43 +149,47 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
 
             await context.SaveChangesAsync();
 
-            return await FindBySlugAsync(entity.Slug, userId, isAdmin);
+            var specie = await context.Species
+                .Include(s => s.DietEntity)
+                .Include(s => s.ClassificationEntity)
+                .ThenInclude(ce => ce.EatenByDiets)
+                .FirstAsync(s => s.Id == toUpdate.Id);
+            
+            return ResultT<Specie>.Ok(SpecieMapper.MapSpecie(specie));
         }
         catch (DbUpdateException ex) when (SqlServerError.IsUniqueConstraintViolation(ex) ||
                                            SqlServerError.IsPrimaryKeyViolation(ex))
         {
-            return Result<Specie>.Conflict("A specie with this name already exists.");
+            return ResultT<Specie>.Conflict("A specie with this name already exists.");
         }
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<Specie>.Failure("Database error");
+            return ResultT<Specie>.Failure("Database error");
         }
     }
 
-    public async Task<Result<Specie>> AddAsync(CreateSpecieRequest toAdd, string? userId)
+    public async Task<ResultT<Specie>> AddAsync(CreateSpecieRequest toAdd, string? userId)
     {
         try
         {
-            var slug = toAdd.Name.ToKebabCase();
-
-            var exists = await context.Species.AnyAsync(s => s.Slug == slug);
-
-            if (exists)
-            {
-                return Result<Specie>.Conflict("Specie already exists");
-            }
-
             if (userId is null)
             {
-                return Result<Specie>.Forbidden("You should be authenticate to add a specie");
+                return ResultT<Specie>.Forbidden("You should be authenticate to add a specie");
             }
-
+            
+            var allName = await context.Species.Select(s => s.Name).ToListAsync();
+            var updateKebab = toAdd.Name.ToKebabCase();
+            if (allName.Any(n => n.ToKebabCase() == updateKebab))
+            {
+                return ResultT<Specie>.Conflict($"Une espèce nommée '{toAdd.Name}' existe déjà.");
+            }
+            
             var entity = new SpecieEntity
             {
                 UserId = userId,
-                Slug = slug,
                 Name = toAdd.Name,
+                Slug = toAdd.Name.ToKebabCase(),
                 ClassificationId = toAdd.ClassificationId,
                 DietId = toAdd.DietId,
                 Height = toAdd.Height,
@@ -191,46 +205,46 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
                 .Species
                 .Include(s => s.DietEntity)
                 .Include(s => s.ClassificationEntity)
-                .FirstAsync(s => s.Slug == entity.Slug);
-            return Result<Specie>.Ok(SpecieMapper.MapSpecie(specie));
+                .FirstAsync(s => s.Id == entity.Id);
+            return ResultT<Specie>.Ok(SpecieMapper.MapSpecie(specie));
         }
         catch (DbUpdateException ex) when (SqlServerError.IsUniqueConstraintViolation(ex) ||
                                            SqlServerError.IsPrimaryKeyViolation(ex))
         {
-            return Result<Specie>.Conflict("A specie with this name already exists.");
+            return ResultT<Specie>.Conflict("A specie with this name already exists.");
         }
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<Specie>.Failure("Database error");
+            return ResultT<Specie>.Failure("Database error");
         }
     }
 
-    public async Task<Result<Specie>> DeleteAsync(string slug, string? userId, bool isAdmin)
+    public async Task<ResultT<Specie>> DeleteAsync(int specieId, string? userId, bool isAdmin)
     {
         try
         {
             var entity = await context.Species
                 .Include(s => s.DietEntity)
                 .Include(s => s.ClassificationEntity)
-                .FirstOrDefaultAsync(s => s.Slug == slug);
+                .FirstOrDefaultAsync(s => s.Id == specieId);
 
             if (entity is null)
-                return Result<Specie>.NotFound($"Specie '{slug}' not found.");
+                return ResultT<Specie>.NotFound($"Specie '{specieId}' not found.");
 
             if (!isAdmin && entity.UserId != userId)
-                return Result<Specie>.Forbidden("Access denied.");
+                return ResultT<Specie>.Forbidden("Access denied.");
 
             var deleted = SpecieMapper.MapSpecie(entity);
             context.Species.Remove(entity);
             await context.SaveChangesAsync();
 
-            return Result<Specie>.Ok(deleted);
+            return ResultT<Specie>.Ok(deleted);
         }
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<Specie>.Failure("Database error");
+            return ResultT<Specie>.Failure("Database error");
         }
     }
 }

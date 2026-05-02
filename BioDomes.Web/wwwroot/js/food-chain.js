@@ -3,6 +3,8 @@ function getAntiForgeryToken() {
     return el ? el.value : null;
 }
 
+const recenterBtn = document.getElementById("cy-recenter");
+
 const name = document.querySelector('#title');
 const diet = document.querySelector('#diet');
 
@@ -17,8 +19,8 @@ function onSpecieSelect(data) {
 
     document.querySelector('#diet-badge').style.display = 'inline-block';
 
-    renderAvailablePrey(data.available, data.slug);
-    renderExistingPrey(data.preys, data.slug);
+    renderAvailablePrey(data.available, data.id);
+    renderExistingPrey(data.preys, data.id);
 }
 
 function renderExistingPrey(preys, rootSpecie) {
@@ -34,13 +36,14 @@ function renderExistingPrey(preys, rootSpecie) {
 
     for (const p of preys) {
         const li = document.createElement('li');
+        li.className = "li-info-card";
         li.innerHTML = `
             <div class="d-flex flex-column">
                 <span>${p.name}</span>
-                <span class="specie-meta">${p.classification.label}</span>
+                <span class="li-card-meta">${p.classification.label}</span>
             </div>
             <button class="btn-action btn-remove" title="Supprimer le lien" 
-                    onclick="handleAction('${rootSpecie}', '${p.slug}', 'remove')">×</button>
+                    onclick="handleAction('${rootSpecie}', '${p.specieId}', 'remove')">×</button>
         `;
         existing.appendChild(li);
     }
@@ -59,13 +62,14 @@ function renderAvailablePrey(preys, rootSpecie) {
 
     for (const p of preys) {
         const li = document.createElement('li');
+        li.className = "li-info-card";
         li.innerHTML = `
             <div class="d-flex flex-column">
                 <span>${p.name}</span>
-                <span class="specie-meta">${p.classification.label}</span>
+                <span class="li-card-meta">${p.classification.label}</span>
             </div>
             <button class="btn-action btn-add" title="Ajouter le lien" 
-                    onclick="handleAction('${rootSpecie}', '${p.slug}', 'add')">+</button>
+                    onclick="handleAction('${rootSpecie}', '${p.specieId}', 'add')">+</button>
         `;
         available.appendChild(li);
     }
@@ -80,7 +84,7 @@ function handleAction(predator, prey, action) {
             'Content-Type': 'application/json',
             'RequestVerificationToken': getAntiForgeryToken()
         },
-        body: JSON.stringify({ predatorSlug: predator, preySlug: prey })
+        body: JSON.stringify({ predatorId: parseInt(predator), preyId: parseInt(prey) })
     })
         .then(res => {
             if (res.ok) {
@@ -92,6 +96,7 @@ function handleAction(predator, prey, action) {
 
 (function () {
     const data = window.foodChainData;
+    const isAdmin = window.isAdmin;
 
     if (!data) {
         console.error("foodChainData is missing");
@@ -104,7 +109,7 @@ function handleAction(predator, prey, action) {
     const elements = [
         ...nodes.map(n => ({
             data: {
-                id: n.Slug,
+                id: n.SpecieId,
                 label: `${n.Name}\n${n.Diet.Label}`
             }
         })),
@@ -199,25 +204,30 @@ function handleAction(predator, prey, action) {
         }
     });
     
-    cy.on('tap', 'node', function (evt) {
-        const node = evt.target;
+    if (isAdmin) {
+        cy.on('tap', 'node', function (evt) {
+            const node = evt.target;
 
-        fetch('?handler=NodeClicked', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': getAntiForgeryToken()
-            },
-            body: JSON.stringify({
-                slug: node.id()
+            fetch('?handler=NodeClicked', {
+
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': getAntiForgeryToken()
+                },
+                body: JSON.stringify({ specieId: parseInt(node.id()) })
             })
-        })
-            .then(res => res.json())
-            .then(data => {
-                console.log(JSON.stringify(data));
-                onSpecieSelect(data);
-            })
-    });
+                .then(res => res.json())
+                .then(data => {
+                    console.log(JSON.stringify(data));
+                    onSpecieSelect(data);
+                })
+        });
+    }
+
+    recenterBtn.addEventListener("click", (e) => {
+        cy.fit(null, 50)
+    })
 
     setTimeout(() => {
         cy.resize();
@@ -228,4 +238,7 @@ function handleAction(predator, prey, action) {
         cy.resize();
     });
 
+    setTimeout(() => {
+        cy.fit(null, 50)
+    }, 50)
 })();

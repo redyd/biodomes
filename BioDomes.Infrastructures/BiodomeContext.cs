@@ -11,6 +11,8 @@ public class BiodomeContext(DbContextOptions<BiodomeContext> options) : Identity
     public DbSet<SpecieEntity> Species { get; set; }
     
     public DbSet<BiomeEntity> Biomes { get; set; }
+    public DbSet<BiomeSpecieEntity> BiomeSpecies { get; set; }
+    public DbSet<BiomeEquipmentEntity> BiomeEquipments { get; set; }
     public DbSet<EquipmentEntity> Equipments { get; set; }
     public DbSet<EquipmentResourceEntity> EquipmentResources { get; set; }
     public DbSet<SpecieClassification> SpecieClassifications { get; set; }
@@ -33,5 +35,7 @@ public class BiodomeContext(DbContextOptions<BiodomeContext> options) : Identity
         builder.ApplyConfiguration(new SpecieDietTypeConfiguration());
         builder.ApplyConfiguration(new SpecieEntityTypeConfiguration());
         builder.ApplyConfiguration(new SpecieFoodChainTypeConfiguration());
+        builder.ApplyConfiguration(new BiomeSpecieEntityTypeConfiguration());
+        builder.ApplyConfiguration(new BiomeEquipmentEntityTypeConfiguration());
     }
 }

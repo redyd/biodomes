@@ -9,8 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Equipments;
 
-public class Add(IWebHostEnvironment environment, IEquipmentRepository repository, ILogger<Add> logger)
-    : AppPageModel(environment)
+public class Add(IWebHostEnvironment env, IEquipmentRepository repository, ILogger<Add> logger)
+    : AppPageModel(env)
 {
     [BindProperty] public EquipmentInputModel Input { get; set; } = new();
     [BindProperty] public List<EquipmentResource> Resources { get; set; } = [];
@@ -61,7 +61,7 @@ public class Add(IWebHostEnvironment environment, IEquipmentRepository repositor
             return Page();
         }
 
-        if (!result.IsSuccess)
+        if (result.Failed)
         {
             return result.ToPageResult(this);
         }

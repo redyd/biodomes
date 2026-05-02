@@ -21,20 +21,15 @@ public class BiomeEntityTypeConfiguration : IEntityTypeConfiguration<BiomeEntity
         
         builder.Property(e => e.Temperature)
             .IsRequired();
-        
-        builder.HasMany(e => e.Species)
-            .WithMany(e => e.Biomes)
-            .UsingEntity(j =>
-            {
-                j.ToTable("biomes_species");
-                j.HasOne(typeof(SpecieEntity))
-                    .WithMany()
-                    .OnDelete(DeleteBehavior.NoAction); 
-            });
-        
-        builder
-            .HasMany(b => b.Equipments)
-            .WithMany(e => e.Biomes)
-            .UsingEntity(j => j.ToTable("biome_equipments"));
+
+        builder.HasData(new BiomeEntity
+        {
+            Id = 1,
+            UserId = "user-1",
+            Name = "Biotest Ultimate",
+            IsPublic = true,
+            Humidity = 16,
+            Temperature = 25,
+        });
     }
 }

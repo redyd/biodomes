@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Equipments;
 
-public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipmentRepository repository)
-    : AppPageModel(environment)
+public class Edit(IWebHostEnvironment env, ILogger<Edit> logger, IEquipmentRepository repository)
+    : AppPageModel(env)
 {
     [BindProperty] public UpdateEquipmentInputModel Input { get; set; } = new();
 
@@ -26,7 +26,7 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
         }
 
         var result = await repository.FindAsync(id, userId, User.IsAdmin());
-        if (!result.IsSuccess)
+        if (result.Failed)
         {
             return result.ToPageResult(this);
         }
@@ -65,7 +65,7 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
 
         // find the result
         var equipmentResult = await repository.FindAsync(id, userId, User.IsAdmin());
-        if (!equipmentResult.IsSuccess)
+        if (equipmentResult.Failed)
         {
             return equipmentResult.ToPageResult(this);
         }
@@ -117,7 +117,7 @@ public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipm
     private async Task<IActionResult> PerformDelete(int id, string userId, Equipment equipment)
     {
         var deletedResult = await repository.DeleteAsync(id, userId, User.IsAdmin());
-        if (!deletedResult.IsSuccess)
+        if (deletedResult.Failed)
         {
             return deletedResult.ToPageResult(this);
         }

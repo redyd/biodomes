@@ -2,6 +2,7 @@ namespace BioDomes.Infrastructures.Models;
 
 public class SpecieEntity
 {
+    public int Id { get; set; }
     public string Slug { get; set; }
     public string Name { get; set; }
     public int Height { get; set; }
@@ -15,7 +16,7 @@ public class SpecieEntity
     public UserEntity User { get; set; }
 
     // relation
-    public List<BiomeEntity> Biomes { get; set; } = new();
+    public List<BiomeSpecieEntity> BiomeSpecies { get; set; } = new();
 
     public int DietId { get; set; }
     public SpecieDiet DietEntity { get; set; }

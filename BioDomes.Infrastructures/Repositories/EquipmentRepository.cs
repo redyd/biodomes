@@ -37,22 +37,22 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
             Label = r.Label
         }).ToList();
     }
-    
-    public async Task<Result<int>> CountAsync()
+
+    public async Task<ResultT<int>> CountAsync()
     {
         try
         {
             var count = await context.Equipments.CountAsync();
-            return Result<int>.Ok(count);
+            return ResultT<int>.Ok(count);
         }
         catch (Exception ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<int>.Failure("Database error");
+            return ResultT<int>.Failure("Database error");
         }
     }
 
-    public async Task<Result<Equipment>> CreateEquipmentAsync(CreateEquipmentRequest request, string userId)
+    public async Task<ResultT<Equipment>> CreateEquipmentAsync(CreateEquipmentRequest request, string userId)
     {
         try
         {
@@ -60,9 +60,9 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
 
             if (exist)
             {
-                return Result<Equipment>.Conflict("An equipment with this name already exists.");
+                return ResultT<Equipment>.Conflict("An equipment with this name already exists.");
             }
-            
+
             var entity = new EquipmentEntity
             {
                 Name = request.Name,
@@ -80,24 +80,24 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
                 .Include(e => e.ProducedResourceEntity)
                 .FirstAsync(e => e.Id == entity.Id);
 
-            return Result<Equipment>.Ok(EquipmentMapper.MapEquipment(created));
+            return ResultT<Equipment>.Ok(EquipmentMapper.MapEquipment(created));
         }
         catch (DbUpdateException ex) when (SqlServerError.IsUniqueConstraintViolation(ex))
         {
-            return Result<Equipment>.Conflict("An equipment with this name already exists.");
+            return ResultT<Equipment>.Conflict("An equipment with this name already exists.");
         }
         catch (DbUpdateException ex) when (SqlServerError.IsForeignKeyViolation(ex))
         {
-            return Result<Equipment>.Failure("A referenced resource does not exist.");
+            return ResultT<Equipment>.Failure("A referenced resource does not exist.");
         }
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<Equipment>.Failure("Database error");
+            return ResultT<Equipment>.Failure("Database error");
         }
     }
 
-    public async Task<Result<Equipment>> FindAsync(int id, string? userId, bool isAdmin)
+    public async Task<ResultT<Equipment>> FindAsync(int id, string? userId, bool isAdmin)
     {
         try
         {
@@ -108,24 +108,24 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
 
             if (entity is null)
             {
-                return Result<Equipment>.NotFound($"Equipment {id} not found.");
+                return ResultT<Equipment>.NotFound($"Equipment {id} not found.");
             }
 
             if (!isAdmin && !entity.IsPublic && entity.UserId != userId)
             {
-                return Result<Equipment>.Forbidden("Access denied.");
+                return ResultT<Equipment>.Forbidden("Access denied.");
             }
 
-            return Result<Equipment>.Ok(EquipmentMapper.MapEquipment(entity));
+            return ResultT<Equipment>.Ok(EquipmentMapper.MapEquipment(entity));
         }
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<Equipment>.Failure("Database error");
+            return ResultT<Equipment>.Failure("Database error");
         }
     }
-
-    public async Task<Result<Equipment>> DeleteAsync(int id, string? userId, bool isAdmin)
+    
+    public async Task<ResultT<Equipment>> DeleteAsync(int id, string? userId, bool isAdmin)
     {
         try
         {
@@ -135,24 +135,24 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (entity is null)
-                return Result<Equipment>.NotFound($"Equipment {id} not found.");
+                return ResultT<Equipment>.NotFound($"Equipment {id} not found.");
 
             if (!isAdmin && entity.UserId != userId)
-                return Result<Equipment>.Forbidden("Access denied.");
+                return ResultT<Equipment>.Forbidden("Access denied.");
 
             var model = EquipmentMapper.MapEquipment(entity);
             context.Equipments.Remove(entity);
             await context.SaveChangesAsync();
-            return Result<Equipment>.Ok(model);
+            return ResultT<Equipment>.Ok(model);
         }
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<Equipment>.Failure("Database error");
+            return ResultT<Equipment>.Failure("Database error");
         }
     }
 
-    public async Task<Result<Equipment>> UpdateAsync(UpdateEquipmentRequest toUpdate, string? userId, bool isAdmin)
+    public async Task<ResultT<Equipment>> UpdateAsync(UpdateEquipmentRequest toUpdate, string? userId, bool isAdmin)
     {
         try
         {
@@ -162,10 +162,10 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
                 .FirstOrDefaultAsync(e => e.Id == toUpdate.Id);
 
             if (entity is null)
-                return Result<Equipment>.NotFound($"Equipment {toUpdate.Id} not found.");
+                return ResultT<Equipment>.NotFound($"Equipment {toUpdate.Id} not found.");
 
             if (!isAdmin && entity.UserId != userId)
-                return Result<Equipment>.Forbidden("Access denied.");
+                return ResultT<Equipment>.Forbidden("Access denied.");
 
             entity.Name = toUpdate.Name;
             entity.Image = toUpdate.Image;
@@ -184,20 +184,20 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
                 .Include(e => e.ProducedResourceEntity)
                 .FirstAsync(e => e.Id == entity.Id);
 
-            return Result<Equipment>.Ok(EquipmentMapper.MapEquipment(updated));
+            return ResultT<Equipment>.Ok(EquipmentMapper.MapEquipment(updated));
         }
         catch (DbUpdateException ex) when (SqlServerError.IsUniqueConstraintViolation(ex))
         {
-            return Result<Equipment>.Conflict("An equipment with this name already exists.");
+            return ResultT<Equipment>.Conflict("An equipment with this name already exists.");
         }
         catch (DbUpdateException ex) when (SqlServerError.IsForeignKeyViolation(ex))
         {
-            return Result<Equipment>.Failure("A referenced resource does not exist.");
+            return ResultT<Equipment>.Failure("A referenced resource does not exist.");
         }
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<Equipment>.Failure("Database error");
+            return ResultT<Equipment>.Failure("Database error");
         }
     }
 }

@@ -30,36 +30,27 @@ public class SpecieFoodChainTypeConfiguration : IEntityTypeConfiguration<SpecieF
     private void SeedData(EntityTypeBuilder<SpecieFoodChain> builder)
     {
         builder.HasData(
-            // 🌱 Plantes → herbivores
-            new SpecieFoodChain { PredatorId = "lievre", PreyId = "paturin-des-pres" },
-            new SpecieFoodChain { PredatorId = "lievre", PreyId = "hetre" },
+            new SpecieFoodChain { PredatorId = 6, PreyId = 4 },  // lievre -> hetre
+            new SpecieFoodChain { PredatorId = 6, PreyId = 9 },  // lievre -> paturin-des-pres
 
-            // 🐭 Omnivore (souris)
-            new SpecieFoodChain { PredatorId = "souris", PreyId = "paturin-des-pres" },
-            new SpecieFoodChain { PredatorId = "souris", PreyId = "mouche" },
+            new SpecieFoodChain { PredatorId = 10, PreyId = 9 }, // souris -> paturin-des-pres
+            new SpecieFoodChain { PredatorId = 10, PreyId = 8 }, // souris -> mouche
 
-            // 🕷️ Petit prédateur
-            new SpecieFoodChain { PredatorId = "araignee", PreyId = "mouche" },
+            new SpecieFoodChain { PredatorId = 1, PreyId = 8 },  // araignee -> mouche
 
-            // 🐦 Prédateur intermédiaire
-            new SpecieFoodChain { PredatorId = "hirondelle", PreyId = "araignee" },
+            new SpecieFoodChain { PredatorId = 5, PreyId = 1 },  // hirondelle -> araignee
 
-            // 🐍 Boa (multi-proies)
-            new SpecieFoodChain { PredatorId = "boa", PreyId = "souris" },
-            new SpecieFoodChain { PredatorId = "boa", PreyId = "hirondelle" },
+            new SpecieFoodChain { PredatorId = 2, PreyId = 10 }, // boa -> souris
+            new SpecieFoodChain { PredatorId = 2, PreyId = 5 },  // boa -> hirondelle
 
-            // 🦁 Lion (top predator)
-            new SpecieFoodChain { PredatorId = "lion", PreyId = "lievre" },
-            new SpecieFoodChain { PredatorId = "lion", PreyId = "souris" },
+            new SpecieFoodChain { PredatorId = 7, PreyId = 6 },  // lion -> lievre
+            new SpecieFoodChain { PredatorId = 7, PreyId = 10 }, // lion -> souris
 
-            // 🌿 Interaction alternative
-            new SpecieFoodChain { PredatorId = "souris", PreyId = "chene" },
+            new SpecieFoodChain { PredatorId = 10, PreyId = 3 }, // souris -> chene
 
-            // 🔁 Cycle volontaire (test algo)
-            new SpecieFoodChain { PredatorId = "hirondelle", PreyId = "mouche" },
+            new SpecieFoodChain { PredatorId = 5, PreyId = 8 },  // hirondelle -> mouche
 
-            // 🔀 Ramification
-            new SpecieFoodChain { PredatorId = "araignee", PreyId = "souris" }
+            new SpecieFoodChain { PredatorId = 1, PreyId = 10 }  // araignee -> souris
         );
     }
 }

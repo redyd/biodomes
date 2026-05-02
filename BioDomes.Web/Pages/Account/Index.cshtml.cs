@@ -8,7 +8,7 @@ using BioDomes.Web.PageModels;
 namespace BioDomes.Web.Pages.Account;
 
 [Authorize]
-public class Index(UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager, IWebHostEnvironment environment) : AppPageModel(environment)
+public class Index(UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager, IWebHostEnvironment env) : AppPageModel(env)
 {
     [BindProperty]
     public InputModel Input { get; set; }

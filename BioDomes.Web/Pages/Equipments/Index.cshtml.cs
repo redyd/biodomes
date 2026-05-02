@@ -5,7 +5,7 @@ using BioDomes.Web.ViewModels;
 
 namespace BioDomes.Web.Pages.Equipments;
 
-public class EquipmentPage(IEquipmentRepository repo, IWebHostEnvironment environment) : AppPageModel(environment)
+public class EquipmentPage(IEquipmentRepository repo, IWebHostEnvironment env) : AppPageModel(env)
 {
     public List<EquipmentView> Equipments { get; set; } = [];
     public bool IsUserConnected { get; set; }

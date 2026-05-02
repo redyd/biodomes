@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BioDomes.Web.Pages.Biomes;
 
-public class BiomePage(IBiomeRepository repository, IWebHostEnvironment environment) : AppPageModel(environment)
+public class BiomePage(IBiomeRepository repository, IWebHostEnvironment env) : AppPageModel(env)
 {
     public List<BiomeView>? Biomes { get; set; }
     
@@ -21,14 +21,10 @@ public class BiomePage(IBiomeRepository repository, IWebHostEnvironment environm
         var biomes = await repository.GetAllAsync(User.GetUserId(), User.IsAdmin());
         Biomes = biomes.Select(b => new BiomeView
         {
-            Id = b.Id,
-            Name = b.Name,
-            Temperature = b.Temperature,
-            Humidity = b.Humidity,
             ImageUrl = !string.IsNullOrWhiteSpace(b.ImageUrl) ? UseUploadedFromId(b.ImageUrl) : null,
             CanEdit = IsUserConnected && (User.IsAdmin() || b.CreatedBy == User.GetUserId()),
             IsPublic = true,
-            State = b.State,
+            Model = b
         })
             .ToList();
 

@@ -1,0 +1,123 @@
+@using BioDomes.Web.Extensions
+@model BioDomes.Web.Pages.Biomes.Detail
+
+@{
+    var count = Model.Analyze.Stats.ProblemCount;
+    var tropicState = Model.Analyze.Stats.AllSpeciesFed
+        ? "Stable"
+        : $"Instable ({count} problème{(count > 1 ? "s" : "")})";
+}
+
+<aside class="sidebar-info p-4">
+    <div class="mb-5">
+        <span class="text-uppercase text-muted small fw-bold">Informations</span>
+        <h2 class="text-bright mt-2 mb-1" id="title">Paramètres & état</h2>
+    </div>
+
+    <section class="mb-5">
+        <div class="d-flex align-items-center mb-3">
+            <div class="point point-primary"></div>
+            <h6 class="text-bright m-0" id="existing-title">Conditions environnementales</h6>
+        </div>
+        <ul class="list-unstyled d-flex flex-column gap-2">
+            <li class="li-info-card">
+                <div class="d-flex flex-column">
+                    <span>@Model.Biome.Model.Temperature °C</span>
+                    <span class="li-card-meta">Température actuelle</span>
+                </div>
+            </li>
+            <li class="li-info-card">
+                <div class="d-flex flex-column">
+                    <span>@Model.Biome.Model.Humidity g/m³</span>
+                    <span class="li-card-meta">Humidité actuelle</span>
+                </div>
+            </li>
+            <li class="li-info-card">
+                <div class="d-flex flex-column">
+                    <span>@Model.Biome.MaxHumidity.ToString("0.##") g/m³</span>
+                    <span class="li-card-meta">Humidité maximum</span>
+                </div>
+            </li>
+            <li>
+                <div class="d-flex justify-content-between mb-1 mt-2">
+                    <span class="li-card-meta">Saturation d'humidité</span>
+                    <span class="li-card-meta">@Model.Biome.HumidityPercent.ToString("0")%</span>
+                </div>
+                <div class="progress" style="height: 6px; background-color: rgba(255,255,255,0.1);">
+                    <div class="progress-bar bg-primary"
+                         role="progressbar"
+                         style="width: @Model.Biome.HumidityPercent.ToString("0")%"
+                         aria-valuenow="@Model.Biome.HumidityPercent"
+                         aria-valuemin="0"
+                         aria-valuemax="100">
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    <section @(Model.Biome.CanEdit ? "class=\"mb-5\"" : "")>
+        <div class="d-flex align-items-center mb-3">
+            <div class="point point-secondary"></div>
+            <h6 class="text-bright m-0">Diagnostiques</h6>
+        </div>
+        <ul class="list-unstyled d-flex flex-column gap-2">
+            <li class="li-info-card">
+                <div class="d-flex flex-column">
+                    <span>@Model.Biome.Model.State</span>
+                    <span class="li-card-meta">État thermique</span>
+                </div>
+            </li>
+            <li class="li-info-card">
+                <div class="d-flex flex-column">
+                    <span class="fw-bold">
+                        @tropicState
+                    </span>
+                    <span class="li-card-meta">État trophique</span>
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    @if (Model.Biome.CanEdit)
+    {
+        <section>
+            <div class="d-flex align-items-center mb-3">
+                <div class="point point-primary"></div>
+                <h6 class="text-bright m-0">Suggestions</h6>
+            </div>
+            <ul class="list-unstyled d-flex flex-column gap-2">
+                @foreach (var group in Model.Recommendations
+                                  .OrderBy(r => r.Type)
+                                  .GroupBy(r => r.Type))
+                {
+                    <span class="fw-bold">@group.Key.GetDisplayName()</span>
+                    <hr class="m-0"/>
+
+                    @foreach (var rec in group)
+                    {
+                        <li class="li-info-card">
+                            <div class="d-flex flex-column">
+                                <span>@rec.Message</span>
+                                <span class="li-card-meta">@rec.Label</span>
+                            </div>
+
+                            <div class="d-inline-flex">
+                                <form method="post" asp-page-handler="ExecuteAction">
+                                    <input type="hidden" name="actionId" value="@rec.ActionId"/>
+                                    <input type="hidden" name="biomeId" value="@Model.Biome.Model.Id"/>
+                                    <button type="submit" class="btn-action btn-add p-1">✓</button>
+                                </form>
+
+                                <button class="btn-action btn-remove p-1 btn-suggestion-del"
+                                        data-id="@rec.ActionId"
+                                        title="Ignorer la suggestion">×
+                                </button>
+                            </div>
+                        </li>
+                    }
+                }
+            </ul>
+        </section>
+    }
+</aside>

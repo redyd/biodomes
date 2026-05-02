@@ -39,9 +39,12 @@
                     }
                 </div>
 
+                
                 <div class="field-group">
-                    <label class="field-label">Image</label>
-                    <input class="field-input" type="file" asp-for="Input.ImageUrl" accept="image/*" />
+                    <label class="image-upload-hint">Ajouter une image</label>
+                    <div class="image-upload-zone">
+                        <input type="file" asp-for="Input.ImageUrl" accept="image/*"/>
+                    </div>
                     <span asp-validation-for="Input.ImageUrl" class="field-error"></span>
                 </div>
                 

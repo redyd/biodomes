@@ -1,0 +1,46 @@
+@model BioDomes.Web.Pages.Biomes.Detail
+
+<dialog id="remove-species-dialog">
+    <div class="large-edit-card">
+        <div class="edit-header">
+            <p class="edit-breadcrumb">Biodômes · @Model.Biome.Model.Name</p>
+            <h1 class="edit-title">Retirer une espèce</h1>
+        </div>
+
+        <form method="post" asp-page-handler="RemoveSpecie" class="edit-body">
+            <input type="hidden" id="remove-specie-id-input" asp-for="SpecieInput.SpecieId"/>
+
+            <div class="field-group">
+                <div class="li-info-card">
+                    <div class="d-flex flex-column">
+                        <span id="remove-specie-name"></span>
+                        <span class="specie-meta">
+                            <span id="remove-specie-count"></span> dans le biome
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">
+                    Quantité à retirer (max <span id="remove-max"></span>)
+                </label>
+                <input class="field-input" type="number"
+                       id="remove-count-input"
+                       step="1" min="1"
+                       asp-for="SpecieInput.Count"/>
+                <span asp-validation-for="SpecieInput.Count" class="field-error"></span>
+            </div>
+
+            <div class="edit-divider"></div>
+
+            <div class="edit-actions">
+                <button type="button" class="btn-cancel"
+                        onclick="document.getElementById('remove-species-dialog').close()">
+                    Annuler
+                </button>
+                <button class="btn-save" type="submit">Retirer</button>
+            </div>
+        </form>
+    </div>
+</dialog>

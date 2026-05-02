@@ -6,22 +6,24 @@
     ViewData["Title"] = "Equipements";
 }
 
-<div class="main-container">
-    <div class="container-title">
-        <h1>Equipements</h1>
-        <p>Les équipements disponibles pour les biomes</p>
-        @if (Model.IsUserConnected)
-        {
-            <a class="btn-save" asp-page="/Equipments/Add">
-                Ajouter un nouvel équipement
-            </a>
-        }
-    </div>
+<div class="container">
+    <div class="main-container">
+        <div class="container-title">
+            <h1>Equipements</h1>
+            <p>Les équipements disponibles pour les biomes</p>
+            @if (Model.IsUserConnected)
+            {
+                <a class="btn-save" asp-page="/Equipments/Add">
+                    Ajouter un nouvel équipement
+                </a>
+            }
+        </div>
 
-    <div class="cards-grid">
-        @foreach (var equipment in Model.Equipments)
-        {
-            <partial name="Shared/_EquipmentCardPartial" model="equipment"/>
-        }
+        <div class="cards-grid">
+            @foreach (var equipment in Model.Equipments)
+            {
+                <partial name="Shared/_EquipmentCardPartial" model="equipment"/>
+            }
+        </div>
     </div>
 </div>

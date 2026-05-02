@@ -12,7 +12,7 @@ namespace BioDomes.Web.Pages.Species;
 public class AddModel(
     ISpeciesRepository speciesRepository,
     ISpecieAttributesRepository attributesRepository,
-    IWebHostEnvironment environment) : AppPageModel(environment)
+    IWebHostEnvironment env) : AppPageModel(env)
 {
     [BindProperty] public SpeciesInputModel? Input { get; set; }
 
@@ -71,11 +71,15 @@ public class AddModel(
             if (result.Status == ResultStatus.Conflict)
             {
                 ErrorNotification("Une espèce avec ce nom existe déjà");
+                if (imageName is not null)
+                {
+                    DeleteImage(imageName);
+                }
                 await LoadSelectLists();
                 return Page();
             }
 
-            if (!result.IsSuccess)
+            if (result.Failed)
             {
                 return result.ToPageResult(this);
             }

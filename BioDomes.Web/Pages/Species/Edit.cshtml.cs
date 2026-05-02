@@ -11,7 +11,7 @@ namespace BioDomes.Web.Pages.Species;
 public class EditModel(
     ISpeciesRepository repository,
     ISpecieAttributesRepository attributesRepository,
-    IWebHostEnvironment environment) : AppPageModel(environment)
+    IWebHostEnvironment env) : AppPageModel(env)
 {
     [BindProperty] public SpeciesInputModel Input { get; set; } = new();
 
@@ -31,7 +31,7 @@ public class EditModel(
         }
 
         var result = await repository.FindBySlugAsync(slug, userId, User.IsAdmin());
-        if (!result.IsSuccess)
+        if (result.Failed)
         {
             return result.ToPageResult(this);
         }
@@ -73,7 +73,7 @@ public class EditModel(
         }
 
         var result = await repository.FindBySlugAsync(slug, userId, User.IsAdmin());
-        if (!result.IsSuccess)
+        if (result.Failed)
         {
             return result.ToPageResult(this);
         }
@@ -83,15 +83,15 @@ public class EditModel(
 
         return action switch
         {
-            "delete" => await PerformDelete(slug, userId, specie),
-            "save" => await PerformUpdate(slug, userId, specie),
+            "delete" => await PerformDelete(userId, specie),
+            "save" => await PerformUpdate(userId, specie),
             _ => Page()
         };
     }
 
-    private async Task<IActionResult> PerformDelete(string slug, string userId, Specie specie)
+    private async Task<IActionResult> PerformDelete(string userId, Specie specie)
     {
-        await repository.DeleteAsync(slug, userId, User.IsAdmin());
+        await repository.DeleteAsync(specie.Id, userId, User.IsAdmin());
 
         if (!string.IsNullOrEmpty(specie.ImageUrl))
         {
@@ -102,7 +102,7 @@ public class EditModel(
         return RedirectToPage("/Species/Index");
     }
 
-    private async Task<IActionResult> PerformUpdate(string slug, string userId, Specie specie)
+    private async Task<IActionResult> PerformUpdate(string userId, Specie specie)
     {
         if (!ModelState.IsValid)
         {
@@ -113,7 +113,7 @@ public class EditModel(
 
         var updatedSpecie = new UpdateSpecieRequest
         {
-            PreviousSlug = slug,
+            Id = specie.Id,
             Name = Input.Name,
             ClassificationId = Input.ClassificationId,
             DietId = Input.DietId,
@@ -144,7 +144,7 @@ public class EditModel(
             return Page();
         }
 
-        if (!result.IsSuccess)
+        if (result.Failed)
         {
             return result.ToPageResult(this);
         }
