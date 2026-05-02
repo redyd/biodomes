@@ -4,10 +4,10 @@ using BioDomes.Domains.Requests;
 
 namespace BioDomes.Domains.Services;
 
-public class SpecieRecommendation(
+public class BiomeAnalyzer(
     IFoodChainRepository foodChainRepo,
     ISpeciesRepository speciesRepo,
-    IBiomeRepository biomeRepo) : ISpecieRecommendation
+    IBiomeRepository biomeRepo) : IBiomeAnalyzer
 {
     /// <summary>
     /// Retourne toutes les espèces disponibles classées par pertinence pour le biome.

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Species;
 
-public class SpeciesModel(ISpeciesRepository repo, IWebHostEnvironment environment) : AppPageModel(environment)
+public class SpeciesModel(ISpeciesRepository repo, IWebHostEnvironment env) : AppPageModel(env)
 {
     public List<SpecieView> SpeciesList { get; set; } = [];
     public bool IsUserConnected { get; set; }

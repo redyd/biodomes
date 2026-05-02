@@ -4,7 +4,7 @@
 <dialog id="add-species-dialog">
     <div class="large-edit-card">
         <div class="edit-header">
-            <p class="edit-breadcrumb">Biodômes · @Model.Biome.Name</p>
+            <p class="edit-breadcrumb">Biodômes · @Model.Biome.Model.Name</p>
             <h1 class="edit-title">Ajouter une espèce</h1>
         </div>
 
@@ -20,7 +20,7 @@
                         @foreach (var specie in group.Select(r => r.Involved))
                         {
                             <label class="suggestion-card">
-                                <input type="radio" asp-for="Input.SpecieId" value="@specie.Id" hidden/>
+                                <input type="radio" asp-for="SpecieInput.SpecieId" value="@specie.Id" hidden/>
                                 @if (!string.IsNullOrWhiteSpace(specie.ImageUrl))
                                 {
                                     <img class="suggestion-card-img"
@@ -32,13 +32,13 @@
                         }
                     </div>
                 }
-                <span asp-validation-for="Input.SpecieId" class="field-error"></span>
+                <span asp-validation-for="SpecieInput.SpecieId" class="field-error"></span>
             </div>
 
             <div class="field-group">
                 <label class="field-label">Quantité</label>
-                <input class="field-input" type="number" step="1" min="1" asp-for="Input.Count"/>
-                <span asp-validation-for="Input.Count" class="field-error"></span>
+                <input class="field-input" type="number" step="1" min="1" asp-for="SpecieInput.Count"/>
+                <span asp-validation-for="SpecieInput.Count" class="field-error"></span>
             </div>
 
             <div class="edit-divider"></div>
@@ -54,3 +54,10 @@
         </form>
     </div>
 </dialog>
+
+@if (Model.ReopenAddSpecieDialog)
+{
+    <script>
+        document.getElementById('add-species-dialog').showModal();
+    </script>
+}

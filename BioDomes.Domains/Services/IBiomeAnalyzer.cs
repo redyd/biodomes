@@ -2,7 +2,7 @@ using BioDomes.Domains.Core;
 
 namespace BioDomes.Domains.Services;
 
-public interface ISpecieRecommendation
+public interface IBiomeAnalyzer
 {
     Task<List<Recommendation<Specie>>> RecommendationToAddForBiome(string? userId, bool isAdmin, int biomeId,
         FoodChainGraph biomeGraph);

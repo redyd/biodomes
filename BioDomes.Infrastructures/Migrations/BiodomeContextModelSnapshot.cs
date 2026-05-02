@@ -59,6 +59,34 @@ namespace BioDomes.Infrastructures.Migrations
                     b.ToTable("biomes", "dbo");
                 });
 
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeEquipmentEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BiomeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EquipmentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Inserted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BiomeId");
+
+                    b.HasIndex("EquipmentId");
+
+                    b.ToTable("biomes_equipments", "dbo");
+                });
+
             modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeSpecieEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -849,7 +877,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "ed630374-122b-493b-bec0-863fea91242e",
+                            ConcurrencyStamp = "f9766240-fc1d-44f6-9387-fdd480bf9f84",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -857,7 +885,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "e5b131f4-ced6-4b39-987d-8f03a7a5d4bc",
+                            SecurityStamp = "2a32a8bc-61e1-4456-a77b-b00862d0bfdb",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -866,7 +894,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "c4a87ce5-dc36-4d3e-a9f3-674837ae94bc",
+                            ConcurrencyStamp = "4cdeee44-ef68-4654-83f1-d99c51d9c2d2",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -874,25 +902,10 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "ddd0801d-4cd3-450a-8844-7ddec16e5bd0",
+                            SecurityStamp = "3734b1c3-1294-4160-aad3-8df2d6455a5d",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         });
-                });
-
-            modelBuilder.Entity("BiomeEntityEquipmentEntity", b =>
-                {
-                    b.Property<int>("BiomesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EquipmentsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BiomesId", "EquipmentsId");
-
-                    b.HasIndex("EquipmentsId");
-
-                    b.ToTable("biome_equipments", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1407,6 +1420,25 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeEquipmentEntity", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.BiomeEntity", "Biome")
+                        .WithMany("Equipments")
+                        .HasForeignKey("BiomeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BioDomes.Infrastructures.Models.EquipmentEntity", "Equipment")
+                        .WithMany("BiomesEquipment")
+                        .HasForeignKey("EquipmentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Biome");
+
+                    b.Navigation("Equipment");
+                });
+
             modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeSpecieEntity", b =>
                 {
                     b.HasOne("BioDomes.Infrastructures.Models.BiomeEntity", "Biome")
@@ -1499,21 +1531,6 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Navigation("Prey");
                 });
 
-            modelBuilder.Entity("BiomeEntityEquipmentEntity", b =>
-                {
-                    b.HasOne("BioDomes.Infrastructures.Models.BiomeEntity", null)
-                        .WithMany()
-                        .HasForeignKey("BiomesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BioDomes.Infrastructures.Models.EquipmentEntity", null)
-                        .WithMany()
-                        .HasForeignKey("EquipmentsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1583,6 +1600,13 @@ namespace BioDomes.Infrastructures.Migrations
             modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeEntity", b =>
                 {
                     b.Navigation("BiomeSpecies");
+
+                    b.Navigation("Equipments");
+                });
+
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.EquipmentEntity", b =>
+                {
+                    b.Navigation("BiomesEquipment");
                 });
 
             modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieEntity", b =>

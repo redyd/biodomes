@@ -27,18 +27,18 @@
                         <div class="biome-row-image">
                             @if (!string.IsNullOrEmpty(biome.ImageUrl))
                             {
-                                <img src="@biome.ImageUrl" alt="@biome.Name"/>
+                                <img src="@biome.ImageUrl" alt="@biome.Model.Name"/>
                             }
                             else
                             {
                                 <div class="biome-row-image-placeholder"></div>
                             }
-                            <span class="biome-state biome-state-badge biome-state-@biome.State.ToLower()">@biome.State</span>
+                            <span class="biome-state biome-state-badge biome-state-@biome.Model.State.ToLower()">@biome.Model.State</span>
                         </div>
 
-                        <a class="biome-row-body" asp-page="/Biomes/Detail" asp-route-id="@biome.Id">
+                        <a class="biome-row-body" asp-page="/Biomes/Detail" asp-route-id="@biome.Model.Id">
                             <div class="biome-row-header">
-                                <h2 class="biome-row-name">@biome.Name</h2>
+                                <h2 class="biome-row-name">@biome.Model.Name</h2>
                                 @if (biome.IsPublic)
                                 {
                                     <span class="biome-badge-public">public</span>
@@ -48,11 +48,11 @@
                             <div class="biome-row-stats">
                                 <div class="biome-stat">
                                     <span class="biome-stat-label">Température</span>
-                                    <span class="biome-stat-value">@biome.Temperature °C</span>
+                                    <span class="biome-stat-value">@biome.Model.Temperature °C</span>
                                 </div>
                                 <div class="biome-stat">
                                     <span class="biome-stat-label">Humidité</span>
-                                    <span class="biome-stat-value">@biome.Humidity g/m³</span>
+                                    <span class="biome-stat-value">@biome.Model.Humidity g/m³</span>
                                 </div>
                             </div>
                         </a>
@@ -61,7 +61,7 @@
                         {
                             <a class="biome-row-actions biome-row-edit"
                                asp-page="/Biomes/Edit"
-                               asp-route-id="@biome.Id">
+                               asp-route-id="@biome.Model.Id">
                                 Modifier →
                             </a>
                         }

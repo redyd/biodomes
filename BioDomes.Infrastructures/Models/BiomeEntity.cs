@@ -16,5 +16,5 @@ public class BiomeEntity
 
     // relations
     public List<BiomeSpecieEntity> BiomeSpecies { get; set; } = new();
-    public List<EquipmentEntity> Equipments { get; set; } = new();
+    public List<BiomeEquipmentEntity> BiomeEquipments { get; set; } = new();
 }

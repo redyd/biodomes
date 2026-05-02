@@ -3,12 +3,12 @@
 <dialog id="remove-species-dialog">
     <div class="large-edit-card">
         <div class="edit-header">
-            <p class="edit-breadcrumb">Biodômes · @Model.Biome.Name</p>
+            <p class="edit-breadcrumb">Biodômes · @Model.Biome.Model.Name</p>
             <h1 class="edit-title">Retirer une espèce</h1>
         </div>
 
         <form method="post" asp-page-handler="RemoveSpecie" class="edit-body">
-            <input type="hidden" id="remove-specie-id-input" asp-for="Input.SpecieId"/>
+            <input type="hidden" id="remove-specie-id-input" asp-for="SpecieInput.SpecieId"/>
 
             <div class="field-group">
                 <div class="li-info-card">
@@ -28,8 +28,8 @@
                 <input class="field-input" type="number"
                        id="remove-count-input"
                        step="1" min="1"
-                       asp-for="Input.Count"/>
-                <span asp-validation-for="Input.Count" class="field-error"></span>
+                       asp-for="SpecieInput.Count"/>
+                <span asp-validation-for="SpecieInput.Count" class="field-error"></span>
             </div>
 
             <div class="edit-divider"></div>

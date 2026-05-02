@@ -11,6 +11,7 @@ public interface IBiomeRepository
     Task<ResultT<int>> CountAsync();
 
     Task<ResultT<Biome>> FindAsync(int id, string? userId, bool isAdmin);
+    Task<ResultT<Biome>> FindComplexAsync(int id, string? userId, bool isAdmin);
 
     Task<ResultT<Biome>> CreateBiomeAsync(CreateBiomeRequest createRequest, string userId);
 
@@ -20,4 +21,7 @@ public interface IBiomeRepository
 
     Task<Result> AddSpecie(SpecieToBiomeRequest request, int biomeId, string? userId, bool isAdmin);
     Task<Result> RemoveSpecie(SpecieToBiomeRequest request, int biomeId, string? userId, bool isAdmin);
+    
+    Task<Result> AddEquipment(EquipmentToBiomeRequest request, int biomeId, string? userId, bool isAdmin);
+    Task<Result> RemoveEquipment(EquipmentToBiomeRequest request, int biomeId, string? userId, bool isAdmin);
 }

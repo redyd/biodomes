@@ -1,4 +1,4 @@
-const btn = document.getElementById("cy-recenter");
+const recenterBtn = document.getElementById("cy-recenter");
 
 const removeSuggestionsBtns = document.querySelectorAll(".btn-suggestion-del");
 
@@ -18,7 +18,7 @@ removeSuggestionsBtns.forEach(btn => {
     });
 });
 
-function openRemoveDialog(btn) {
+function openRemoveSpecieDialog(btn) {
     const id = btn.dataset.specieId;
     const name = btn.dataset.specieName;
     const count = btn.dataset.specieCount;
@@ -33,20 +33,31 @@ function openRemoveDialog(btn) {
     document.getElementById('remove-species-dialog').showModal();
 }
 
+function openRemoveEquipmentDialog(btn) {
+    const id = btn.dataset.equipmentId;
+    const name = btn.dataset.equipmentName;
+    const count = btn.dataset.equipmentCount;
+
+    document.getElementById('remove-equipment-name').textContent = name;
+    document.getElementById('remove-equipment-count').textContent = count;
+    document.getElementById('remove-equipment-id-input').value = id;
+    document.getElementById('remove-max').textContent = count;
+    document.getElementById('remove-count-input').max = count;
+    document.getElementById('remove-count-input').value = 1;
+
+    document.getElementById('remove-equipment-dialog').showModal();
+}
+
 (function () {
     const analyze = window.data;
     const stats = analyze.Stats;
     
     const data = analyze.Graph;
     
-    console.log(stats.StarvedSpecies);
-
     if (!data) {
         console.error("foodChainData is missing");
         return;
     }
-
-    console.log(data);
 
     const nodes = data.Nodes || [];
     const edges = data.Edges || [];
@@ -99,7 +110,6 @@ function openRemoveDialog(btn) {
                     'background-color': '#132830',
                     'label': 'data(label)',
                     'color': '#e8f4f2',
-                    'font-family': 'var(--sans)',
                     'font-weight': '600',
                     'text-valign': 'center',
                     'text-halign': 'center',
@@ -235,7 +245,7 @@ function openRemoveDialog(btn) {
         });
     }
 
-    btn.addEventListener("click", (e) => {
+    recenterBtn.addEventListener("click", (e) => {
         cy.fit(null, 50)
     })
 
@@ -249,5 +259,7 @@ function openRemoveDialog(btn) {
     });
     
     pulseNodes();
-
+    setTimeout(() => {
+        cy.fit(null, 50)
+    }, 50)
 })();

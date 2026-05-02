@@ -38,7 +38,7 @@ function renderExistingPrey(preys, rootSpecie) {
         li.innerHTML = `
             <div class="d-flex flex-column">
                 <span>${p.name}</span>
-                <span class="specie-meta">${p.classification.label}</span>
+                <span class="li-card-meta">${p.classification.label}</span>
             </div>
             <button class="btn-action btn-remove" title="Supprimer le lien" 
                     onclick="handleAction('${rootSpecie}', '${p.specieId}', 'remove')">×</button>
@@ -64,7 +64,7 @@ function renderAvailablePrey(preys, rootSpecie) {
         li.innerHTML = `
             <div class="d-flex flex-column">
                 <span>${p.name}</span>
-                <span class="specie-meta">${p.classification.label}</span>
+                <span class="li-card-meta">${p.classification.label}</span>
             </div>
             <button class="btn-action btn-add" title="Ajouter le lien" 
                     onclick="handleAction('${rootSpecie}', '${p.specieId}', 'add')">+</button>

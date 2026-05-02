@@ -17,11 +17,6 @@ public class Diet
         return !(a == b);
     }
 
-    public bool CanEat(Classification classification)
-    {
-        return classification.EatenByDiets.Contains(this);
-    }
-
     public Diet(int id, string label)
     {
         Id = id;

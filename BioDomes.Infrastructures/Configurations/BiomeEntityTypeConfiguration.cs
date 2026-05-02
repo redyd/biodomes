@@ -21,10 +21,5 @@ public class BiomeEntityTypeConfiguration : IEntityTypeConfiguration<BiomeEntity
         
         builder.Property(e => e.Temperature)
             .IsRequired();
-        
-        builder
-            .HasMany(b => b.Equipments)
-            .WithMany(e => e.Biomes)
-            .UsingEntity(j => j.ToTable("biome_equipments"));
     }
 }

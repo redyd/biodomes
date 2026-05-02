@@ -18,5 +18,5 @@ public class EquipmentEntity
     public int ConsumedResourceId { get; set; }
     public EquipmentResourceEntity ConsumedResourceEntity { get; set; } = null!;
     
-    public List<BiomeEntity> Biomes { get; set; } = null!;
+    public List<BiomeEquipmentEntity> BiomesEquipment { get; set; } = null!;
 }

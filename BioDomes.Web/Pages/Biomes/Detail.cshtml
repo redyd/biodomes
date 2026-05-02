@@ -4,7 +4,7 @@
 
 @{
     Layout = "Shared/_Layout";
-    ViewData["Title"] = Model.Biome.Name;
+    ViewData["Title"] = Model.Biome.Model.Name;
 }
 
 <div class="container">
@@ -12,19 +12,19 @@
         <section>
             <div class="container-title">
                 <div class="d-flex justify-content-center align-items-center gap-3 flex-row">
-                    <h1 id="top">@Model.Biome.Name</h1>
-                    <span class="biome-state biome-state-@Model.Biome.State.ToLower()">
-                        @Model.Biome.State
+                    <h1 id="top">@Model.Biome.Model.Name</h1>
+                    <span class="biome-state biome-state-@Model.Biome.Model.State.ToLower()">
+                        @Model.Biome.Model.State
                     </span>
                 </div>
                 <p>Créé par "@Model.Creator"</p>
                 @if (Model.Biome.CanEdit)
                 {
-                    <a class="btn-save" asp-page="/Biomes/Edit" asp-route-id="@Model.Biome.Id">Modifier les
+                    <a class="btn-save" asp-page="/Biomes/Edit" asp-route-id="@Model.Biome.Model.Id">Modifier les
                         informations</a>
                 }
             </div>
-            <img class="img-header" src="@Model.Biome.ImageUrl" alt="@Model.Biome.Name"/>
+            <img class="img-header" src="@Model.Biome.ImageUrl" alt="@Model.Biome.Model.Name"/>
         </section>
     </div>
 </div>
@@ -48,7 +48,7 @@
             <div id="cy"></div>
         </div>
 
-        <partial name="Shared/Sidebar/_SpeciesSidebar" model="Model"/>
+        <partial name="Shared/Sidebar/_BiomeSidebar" model="Model"/>
 
     </div>
 </div>
@@ -56,19 +56,15 @@
 <partial name="Shared/Dialog/_AddSpecieDialog" model="Model"/>
 <partial name="Shared/Dialog/_RemoveSpecieDialog" model="Model"/>
 
+<partial name="Shared/Dialog/_AddEquipmentDialog" model="Model"/>
+<partial name="Shared/Dialog/_RemoveEquipmentDialog" model="Model"/>
+
 <div id="node-popper" class="node-tooltip" style="display:none; position:absolute; z-index:1000;">
     <div class="tooltip-content">
         <strong id="tooltip-name"></strong>
         <p id="tooltip-status" class="m-0"></p>
     </div>
 </div>
-
-@if (Model.ReopenAddSpecieDialog)
-{
-    <script>
-        document.getElementById('add-species-dialog').showModal();
-    </script>
-}
 
 <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
 

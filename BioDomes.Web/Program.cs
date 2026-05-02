@@ -37,7 +37,7 @@ builder.Services.AddScoped<IBiomeRepository, BiomeRepository>();
 builder.Services.AddScoped<ISpecieAttributesRepository, SpecieAttributesRepository>();
 builder.Services.AddScoped<IFoodChainRepository, FoodChainRepository>();
 
-builder.Services.AddScoped<ISpecieRecommendation, SpecieRecommendation>();
+builder.Services.AddScoped<IBiomeAnalyzer, BiomeAnalyzer>();
 
 var app = builder.Build();
 

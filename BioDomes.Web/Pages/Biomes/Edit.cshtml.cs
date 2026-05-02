@@ -11,7 +11,7 @@ using BioDomes.Web.InputModel;
 namespace BioDomes.Web.Pages.Biomes;
 
 [Authorize]
-public class EditPage(IBiomeRepository repository, IWebHostEnvironment environment) : AppPageModel(environment)
+public class EditPage(IBiomeRepository repository, IWebHostEnvironment env) : AppPageModel(env)
 {
     [BindProperty(SupportsGet = true)] public int Id { get; set; }
 

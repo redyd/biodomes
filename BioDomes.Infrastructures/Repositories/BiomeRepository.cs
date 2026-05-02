@@ -23,7 +23,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         }
 
         var result = await query.ToListAsync();
-        return result.Select(BiomeMapper.MapBiome).ToList();
+        return result.Select(BiomeMapper.MapSimpleBiome).ToList();
     }
 
     public async Task<ResultT<int>> CountAsync()
@@ -72,7 +72,55 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
 
             if (entity.IsPublic || entity.UserId == userId || isAdmin)
             {
-                return ResultT<Biome>.Ok(BiomeMapper.MapBiome(entity));
+                return ResultT<Biome>.Ok(BiomeMapper.MapSimpleBiome(entity));
+            }
+
+            return ResultT<Biome>.Forbidden("Access denied.");
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning($"Database error: {ex.Message}");
+            return ResultT<Biome>.Failure("Database error");
+        }
+    }
+    
+    public async Task<ResultT<Biome>> FindComplexAsync(int id, string? userId, bool isAdmin)
+    {
+        try
+        {
+            var entity = await context.Biomes
+                .Include(b => b.BiomeSpecies)
+                .ThenInclude(spe => spe.Specie)
+                .ThenInclude(sp => sp.ClassificationEntity)
+                
+                .Include(b => b.BiomeSpecies)
+                .ThenInclude(spe => spe.Specie)
+                .ThenInclude(sp => sp.DietEntity)
+                
+                .Include(b => b.BiomeSpecies)
+                .ThenInclude(spe => spe.Specie)
+                .ThenInclude(sp => sp.ClassificationEntity)
+                .ThenInclude(c => c.EatenByDiets)
+                
+                .Include(b => b.BiomeEquipments)
+                .ThenInclude(ee => ee.Equipment)
+                .ThenInclude(e => e.ProducedResourceEntity)
+                
+                .Include(b => b.BiomeEquipments)
+                .ThenInclude(ee => ee.Equipment)
+                .ThenInclude(e => e.ConsumedResourceEntity)
+                
+                .Include(b => b.BiomeEquipments)
+                .FirstOrDefaultAsync(b => b.Id == id);
+            
+            if (entity is null)
+            {
+                return ResultT<Biome>.NotFound($"Biome {id} not found");
+            }
+
+            if (entity.IsPublic || entity.UserId == userId || isAdmin)
+            {
+                return ResultT<Biome>.Ok(BiomeMapper.MapComplexBiome(entity));
             }
 
             return ResultT<Biome>.Forbidden("Access denied.");
@@ -110,7 +158,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
             var created = await context.Biomes
                 .FirstAsync(b => b.Id == entity.Id);
 
-            return ResultT<Biome>.Ok(BiomeMapper.MapBiome(created));
+            return ResultT<Biome>.Ok(BiomeMapper.MapSimpleBiome(created));
         }
         catch (DbUpdateException ex) when (SqlServerError.IsUniqueConstraintViolation(ex))
         {
@@ -154,7 +202,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
                 entity.IsPublic = toUpdate.IsPublic.Value;
 
             await context.SaveChangesAsync();
-            return ResultT<Biome>.Ok(BiomeMapper.MapBiome(entity));
+            return ResultT<Biome>.Ok(BiomeMapper.MapSimpleBiome(entity));
         }
         catch (DbUpdateException ex)
         {
@@ -176,7 +224,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
             if (!isAdmin && entity.UserId != userId)
                 return ResultT<Biome>.Forbidden("Access denied.");
 
-            var model = BiomeMapper.MapBiome(entity);
+            var model = BiomeMapper.MapSimpleBiome(entity);
             context.Biomes.Remove(entity);
             await context.SaveChangesAsync();
             return ResultT<Biome>.Ok(model);
@@ -247,6 +295,70 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         var toRemove = existing.Take(request.Count).ToList();
 
         context.BiomeSpecies.RemoveRange(toRemove);
+        await context.SaveChangesAsync();
+        
+        return Result.Ok();
+    }
+
+    public async Task<Result> AddEquipment(EquipmentToBiomeRequest request, int biomeId, string? userId, bool isAdmin)
+    {
+        try
+        {
+            var biome = await context.Biomes.FirstOrDefaultAsync(b => b.Id == biomeId);
+
+            if (biome is null)
+            {
+                return Result.NotFound("Biome is not found");
+            }
+
+            if (biome.UserId != userId && !isAdmin)
+            {
+                return Result.Forbidden("Access denied.");
+            }
+
+            var allToAdd = new List<BiomeEquipmentEntity>();
+            for (var c = 0; c < request.Count; c++)
+            {
+                allToAdd.Add(new BiomeEquipmentEntity
+                {
+                    BiomeId = biomeId,
+                    EquipmentId = request.EquipmentId,
+                });
+            }
+
+            await context.BiomeEquipments.AddRangeAsync(allToAdd);
+            await context.SaveChangesAsync();
+
+            return Result.Ok();
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning($"Database error: {ex.Message}");
+            return Result.Failure("Database error");
+        }
+    }
+
+    public async Task<Result> RemoveEquipment(EquipmentToBiomeRequest request, int biomeId, string? userId, bool isAdmin)
+    {
+        var biome = await context.Biomes.FirstOrDefaultAsync(b => b.Id == biomeId);
+
+        if (biome is null)
+        {
+            return Result.NotFound("Biome is not found");
+        }
+
+        if (biome.UserId != userId && !isAdmin)
+        {
+            return Result.Forbidden("Access denied.");
+        }
+        
+        var existing = await context.BiomeEquipments
+            .Where(bs => bs.BiomeId == biomeId && bs.EquipmentId == request.EquipmentId)
+            .ToListAsync();
+
+        var toRemove = existing.Take(request.Count).ToList();
+
+        context.BiomeEquipments.RemoveRange(toRemove);
         await context.SaveChangesAsync();
         
         return Result.Ok();

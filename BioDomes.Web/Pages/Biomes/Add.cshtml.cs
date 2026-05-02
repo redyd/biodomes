@@ -11,7 +11,7 @@ using BioDomes.Web.InputModel;
 namespace BioDomes.Web.Pages.Biomes;
 
 [Authorize]
-public class AddPage(IWebHostEnvironment environment, IBiomeRepository repository) : AppPageModel(environment)
+public class AddPage(IWebHostEnvironment env, IBiomeRepository repository) : AppPageModel(env)
 {
     [BindProperty]
     public BiomeInputModel Input { get; set; } = new();

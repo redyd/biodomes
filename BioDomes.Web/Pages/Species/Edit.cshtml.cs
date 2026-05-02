@@ -11,7 +11,7 @@ namespace BioDomes.Web.Pages.Species;
 public class EditModel(
     ISpeciesRepository repository,
     ISpecieAttributesRepository attributesRepository,
-    IWebHostEnvironment environment) : AppPageModel(environment)
+    IWebHostEnvironment env) : AppPageModel(env)
 {
     [BindProperty] public SpeciesInputModel Input { get; set; } = new();
 

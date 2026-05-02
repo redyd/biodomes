@@ -37,7 +37,7 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
             Label = r.Label
         }).ToList();
     }
-    
+
     public async Task<ResultT<int>> CountAsync()
     {
         try
@@ -62,7 +62,7 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
             {
                 return ResultT<Equipment>.Conflict("An equipment with this name already exists.");
             }
-            
+
             var entity = new EquipmentEntity
             {
                 Name = request.Name,
@@ -124,7 +124,7 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
             return ResultT<Equipment>.Failure("Database error");
         }
     }
-
+    
     public async Task<ResultT<Equipment>> DeleteAsync(int id, string? userId, bool isAdmin)
     {
         try

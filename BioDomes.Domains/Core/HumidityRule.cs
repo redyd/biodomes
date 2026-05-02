@@ -15,4 +15,6 @@ public class HumidityRule
 
     public double MaxHumidity =>
         216.7 * 6.112 * Math.Exp(17.67 * _temp / (_temp + 243.5)) / (_temp + 273.15);
+
+    public double HumidityPercent => Math.Min(MaxHumidity > 0 ? _hum / MaxHumidity * 100 : 0, 100);
 }

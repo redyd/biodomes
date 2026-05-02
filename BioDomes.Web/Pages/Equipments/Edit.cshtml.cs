@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Equipments;
 
-public class Edit(IWebHostEnvironment environment, ILogger<Edit> logger, IEquipmentRepository repository)
-    : AppPageModel(environment)
+public class Edit(IWebHostEnvironment env, ILogger<Edit> logger, IEquipmentRepository repository)
+    : AppPageModel(env)
 {
     [BindProperty] public UpdateEquipmentInputModel Input { get; set; } = new();
 

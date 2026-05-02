@@ -12,7 +12,7 @@ namespace BioDomes.Web.Pages.Species;
 public class AddModel(
     ISpeciesRepository speciesRepository,
     ISpecieAttributesRepository attributesRepository,
-    IWebHostEnvironment environment) : AppPageModel(environment)
+    IWebHostEnvironment env) : AppPageModel(env)
 {
     [BindProperty] public SpeciesInputModel? Input { get; set; }
 

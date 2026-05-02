@@ -1086,7 +1086,7 @@ body {
     box-shadow: var(--shadow-teal);
 }
 
-.specie-meta {
+.li-card-meta {
     font-family: var(--mono), serif;
     font-size: 0.75rem;
     color: var(--text-mid);
@@ -1199,7 +1199,7 @@ a {
 
 dialog {
     /* taille & position */
-    width: min(75%, 90vw);
+    width: min(50%, 90vw);
     max-height: 85vh;
     overflow-y: auto;
     margin: auto;
