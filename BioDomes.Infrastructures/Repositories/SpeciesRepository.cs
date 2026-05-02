@@ -46,6 +46,7 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
                 .Species
                 .Include(e => e.DietEntity)
                 .Include(e => e.ClassificationEntity)
+                .ThenInclude(e => e.EatenByDiets)
                 .AsQueryable();
 
             if (!isAdmin)

@@ -19,10 +19,6 @@ public class SpecieRecommendation(
     /// - Ensuite, ce seront les types d'espèces qui ne sont pas encore dans le biome (par exemple "Mammifère",
     /// et qui auraient de quoi manger
     /// </summary>
-    /// <param name="isAdmin"></param>
-    /// <param name="biomeId"></param>
-    /// <param name="biomeGraph"></param>
-    /// <param name="userId"></param>
     /// <returns></returns>
     public async Task<List<Recommendation<Specie>>> RecommendationToAddForBiome(string? userId, bool isAdmin,
         int biomeId, FoodChainGraph biomeGraph)
@@ -42,6 +38,7 @@ public class SpecieRecommendation(
         var globalGraph = globalGraphResult.Value!;
 
         var allSpecies = allSpeciesResult.Value!;
+        var speciesIdAlreadyInBiomes = biomeGraph.Nodes.Select(n => n.SpecieId).ToHashSet();
 
         // basic case
         if (biomeGraph.Nodes.Count == 0)
@@ -49,27 +46,60 @@ public class SpecieRecommendation(
             return HandleEmptyBiome(globalGraph, allSpecies, results, biomeId);
         }
 
-        // complex case
-        var relations = biomeGraph.CountRelations();
-
         // handling the case where a specie does not have something to eat
         var withoutPreys = biomeGraph.NoPreySpecies();
+        
         foreach (var withoutPrey in withoutPreys)
         {
             var specie = allSpecies[withoutPrey.SpecieId];
-
-            // find every species than it can eat
-            var potential = allSpecies
+            
+            // find every species than it can eat, except those already in biome
+            var candidates = allSpecies
                 .Values
-                .Select(sp => sp.Classification.EatenByDiets.Any(diet => diet == specie.Diet))
+                .Where(sp => !speciesIdAlreadyInBiomes.Contains(sp.Id))
+                .Where(sp => specie.Diet.CanEat(sp.Classification))
+                .Where(sp => sp.Id != specie.Id)
                 .ToList();
+            
+            // exclude boucle
+            var predatorIsPreyOf = biomeGraph.Edges
+                .Where(e => e.PreyId == withoutPrey.SpecieId)
+                .Select(e => e.PredatorId)
+                .ToHashSet();
+            candidates = candidates
+                .Where(sp => !predatorIsPreyOf.Contains(sp.Id))
+                .ToList();
+            
+            if (candidates.Count == 0) continue;
 
-            if (potential.Count == 0) continue;
+            // make a set of the species id in the biodome
+            var biomeSpecieIds = biomeGraph.Nodes.Select(n => n.SpecieId).ToHashSet();
 
-            // calculate how much the specie would need to
-            var totalWeight = specie.Weight * relations[specie.Id];
+            // score each candidate
+            foreach (var candidate in candidates)
+            {
+                var candidateHasFoodInBiome = biomeGraph.Edges
+                    .Any(e => e.PredatorId == candidate.Id && biomeSpecieIds.Contains(e.PreyId));
 
-            // to select which species will be added, we create a 
+                var relationsAdded = globalGraph.Edges
+                    .Count(e => e.PredatorId == candidate.Id && biomeSpecieIds.Contains(e.PreyId)
+                                || e.PreyId == candidate.Id && biomeSpecieIds.Contains(e.PredatorId));
+
+                var type = relationsAdded >= 3
+                    ? RecommendationType.Excellent
+                    : candidateHasFoodInBiome
+                        ? RecommendationType.Good
+                        : RecommendationType.Ok;
+                
+                results.Add(new Recommendation<Specie>
+                {
+                    ActionId = $"add-biome-specie specie:{candidate.Id} count:1 biome:{biomeId}",
+                    Involved = candidate,
+                    Label = $"Proie pour {specie.Name}",
+                    Message = $"Ajoutez '{candidate.Name}' pour nourrir {specie.Name}",
+                    Type = type
+                });
+            }
         }
 
         return results;
@@ -108,7 +138,7 @@ public class SpecieRecommendation(
                 Message = isExcellent
                     ? $"Ajoutez '{specie.Name}' pour bien démarrer"
                     : $"Ajoutez '{specie.Name}' pour commencer",
-                Type = isExcellent ? RecommendationType.Excellent : RecommendationType.Ok
+                Type = isExcellent ? RecommendationType.Excellent : RecommendationType.Good
             };
 
             results.Add(rec);

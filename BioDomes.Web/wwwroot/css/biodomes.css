@@ -1109,6 +1109,7 @@ body {
     overflow: hidden;
     position: sticky;
     top: 70px;
+    display: flex;
 }
 
 .btn-action {
@@ -1177,6 +1178,10 @@ a {
     scroll-margin-top: 70px ;
 }
 
+#top {
+    scroll-margin-top: 100vh ;
+}
+
 .progress {
     border-radius: 10px;
     overflow: hidden;
@@ -1218,8 +1223,14 @@ dialog::backdrop {
 }
 
 #cy {
-    height: calc(100vh - 70px);
+    flex-grow: 1;
     width: 100%;
+}
+
+.flex-grow-1.position-relative {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .suggestion-group-label {

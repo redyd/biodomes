@@ -11,6 +11,10 @@ public class FoodChainGraph
         Edges = edges;
     }
     
+    /// <summary>
+    /// Récupère les espèces sans proies
+    /// </summary>
+    /// <returns></returns>
     public IReadOnlyList<FoodChainNode> NoPreySpecies()
     {
         var predatorIds = Edges
@@ -33,6 +37,22 @@ public class FoodChainGraph
         foreach (var node in Nodes)
         {
             dict[node.SpecieId] = Edges.Count(edge => edge.PreyId == node.SpecieId || edge.PredatorId == node.SpecieId);
+        }
+
+        return dict;
+    }
+
+    /// <summary>
+    /// Détermine le nombre de proies qu'une espèce a
+    /// </summary>
+    /// <returns></returns>
+    public Dictionary<int, int> CountPreyRelations()
+    {
+        var dict = new Dictionary<int, int>();
+
+        foreach (var node in Nodes)
+        {
+            dict[node.SpecieId] = Edges.Count(edge => edge.PredatorId == node.SpecieId);
         }
 
         return dict;

@@ -12,7 +12,7 @@
         <section>
             <div class="container-title">
                 <div class="d-flex justify-content-center align-items-center gap-3 flex-row">
-                    <h1>@Model.Biome.Name</h1>
+                    <h1 id="top">@Model.Biome.Name</h1>
                     <span class="biome-state biome-state-@Model.Biome.State.ToLower()">
                         @Model.Biome.State
                     </span>
@@ -110,7 +110,7 @@
                         <h6 class="text-bright m-0" id="available-title">Suggestions</h6>
                     </div>
                     <ul class="list-unstyled d-flex flex-column gap-2">
-                        @foreach (var rec in Model.Recommendations.Where(r => r.Type < RecommendationType.Bad))
+                        @foreach (var rec in Model.Recommendations)
                         {
                             <li class="li-info-card">
                                 <div class="d-flex flex-column">
@@ -133,9 +133,14 @@
         </aside>
 
         @* graph *@
-        <div class="flex-grow-1 mt-3">
-            <div class="container-title">
+        <div class="flex-grow-1 mt-3 position-relative">
+            <button id="cy-recenter" class="position-absolute btn-add bg-transparent border-0 mx-3">
+                Recentre le graphe
+            </button>
+            <a href="#top" class="position-absolute btn-add bg-transparent border-0 mx-3 end-0">Remonter</a>
+            <div class="container-title mb-0">
                 <a href="#title-section" class="large-title">Détail</a>
+                <hr class="mb-0"/>
             </div>
             <div id="cy"></div>
         </div>
@@ -174,7 +179,12 @@
                                 <span>@specie.Name</span>
                                 <span class="specie-meta">@specie.Classification.Label</span>
                             </div>
-                            <button class="btn-action btn-remove" title="Supprimer le lien">×</button>
+                            <button
+                                class="btn-action btn-remove"
+                                title="Supprimer des @specie.Name"
+                                onclick="document.getElementById('remove-species-dialog').showModal()">
+                                ×
+                            </button>
                         </li>
                     }
                     @if (Model.FoodChain.Nodes.Count == 0)
@@ -208,20 +218,22 @@
     </div>
 </div>
 
-<dialog id="add-species-dialog">
+<partial name="Shared/Modals/_AddSpecieDialog" model="species"/>
+
+<dialog id="remove-species-dialog">
     <div class="large-edit-card">
         <div class="edit-header">
             <p class="edit-breadcrumb">Biodômes · @Model.Biome.Name</p>
-            <h1 class="edit-title">Ajouter une espèces</h1>
+            <h1 class="edit-title">Retirer une espèce</h1>
         </div>
 
-        <form method="post" asp-page-handler="AddSpecie" class="edit-body">
+        <form method="post" asp-page-handler="RemoveSpecie" class="edit-body">
 
             <div class="field-group">
                 @foreach (var group in Model
-                              .Recommendations
-                              .GroupBy(r => r.Type)
-                              .OrderBy(g => g.Key))
+                                  .Recommendations
+                                  .GroupBy(r => r.Type)
+                                  .OrderBy(g => g.Key))
                 {
                     <p class="suggestion-group-label">@group.Key</p>
                     <div class="suggestion-group">
@@ -231,7 +243,8 @@
                                 <input type="radio" asp-for="Input.SpecieId" value="@specie.Id" hidden/>
                                 @if (!string.IsNullOrWhiteSpace(specie.ImageUrl))
                                 {
-                                    <img class="suggestion-card-img" src="@Model.UseUploadedFromId(specie.ImageUrl)" alt="@specie.Name"/>
+                                    <img class="suggestion-card-img" src="@Model.UseUploadedFromId(specie.ImageUrl)"
+                                         alt="@specie.Name"/>
                                 }
                                 <span class="suggestion-name">@specie.Name</span>
                             </label>
@@ -252,7 +265,7 @@
 
             <div class="edit-actions">
                 <button type="button" class="btn-cancel"
-                        onclick="document.getElementById('add-species-dialog').close()">
+                        onclick="document.getElementById('remove-species-dialog').close()">
                     Annuler
                 </button>
                 <button class="btn-save" type="submit" name="action" value="save">Ajouter</button>
@@ -261,11 +274,10 @@
     </div>
 </dialog>
 
-@if (Model.ReopenAddSpecieDialog)
-{
-    <script>
-        document.getElementById('add-species-dialog').showModal();
-    </script>
-}
+<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+
+<script>
+    window.foodChainData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.FoodChain));
+</script>
 
 <script src="~/js/biome-detail.js"></script>
