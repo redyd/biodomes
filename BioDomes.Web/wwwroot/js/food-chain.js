@@ -3,6 +3,8 @@ function getAntiForgeryToken() {
     return el ? el.value : null;
 }
 
+const recenterBtn = document.getElementById("cy-recenter");
+
 const name = document.querySelector('#title');
 const diet = document.querySelector('#diet');
 
@@ -223,6 +225,10 @@ function handleAction(predator, prey, action) {
         });
     }
 
+    recenterBtn.addEventListener("click", (e) => {
+        cy.fit(null, 50)
+    })
+
     setTimeout(() => {
         cy.resize();
         cy.fit();
@@ -232,4 +238,7 @@ function handleAction(predator, prey, action) {
         cy.resize();
     });
 
+    setTimeout(() => {
+        cy.fit(null, 50)
+    }, 50)
 })();
