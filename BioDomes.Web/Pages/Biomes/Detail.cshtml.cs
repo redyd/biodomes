@@ -173,7 +173,7 @@ public class Detail(
         {
             ImageUrl = !string.IsNullOrWhiteSpace(b.ImageUrl)
                 ? UseUploadedFromId(b.ImageUrl)
-                : "/img/defaults/biome_bg.png",
+                : UseStaticImage("biome_bg.png"),
             CanEdit = userId is not null && (User.IsAdmin() || b.CreatedBy == User.GetUserId()),
             IsPublic = true,
             MaxHumidity = rule.MaxHumidity,

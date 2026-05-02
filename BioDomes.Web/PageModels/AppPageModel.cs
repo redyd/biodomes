@@ -19,6 +19,18 @@ public abstract class AppPageModel(IWebHostEnvironment env) : PageModel
 
         return $"{Request.PathBase}/{BasePathForUploads}/{safeFileName}".Replace("\\", "/");
     }
+    
+    public string UseStaticImage(string fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            throw new ArgumentException(null, nameof(fileName));
+        }
+
+        var safeFileName = Path.GetFileName(fileName);
+
+        return $"{Request.PathBase}/{BasePathForDefault}/{safeFileName}".Replace("\\", "/");
+    }
 
     protected string GetFullPathOfFile(string fileName)
     {
