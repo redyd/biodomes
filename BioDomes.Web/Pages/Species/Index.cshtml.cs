@@ -17,7 +17,7 @@ public class SpeciesModel(ISpeciesRepository repo, IWebHostEnvironment environme
         IsUserConnected = userId is not null;
 
         var result = await repo.FindAllAsync(userId, User.IsAdmin());
-        if (!result.IsSuccess)
+        if (result.Failed)
         {
             return result.ToPageResult(this);
         }

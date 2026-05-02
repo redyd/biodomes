@@ -28,9 +28,9 @@ public class SpecieRecommendation(
         var globalGraphResult = await foodChainRepo.GetFullGraphAsync(userId, isAdmin);
         var allSpeciesResult = await speciesRepo.FindAllAsDictAsync(userId, isAdmin);
 
-        if (!allSpeciesResult.IsSuccess
+        if (allSpeciesResult.Failed
             || allSpeciesResult.Value is null
-            || !globalGraphResult.IsSuccess
+            || globalGraphResult.Failed
             || globalGraphResult.Value is null)
         {
             return [];
@@ -51,9 +51,9 @@ public class SpecieRecommendation(
         var graphResult = await foodChainRepo.GetFullGraphForBiomeAsync(biomeId, userId, isAdmin);
         var allSpeciesResult = await speciesRepo.FindAllAsDictAsync(userId, isAdmin);
 
-        if (!graphResult.IsSuccess
+        if (graphResult.Failed
             || graphResult.Value is null
-            || !allSpeciesResult.IsSuccess
+            || allSpeciesResult.Failed
             || allSpeciesResult.Value is null)
         {
             return new BiomeAnalysis
@@ -69,18 +69,20 @@ public class SpecieRecommendation(
         return new BiomeAnalysis { Graph = graph, Stats = stats };
     }
 
-    public async Task PerformAction(string actionId)
+    public async Task<Result> PerformAction(string actionId, string? userId, bool isAdmin)
     {
         var (action, args) = ParseActionId(actionId);
 
         if (action == "add-biome-specie")
         {
-            await biomeRepo.AddSpecie(new SpecieToBiomeRequest
+            return await biomeRepo.AddSpecie(new SpecieToBiomeRequest
             {
                 SpecieId = args["specie"],
                 Count = args["count"]
-            }, args["biome"]);
+            }, args["biome"], userId, isAdmin);
         }
+
+        return Result.NotFound("Your request could not be resolved");
     }
 
     private List<Recommendation<Specie>> HandleEmptyBiome(FoodChainGraph globalGraph, List<Specie> candidates,

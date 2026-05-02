@@ -22,17 +22,17 @@ public class IndexModel(
         var countEquipmentResult = await equipmentRepo.CountAsync();
         var countBiomeResult = await biomeRepo.CountAsync();
 
-        if (!countSpecieResult.IsSuccess)
+        if (countSpecieResult.Failed)
         {
             return countSpecieResult.ToPageResult(this);
         }
 
-        if (!countEquipmentResult.IsSuccess)
+        if (countEquipmentResult.Failed)
         {
             return countEquipmentResult.ToPageResult(this);
         }
 
-        if (!countBiomeResult.IsSuccess)
+        if (countBiomeResult.Failed)
         {
             return countBiomeResult.ToPageResult(this);
         }

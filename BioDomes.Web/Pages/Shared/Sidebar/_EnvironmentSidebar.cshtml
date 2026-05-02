@@ -1,6 +1,13 @@
 @using BioDomes.Web.Extensions
 @model BioDomes.Web.Pages.Biomes.Detail
 
+@{
+    var count = Model.Analyze.Stats.ProblemCount;
+    var tropicState = Model.Analyze.Stats.AllSpeciesFed
+        ? "Stable"
+        : $"Instable ({count} problème{(count > 1 ? "s" : "")})";
+}
+
 <aside class="sidebar-info p-4">
     <div class="mb-5">
         <span class="text-uppercase text-muted small fw-bold">Informations</span>
@@ -64,7 +71,7 @@
             <li class="li-info-card">
                 <div class="d-flex flex-column">
                     <span class="fw-bold">
-                        @(Model.Analyze.Stats.AllSpeciesFed ? "Stable" : $"Instable ({Model.Analyze.Stats.ProblemCount} problèmes)")
+                        @tropicState
                     </span>
                     <span class="specie-meta">État trophique</span>
                 </div>
@@ -81,8 +88,8 @@
             </div>
             <ul class="list-unstyled d-flex flex-column gap-2">
                 @foreach (var group in Model.Recommendations
-                              .OrderBy(r => r.Type)
-                              .GroupBy(r => r.Type))
+                                  .OrderBy(r => r.Type)
+                                  .GroupBy(r => r.Type))
                 {
                     <span class="fw-bold">@group.Key.GetDisplayName()</span>
                     <hr class="m-0"/>
@@ -104,7 +111,8 @@
 
                                 <button class="btn-action btn-remove p-1 btn-suggestion-del"
                                         data-id="@rec.ActionId"
-                                        title="Ignorer la suggestion">×</button>
+                                        title="Ignorer la suggestion">×
+                                </button>
                             </div>
                         </li>
                     }

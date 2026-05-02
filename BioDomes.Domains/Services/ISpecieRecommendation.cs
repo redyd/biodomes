@@ -9,5 +9,5 @@ public interface ISpecieRecommendation
 
     Task<BiomeAnalysis> AnalyzeBiome(string? userId, bool isAdmin, int biomeId);
 
-    Task PerformAction(string actionId);
+    Task<Result> PerformAction(string actionId, string? userId, bool isAdmin);
 }

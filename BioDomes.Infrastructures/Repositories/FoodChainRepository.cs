@@ -9,7 +9,7 @@ namespace BioDomes.Infrastructures.Repositories;
 
 public class FoodChainRepository(BiodomeContext context, ILogger<FoodChainRepository> logger) : IFoodChainRepository
 {
-    public async Task<Result<FoodChainGraph>> GetFullGraphAsync(string? userId, bool isAdmin)
+    public async Task<ResultT<FoodChainGraph>> GetFullGraphAsync(string? userId, bool isAdmin)
     {
         try
         {
@@ -40,16 +40,16 @@ public class FoodChainRepository(BiodomeContext context, ILogger<FoodChainReposi
                 .AsNoTracking()
                 .ToListAsync();
 
-            return Result<FoodChainGraph>.Ok(new FoodChainGraph(nodes, edges));
+            return ResultT<FoodChainGraph>.Ok(new FoodChainGraph(nodes, edges));
         }
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<FoodChainGraph>.Failure("Database error");
+            return ResultT<FoodChainGraph>.Failure("Database error");
         }
     }
 
-    public async Task<Result<FoodChainGraph>> GetFullGraphForBiomeAsync(int biomeId, string? userId, bool isAdmin)
+    public async Task<ResultT<FoodChainGraph>> GetFullGraphForBiomeAsync(int biomeId, string? userId, bool isAdmin)
     {
         try
         {
@@ -58,10 +58,10 @@ public class FoodChainRepository(BiodomeContext context, ILogger<FoodChainReposi
                 .FirstOrDefaultAsync(b => b.Id == biomeId);
 
             if (biome is null)
-                return Result<FoodChainGraph>.NotFound($"Biome {biomeId} not found");
+                return ResultT<FoodChainGraph>.NotFound($"Biome {biomeId} not found");
 
             if (!biome.IsPublic && biome.UserId != userId && !isAdmin)
-                return Result<FoodChainGraph>.Forbidden("Access denied.");
+                return ResultT<FoodChainGraph>.Forbidden("Access denied.");
 
             var allSpecies = await context.Species
                 .Where(s =>
@@ -96,12 +96,12 @@ public class FoodChainRepository(BiodomeContext context, ILogger<FoodChainReposi
                 .AsNoTracking()
                 .ToListAsync();
 
-            return Result<FoodChainGraph>.Ok(new FoodChainGraph(nodes, edges));
+            return ResultT<FoodChainGraph>.Ok(new FoodChainGraph(nodes, edges));
         }
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<FoodChainGraph>.Failure("Database error");
+            return ResultT<FoodChainGraph>.Failure("Database error");
         }
     }
 

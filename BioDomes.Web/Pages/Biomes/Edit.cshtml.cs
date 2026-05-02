@@ -29,7 +29,7 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment environme
         IsAdmin = User.IsAdmin();
 
         var result = await repository.FindAsync(Id, userId, IsAdmin);
-        if (!result.IsSuccess)
+        if (result.Failed)
             return result.ToPageResult(this);
 
         var biome = result.Value!;
@@ -59,7 +59,7 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment environme
         if (action == "delete")
         {
             var deleteResult = await repository.DeleteAsync(Id, userId, IsAdmin);
-            if (!deleteResult.IsSuccess)
+            if (deleteResult.Failed)
             {
                 ErrorNotification("Erreur lors de la suppression du biome.");
                 return deleteResult.ToPageResult(this);
@@ -78,7 +78,7 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment environme
         if (!ModelState.IsValid)
         {
             var biomeForImage = await repository.FindAsync(Id, userId, IsAdmin);
-            if (biomeForImage.IsSuccess)
+            if (!biomeForImage.Failed)
             {
                 CurrentImageUrl = biomeForImage.Value!.ImageUrl;
             }
@@ -91,7 +91,7 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment environme
         {
             ErrorNotification($"Humidité max pour {Input.Temperature}° : {rule.MaxHumidity:F2} g/m³.");
             var biomeForImage = await repository.FindAsync(Id, userId, IsAdmin);
-            if (biomeForImage.IsSuccess)
+            if (!biomeForImage.Failed)
             {
                 CurrentImageUrl = biomeForImage.Value!.ImageUrl;
             }
@@ -119,7 +119,7 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment environme
             return Page();
         }
 
-        if (!result.IsSuccess)
+        if (result.Failed)
         {
             ErrorNotification("Erreur lors de la modification du biome.");
             return Page();

@@ -53,7 +53,7 @@ public class AddPage(IWebHostEnvironment environment, IBiomeRepository repositor
         };
         
         var result = await repository.CreateBiomeAsync(createRequest, userId);
-        if (!result.IsSuccess)
+        if (result.Failed)
         {
             ErrorNotification($"Erreur dans la création du biome");
             return Page();

@@ -10,12 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Biomes;
 
-public class Detail(
-    IWebHostEnvironment environment,
-    IBiomeRepository biomeRepo,
-    IFoodChainRepository foodChainRepo,
-    ISpecieRecommendation recommendation,
-    ILogger<Detail> logger)
+public class Detail(IWebHostEnvironment environment, IBiomeRepository biomeRepo, ISpecieRecommendation recommendation)
     : AppPageModel(environment)
 {
     [BindProperty] public BiomeSpecieInputModel Input { get; set; } = new();
@@ -44,17 +39,21 @@ public class Detail(
             return Page();
         }
 
-        logger.LogInformation("ADDING SPECIE");
-        await biomeRepo.AddSpecie(new SpecieToBiomeRequest
+        var result = await biomeRepo.AddSpecie(new SpecieToBiomeRequest
         {
             SpecieId = (int)Input.SpecieId,
             Count = (int)Input.Count,
-        }, id);
-        
+        }, id, User.GetUserId(), User.IsAdmin());
+
+        if (result.Failed)
+        {
+            return result.ToPageResult(this);
+        }
+
         SuccessNotification("Espèce ajoutée avec succès");
         return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { id }, fragment: "title-section");
     }
-    
+
     public async Task<IActionResult> OnPostRemoveSpecieAsync(int id)
     {
         if (!ModelState.IsValid || Input.SpecieId is null || Input.Count is null)
@@ -64,11 +63,16 @@ public class Detail(
             return Page();
         }
 
-        await biomeRepo.RemoveSpecie(new SpecieToBiomeRequest
+        var result = await biomeRepo.RemoveSpecie(new SpecieToBiomeRequest
         {
             SpecieId = (int)Input.SpecieId,
-            Count    = (int)Input.Count,
-        }, id);
+            Count = (int)Input.Count,
+        }, id, User.GetUserId(), User.IsAdmin());
+
+        if (result.Failed)
+        {
+            return result.ToPageResult(this);
+        }
 
         SuccessNotification("Espèce retirée avec succès");
         return RedirectToPage(pageName: null, pageHandler: null,
@@ -77,7 +81,13 @@ public class Detail(
 
     public async Task<IActionResult> OnPostExecuteActionAsync(string actionId, int biomeId)
     {
-        await recommendation.PerformAction(actionId);
+        var result = await recommendation.PerformAction(actionId, User.GetUserId(), User.IsAdmin());
+
+        if (result.Failed)
+        {
+            return result.ToPageResult(this);
+        }
+
         return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { id = biomeId },
             fragment: "title-section");
     }
@@ -112,17 +122,17 @@ public class Detail(
         var userId = User.GetUserId();
 
         var biomeResult = await biomeRepo.FindAsync(id, userId, User.IsAdmin());
-        if (!biomeResult.IsSuccess || biomeResult.Value is null)
+        if (biomeResult.Failed || biomeResult.Value is null)
             return biomeResult.ToPageResult(this);
 
         var creatorResult = await biomeRepo.GetCreatorAsync(biomeResult.Value.Id);
-        if (!creatorResult.IsSuccess || creatorResult.Value is null)
+        if (creatorResult.Failed || creatorResult.Value is null)
             return creatorResult.ToPageResult(this);
 
         Creator = creatorResult.Value;
         Biome = BuildBiomeView(biomeResult.Value, userId);
-        
-        
+
+
         Analyze = await recommendation.AnalyzeBiome(userId, User.IsAdmin(), id);
         Recommendations = await recommendation.RecommendationToAddForBiome(userId, User.IsAdmin(), id, Analyze.Graph);
         return null;

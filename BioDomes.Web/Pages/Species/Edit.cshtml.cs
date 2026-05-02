@@ -31,7 +31,7 @@ public class EditModel(
         }
 
         var result = await repository.FindBySlugAsync(slug, userId, User.IsAdmin());
-        if (!result.IsSuccess)
+        if (result.Failed)
         {
             return result.ToPageResult(this);
         }
@@ -73,7 +73,7 @@ public class EditModel(
         }
 
         var result = await repository.FindBySlugAsync(slug, userId, User.IsAdmin());
-        if (!result.IsSuccess)
+        if (result.Failed)
         {
             return result.ToPageResult(this);
         }
@@ -144,7 +144,7 @@ public class EditModel(
             return Page();
         }
 
-        if (!result.IsSuccess)
+        if (result.Failed)
         {
             return result.ToPageResult(this);
         }

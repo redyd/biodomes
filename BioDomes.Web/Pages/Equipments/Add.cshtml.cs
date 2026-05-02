@@ -61,7 +61,7 @@ public class Add(IWebHostEnvironment environment, IEquipmentRepository repositor
             return Page();
         }
 
-        if (!result.IsSuccess)
+        if (result.Failed)
         {
             return result.ToPageResult(this);
         }

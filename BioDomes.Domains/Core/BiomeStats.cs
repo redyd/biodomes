@@ -6,9 +6,5 @@ public class BiomeStats
     public IReadOnlyList<FoodChainNode> StarvedSpecies { get; init; } = [];
     public IReadOnlyList<FoodChainNode> UnderfedSpecies { get; init; } = [];
 
-    public int ProblemCount => StarvedSpecies
-        .Select(s => s.SpecieId)
-        .Concat(UnderfedSpecies.Select(s => s.SpecieId))
-        .Distinct()
-        .Count();
+    public int ProblemCount { get; init; }
 }

@@ -15,7 +15,7 @@ public class Index(IWebHostEnvironment environment, IFoodChainRepository repo)
     public async Task<IActionResult> OnGetAsync()
     {
         var result = await repo.GetFullGraphAsync(User.GetUserId(), User.IsAdmin());
-        if (!result.IsSuccess || result.Value is null)
+        if (result.Failed || result.Value is null)
         {
             return result.ToPageResult(this);
         }
@@ -38,7 +38,7 @@ public class Index(IWebHostEnvironment environment, IFoodChainRepository repo)
     public async Task<IActionResult> OnPostNodeClicked([FromBody] NodeClickDto node)
     {
         var result = await repo.GetFullGraphAsync(User.GetUserId(), User.IsAdmin());
-        if (!result.IsSuccess || result.Value is null)
+        if (result.Failed || result.Value is null)
         {
             return result.ToPageResult(this);
         }

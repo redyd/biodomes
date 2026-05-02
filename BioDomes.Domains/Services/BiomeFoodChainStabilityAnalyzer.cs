@@ -58,6 +58,11 @@ public static class BiomeFoodChainStabilityAnalyzer
             AllSpeciesFed = starved.Count == 0 && underfed.Count == 0,
             StarvedSpecies = starved,
             UnderfedSpecies = underfed,
+            ProblemCount = starved
+                .Select(s => s.SpecieId)
+                .Concat(underfed.Select(s => s.SpecieId))
+                .Distinct()
+                .Count()
         };
     }
 

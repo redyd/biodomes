@@ -26,21 +26,21 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         return result.Select(BiomeMapper.MapBiome).ToList();
     }
 
-    public async Task<Result<int>> CountAsync()
+    public async Task<ResultT<int>> CountAsync()
     {
         try
         {
             var count = await context.Biomes.CountAsync();
-            return Result<int>.Ok(count);
+            return ResultT<int>.Ok(count);
         }
         catch (Exception ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<int>.Failure("Database error");
+            return ResultT<int>.Failure("Database error");
         }
     }
 
-    public async Task<Result<string>> GetCreatorAsync(int biomeId)
+    public async Task<ResultT<string>> GetCreatorAsync(int biomeId)
     {
         try
         {
@@ -48,17 +48,17 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
                 .FirstOrDefaultAsync(b => b.Id == biomeId);
 
             return biome?.User.UserName is null 
-                ? Result<string>.NotFound("Biome not found") 
-                : Result<string>.Ok(biome.User.UserName);
+                ? ResultT<string>.NotFound("Biome not found") 
+                : ResultT<string>.Ok(biome.User.UserName);
         }
         catch (Exception ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<string>.Failure("Database error");
+            return ResultT<string>.Failure("Database error");
         }
     }
 
-    public async Task<Result<Biome>> FindAsync(int id, string? userId, bool isAdmin)
+    public async Task<ResultT<Biome>> FindAsync(int id, string? userId, bool isAdmin)
     {
         try
         {
@@ -67,24 +67,24 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
 
             if (entity is null)
             {
-                return Result<Biome>.NotFound($"Biome {id} not found");
+                return ResultT<Biome>.NotFound($"Biome {id} not found");
             }
 
             if (entity.IsPublic || entity.UserId == userId || isAdmin)
             {
-                return Result<Biome>.Ok(BiomeMapper.MapBiome(entity));
+                return ResultT<Biome>.Ok(BiomeMapper.MapBiome(entity));
             }
 
-            return Result<Biome>.Forbidden("Access denied.");
+            return ResultT<Biome>.Forbidden("Access denied.");
         }
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<Biome>.Failure("Database error");
+            return ResultT<Biome>.Failure("Database error");
         }
     }
 
-    public async Task<Result<Biome>> CreateBiomeAsync(CreateBiomeRequest createRequest, string userId)
+    public async Task<ResultT<Biome>> CreateBiomeAsync(CreateBiomeRequest createRequest, string userId)
     {
         try
         {
@@ -92,7 +92,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
 
             if (exist)
             {
-                return Result<Biome>.Conflict("A biome with this name already exist.");
+                return ResultT<Biome>.Conflict("A biome with this name already exist.");
             }
 
             var entity = new BiomeEntity
@@ -110,24 +110,24 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
             var created = await context.Biomes
                 .FirstAsync(b => b.Id == entity.Id);
 
-            return Result<Biome>.Ok(BiomeMapper.MapBiome(created));
+            return ResultT<Biome>.Ok(BiomeMapper.MapBiome(created));
         }
         catch (DbUpdateException ex) when (SqlServerError.IsUniqueConstraintViolation(ex))
         {
-            return Result<Biome>.Conflict("A biome with this name already exists.");
+            return ResultT<Biome>.Conflict("A biome with this name already exists.");
         }
         catch (DbUpdateException ex) when (SqlServerError.IsForeignKeyViolation(ex))
         {
-            return Result<Biome>.Failure("A referenced resource does not exist.");
+            return ResultT<Biome>.Failure("A referenced resource does not exist.");
         }
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<Biome>.Failure("Database error");
+            return ResultT<Biome>.Failure("Database error");
         }
     }
 
-    public async Task<Result<Biome>> UpdateAsync(UpdateBiomeRequest toUpdate, string? userId, bool isAdmin)
+    public async Task<ResultT<Biome>> UpdateAsync(UpdateBiomeRequest toUpdate, string? userId, bool isAdmin)
     {
         try
         {
@@ -135,12 +135,12 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
                 .FirstOrDefaultAsync(b => b.Id == toUpdate.Id);
 
             if (entity is null)
-                return Result<Biome>.NotFound("Biome not found");
+                return ResultT<Biome>.NotFound("Biome not found");
 
 
             if (!isAdmin && !entity.IsPublic && entity.UserId != userId)
             {
-                return Result<Biome>.Forbidden("Access denied.");
+                return ResultT<Biome>.Forbidden("Access denied.");
             }
 
             entity.Name = toUpdate.Name;
@@ -154,16 +154,16 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
                 entity.IsPublic = toUpdate.IsPublic.Value;
 
             await context.SaveChangesAsync();
-            return Result<Biome>.Ok(BiomeMapper.MapBiome(entity));
+            return ResultT<Biome>.Ok(BiomeMapper.MapBiome(entity));
         }
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<Biome>.Failure("Database error");
+            return ResultT<Biome>.Failure("Database error");
         }
     }
 
-    public async Task<Result<Biome>> DeleteAsync(int id, string userId, bool isAdmin)
+    public async Task<ResultT<Biome>> DeleteAsync(int id, string userId, bool isAdmin)
     {
         try
         {
@@ -171,41 +171,75 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
                 .FirstOrDefaultAsync(b => b.Id == id);
 
             if (entity is null)
-                return Result<Biome>.NotFound($"Biome {id} not found.");
+                return ResultT<Biome>.NotFound($"Biome {id} not found.");
 
             if (!isAdmin && entity.UserId != userId)
-                return Result<Biome>.Forbidden("Access denied.");
+                return ResultT<Biome>.Forbidden("Access denied.");
 
             var model = BiomeMapper.MapBiome(entity);
             context.Biomes.Remove(entity);
             await context.SaveChangesAsync();
-            return Result<Biome>.Ok(model);
+            return ResultT<Biome>.Ok(model);
         }
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return Result<Biome>.Failure("Database error");
+            return ResultT<Biome>.Failure("Database error");
         }
     }
 
-    public async Task AddSpecie(SpecieToBiomeRequest request, int biomeId)
+    public async Task<Result> AddSpecie(SpecieToBiomeRequest request, int biomeId, string? userId, bool isAdmin)
     {
-        var allToAdd = new List<BiomeSpecieEntity>();
-        for (var c = 0; c < request.Count; c++)
+        try
         {
-            allToAdd.Add(new BiomeSpecieEntity
-            {
-                BiomeId = biomeId,
-                SpecieId = request.SpecieId,
-            });
-        }
+            var biome = await context.Biomes.FirstOrDefaultAsync(b => b.Id == biomeId);
 
-        await context.BiomeSpecies.AddRangeAsync(allToAdd);
-        await context.SaveChangesAsync();
+            if (biome is null)
+            {
+                return Result.NotFound("Biome is not found");
+            }
+
+            if (biome.UserId != userId && !isAdmin)
+            {
+                return Result.Forbidden("Access denied.");
+            }
+
+            var allToAdd = new List<BiomeSpecieEntity>();
+            for (var c = 0; c < request.Count; c++)
+            {
+                allToAdd.Add(new BiomeSpecieEntity
+                {
+                    BiomeId = biomeId,
+                    SpecieId = request.SpecieId,
+                });
+            }
+
+            await context.BiomeSpecies.AddRangeAsync(allToAdd);
+            await context.SaveChangesAsync();
+
+            return Result.Ok();
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning($"Database error: {ex.Message}");
+            return Result.Failure("Database error");
+        }
     }
 
-    public async Task RemoveSpecie(SpecieToBiomeRequest request, int biomeId)
+    public async Task<Result> RemoveSpecie(SpecieToBiomeRequest request, int biomeId, string? userId, bool isAdmin)
     {
+        var biome = await context.Biomes.FirstOrDefaultAsync(b => b.Id == biomeId);
+
+        if (biome is null)
+        {
+            return Result.NotFound("Biome is not found");
+        }
+
+        if (biome.UserId != userId && !isAdmin)
+        {
+            return Result.Forbidden("Access denied.");
+        }
+        
         var existing = await context.BiomeSpecies
             .Where(bs => bs.BiomeId == biomeId && bs.SpecieId == request.SpecieId)
             .ToListAsync();
@@ -214,5 +248,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
 
         context.BiomeSpecies.RemoveRange(toRemove);
         await context.SaveChangesAsync();
+        
+        return Result.Ok();
     }
 }

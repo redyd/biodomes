@@ -79,7 +79,7 @@ public class AddModel(
                 return Page();
             }
 
-            if (!result.IsSuccess)
+            if (result.Failed)
             {
                 return result.ToPageResult(this);
             }
