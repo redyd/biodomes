@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BioDomes.Infrastructures.Migrations
 {
     [DbContext(typeof(BiodomeContext))]
-    [Migration("20260501092426_track biome specie by time")]
-    partial class trackbiomespeciebytime
+    [Migration("20260502145548_fix classification")]
+    partial class fixclassification
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -308,7 +308,11 @@ namespace BioDomes.Infrastructures.Migrations
 
                     b.Property<string>("Label")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("RequireFood")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -318,102 +322,122 @@ namespace BioDomes.Infrastructures.Migrations
                         new
                         {
                             Id = 1,
-                            Label = "Mammifère"
+                            Label = "Mammifère",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 2,
-                            Label = "Oiseau"
+                            Label = "Oiseau",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 3,
-                            Label = "Poisson"
+                            Label = "Poisson",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 4,
-                            Label = "Reptile"
+                            Label = "Reptile",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 5,
-                            Label = "Amphibien"
+                            Label = "Amphibien",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 6,
-                            Label = "Crustacé"
+                            Label = "Crustacé",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 7,
-                            Label = "Arachnides"
+                            Label = "Arachnides",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 8,
-                            Label = "Insecte"
+                            Label = "Insecte",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 9,
-                            Label = "Myriapode"
+                            Label = "Myriapode",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 10,
-                            Label = "Mollusque"
+                            Label = "Mollusque",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 11,
-                            Label = "Echinoderme"
+                            Label = "Echinoderme",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 12,
-                            Label = "Anélide"
+                            Label = "Anélide",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 13,
-                            Label = "Cnidaire"
+                            Label = "Cnidaire",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 14,
-                            Label = "Plathelminthe"
+                            Label = "Plathelminthe",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 15,
-                            Label = "Porifère"
+                            Label = "Porifère",
+                            RequireFood = true
                         },
                         new
                         {
                             Id = 16,
-                            Label = "Plante"
+                            Label = "Plante",
+                            RequireFood = false
                         },
                         new
                         {
                             Id = 17,
-                            Label = "Mousse"
+                            Label = "Mousse",
+                            RequireFood = false
                         },
                         new
                         {
                             Id = 18,
-                            Label = "Algue"
+                            Label = "Algue",
+                            RequireFood = false
                         },
                         new
                         {
                             Id = 19,
-                            Label = "Lichen"
+                            Label = "Lichen",
+                            RequireFood = false
                         },
                         new
                         {
                             Id = 20,
-                            Label = "Champignon"
+                            Label = "Champignon",
+                            RequireFood = false
                         });
                 });
 
@@ -828,7 +852,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "c3bc10a5-c61f-4071-979c-77dc94386816",
+                            ConcurrencyStamp = "ed630374-122b-493b-bec0-863fea91242e",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -836,7 +860,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "aac15b89-6018-4bcc-8d36-38878740e13f",
+                            SecurityStamp = "e5b131f4-ced6-4b39-987d-8f03a7a5d4bc",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -845,7 +869,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "efc7803a-3723-40f5-b150-a61497ed9ea8",
+                            ConcurrencyStamp = "c4a87ce5-dc36-4d3e-a9f3-674837ae94bc",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -853,7 +877,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "b6f6f22e-ae9e-41ed-9a16-bda13de92879",
+                            SecurityStamp = "ddd0801d-4cd3-450a-8844-7ddec16e5bd0",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         });
@@ -1065,6 +1089,11 @@ namespace BioDomes.Infrastructures.Migrations
                         },
                         new
                         {
+                            classification_id = 1,
+                            diet_id = 8
+                        },
+                        new
+                        {
                             classification_id = 2,
                             diet_id = 1
                         },
@@ -1072,6 +1101,11 @@ namespace BioDomes.Infrastructures.Migrations
                         {
                             classification_id = 2,
                             diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 2,
+                            diet_id = 8
                         },
                         new
                         {
@@ -1085,6 +1119,11 @@ namespace BioDomes.Infrastructures.Migrations
                         },
                         new
                         {
+                            classification_id = 3,
+                            diet_id = 8
+                        },
+                        new
+                        {
                             classification_id = 4,
                             diet_id = 1
                         },
@@ -1092,6 +1131,11 @@ namespace BioDomes.Infrastructures.Migrations
                         {
                             classification_id = 4,
                             diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 4,
+                            diet_id = 8
                         },
                         new
                         {
@@ -1105,6 +1149,11 @@ namespace BioDomes.Infrastructures.Migrations
                         },
                         new
                         {
+                            classification_id = 5,
+                            diet_id = 8
+                        },
+                        new
+                        {
                             classification_id = 6,
                             diet_id = 1
                         },
@@ -1112,6 +1161,11 @@ namespace BioDomes.Infrastructures.Migrations
                         {
                             classification_id = 6,
                             diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 6,
+                            diet_id = 8
                         },
                         new
                         {
@@ -1125,6 +1179,11 @@ namespace BioDomes.Infrastructures.Migrations
                         },
                         new
                         {
+                            classification_id = 7,
+                            diet_id = 8
+                        },
+                        new
+                        {
                             classification_id = 8,
                             diet_id = 1
                         },
@@ -1132,6 +1191,11 @@ namespace BioDomes.Infrastructures.Migrations
                         {
                             classification_id = 8,
                             diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 8,
+                            diet_id = 8
                         },
                         new
                         {
@@ -1145,6 +1209,11 @@ namespace BioDomes.Infrastructures.Migrations
                         },
                         new
                         {
+                            classification_id = 9,
+                            diet_id = 8
+                        },
+                        new
+                        {
                             classification_id = 10,
                             diet_id = 1
                         },
@@ -1152,6 +1221,21 @@ namespace BioDomes.Infrastructures.Migrations
                         {
                             classification_id = 10,
                             diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 10,
+                            diet_id = 8
+                        },
+                        new
+                        {
+                            classification_id = 10,
+                            diet_id = 4
+                        },
+                        new
+                        {
+                            classification_id = 10,
+                            diet_id = 5
                         },
                         new
                         {
@@ -1165,6 +1249,11 @@ namespace BioDomes.Infrastructures.Migrations
                         },
                         new
                         {
+                            classification_id = 11,
+                            diet_id = 8
+                        },
+                        new
+                        {
                             classification_id = 12,
                             diet_id = 1
                         },
@@ -1172,6 +1261,21 @@ namespace BioDomes.Infrastructures.Migrations
                         {
                             classification_id = 12,
                             diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 12,
+                            diet_id = 8
+                        },
+                        new
+                        {
+                            classification_id = 12,
+                            diet_id = 5
+                        },
+                        new
+                        {
+                            classification_id = 12,
+                            diet_id = 4
                         },
                         new
                         {
@@ -1185,6 +1289,11 @@ namespace BioDomes.Infrastructures.Migrations
                         },
                         new
                         {
+                            classification_id = 13,
+                            diet_id = 8
+                        },
+                        new
+                        {
                             classification_id = 14,
                             diet_id = 1
                         },
@@ -1192,6 +1301,11 @@ namespace BioDomes.Infrastructures.Migrations
                         {
                             classification_id = 14,
                             diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 14,
+                            diet_id = 8
                         },
                         new
                         {
@@ -1205,6 +1319,11 @@ namespace BioDomes.Infrastructures.Migrations
                         },
                         new
                         {
+                            classification_id = 15,
+                            diet_id = 8
+                        },
+                        new
+                        {
                             classification_id = 16,
                             diet_id = 2
                         },
@@ -1212,6 +1331,11 @@ namespace BioDomes.Infrastructures.Migrations
                         {
                             classification_id = 16,
                             diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 16,
+                            diet_id = 8
                         },
                         new
                         {
@@ -1225,6 +1349,11 @@ namespace BioDomes.Infrastructures.Migrations
                         },
                         new
                         {
+                            classification_id = 17,
+                            diet_id = 8
+                        },
+                        new
+                        {
                             classification_id = 18,
                             diet_id = 2
                         },
@@ -1232,6 +1361,11 @@ namespace BioDomes.Infrastructures.Migrations
                         {
                             classification_id = 18,
                             diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 18,
+                            diet_id = 8
                         },
                         new
                         {
@@ -1245,6 +1379,11 @@ namespace BioDomes.Infrastructures.Migrations
                         },
                         new
                         {
+                            classification_id = 19,
+                            diet_id = 4
+                        },
+                        new
+                        {
                             classification_id = 20,
                             diet_id = 6
                         },
@@ -1252,6 +1391,11 @@ namespace BioDomes.Infrastructures.Migrations
                         {
                             classification_id = 20,
                             diet_id = 3
+                        },
+                        new
+                        {
+                            classification_id = 20,
+                            diet_id = 4
                         });
                 });
 

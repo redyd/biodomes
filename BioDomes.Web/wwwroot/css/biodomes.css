@@ -1175,11 +1175,11 @@ a {
 }
 
 #title-section {
-    scroll-margin-top: 70px ;
+    scroll-margin-top: 70px;
 }
 
 #top {
-    scroll-margin-top: 100vh ;
+    scroll-margin-top: 100vh;
 }
 
 .progress {
@@ -1280,6 +1280,25 @@ dialog::backdrop {
     border-radius: var(--radius-sm);
     object-fit: cover;
     flex-shrink: 0;
+}
+
+.node-tooltip {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    color: white;
+    pointer-events: none;
+}
+
+.status-starved {
+    color: #f44336;
+    font-weight: bold;
+}
+
+.status-underfed {
+    color: #ff9800;
 }
 
 .suggestion-name {

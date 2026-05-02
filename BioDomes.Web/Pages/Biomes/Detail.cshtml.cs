@@ -20,8 +20,8 @@ public class Detail(
 {
     [BindProperty] public BiomeSpecieInputModel Input { get; set; } = new();
     public BiomeView Biome { get; set; } = null!;
-    public FoodChainGraph FoodChain { get; set; } = null!;
     public List<Recommendation<Specie>> Recommendations { get; set; } = null!;
+    public BiomeAnalysis Analyze { get; set; } = null!;
     public string Creator { get; set; } = string.Empty;
     public bool ReopenAddSpecieDialog { get; set; }
 
@@ -50,7 +50,7 @@ public class Detail(
             SpecieId = (int)Input.SpecieId,
             Count = (int)Input.Count,
         }, id);
-
+        
         SuccessNotification("Espèce ajoutée avec succès");
         return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { id }, fragment: "title-section");
     }
@@ -121,13 +121,10 @@ public class Detail(
 
         Creator = creatorResult.Value;
         Biome = BuildBiomeView(biomeResult.Value, userId);
-
-        var graphResult = await foodChainRepo.GetFullGraphForBiomeAsync(Biome.Id, userId, User.IsAdmin());
-        if (!graphResult.IsSuccess || graphResult.Value is null)
-            return graphResult.ToPageResult(this);
-
-        FoodChain = graphResult.Value;
-        Recommendations = await recommendation.RecommendationToAddForBiome(userId, User.IsAdmin(), id, FoodChain);
+        
+        
+        Analyze = await recommendation.AnalyzeBiome(userId, User.IsAdmin(), id);
+        Recommendations = await recommendation.RecommendationToAddForBiome(userId, User.IsAdmin(), id, Analyze.Graph);
         return null;
     }
 }

@@ -34,7 +34,12 @@ function openRemoveDialog(btn) {
 }
 
 (function () {
-    const data = window.foodChainData;
+    const analyze = window.data;
+    const stats = analyze.Stats;
+    
+    const data = analyze.Graph;
+    
+    console.log(stats.StarvedSpecies);
 
     if (!data) {
         console.error("foodChainData is missing");
@@ -47,13 +52,19 @@ function openRemoveDialog(btn) {
     const edges = data.Edges || [];
 
     const elements = [
-        ...nodes.map(n => ({
-            data: {
-                id: n.SpecieId,
-                label: `${n.Name}\n${n.Count}`,
-                count: n.Count
-            }
-        })),
+        ...nodes.map(n => {
+            const isStarved = stats.StarvedSpecies.some(s => s.SpecieId === n.SpecieId);
+            const isUnderfed = stats.UnderfedSpecies.some(s => s.SpecieId === n.SpecieId);
+
+            return {
+                data: {
+                    id: n.SpecieId,
+                    label: `${n.Name}\n${n.Count}`,
+                    count: n.Count,
+                    hungerStatus: isStarved ? 'starved' : (isUnderfed ? 'underfed' : 'normal')
+                }
+            };
+        }),
         ...edges.map(e => ({
             data: {
                 source: e.PredatorId,
@@ -125,6 +136,24 @@ function openRemoveDialog(btn) {
             },
 
             {
+                selector: 'node[hungerStatus = "underfed"]',
+                style: {
+                    'border-color': '#ff9800',
+                    'border-width': 3,
+                    'border-opacity': 1
+                }
+            },
+
+            {
+                selector: 'node[hungerStatus = "starved"]',
+                style: {
+                    'border-color': '#f44336',
+                    'border-width': 4,
+                    'border-opacity': 1,
+                }
+            },
+
+            {
                 selector: ':selected',
                 style: {
                     'border-color': '#ffffff',
@@ -152,6 +181,60 @@ function openRemoveDialog(btn) {
         }
     });
 
+    const popper = document.getElementById('node-popper');
+
+    cy.on('tap', 'node', function(evt) {
+        const node = evt.target;
+        const status = node.data('hungerStatus');
+        const name = node.data('label').split('\n')[0];
+
+        if (status === 'normal') {
+            popper.style.display = 'none';
+            return;
+        }
+
+        document.getElementById('tooltip-name').textContent = name;
+        const statusEl = document.getElementById('tooltip-status');
+        statusEl.textContent = status === 'starved' ? 'Affamé' : 'Sous-alimenté';
+        statusEl.className = status === 'starved' ? 'status-starved' : 'status-underfed';
+
+        const cyContainer = document.getElementById('cy');
+        const rect = cyContainer.getBoundingClientRect();
+        const pos = node.renderedPosition();
+
+        popper.style.display = 'block';
+        popper.style.top = (pos.y + rect.top + window.scrollY - 80) + 'px';
+        popper.style.left = (pos.x + rect.left + window.scrollX + 10) + 'px';
+    });
+
+    cy.on('tap', function(event) {
+        if (event.target === cy) {
+            popper.style.display = 'none';
+        }
+    });
+
+    cy.on('pan zoom', () => { popper.style.display = 'none'; });
+
+    function pulseNodes() {
+        const starvedNodes = cy.nodes('[hungerStatus = "starved"]');
+
+        starvedNodes.forEach(node => {
+            function pulse() {
+                node.animation({
+                    style: { 'border-opacity': 0.6 },
+                    duration: 700
+                }).play().promise().then(() => {
+                    node.animation({
+                        style: { 'border-opacity': 1 },
+                        duration: 700
+                    }).play().promise().then(pulse);
+                });
+            }
+
+            pulse();
+        });
+    }
+
     btn.addEventListener("click", (e) => {
         cy.fit(null, 50)
     })
@@ -164,5 +247,7 @@ function openRemoveDialog(btn) {
     window.addEventListener('resize', () => {
         cy.resize();
     });
+    
+    pulseNodes();
 
 })();

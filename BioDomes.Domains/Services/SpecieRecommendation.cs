@@ -10,23 +10,23 @@ public class SpecieRecommendation(
     IBiomeRepository biomeRepo) : ISpecieRecommendation
 {
     /// <summary>
-    /// Algorithme de recommendation d'espèces à ajouter.
-    /// Dans le cas le plus basique où le biome est vide, on va rechercher dans la chaine alimentaire établie les
-    /// espèces avec le plus de lien et les favoriser par rapport aux autres (3 liens ou plus -> Good, le reste Ok)
-    /// Sinon, on va classer les espèces comme ceci:
-    /// - En premier, on va récupérer les espèces qui n'ont pas de quoi se nourrir, et leur trouver des espèces à manger
-    /// (attention à ne pas créer des boucles, par ex. A -> B et B -> A)
-    /// - Ensuite, ce seront les types d'espèces qui ne sont pas encore dans le biome (par exemple "Mammifère",
-    /// et qui auraient de quoi manger
+    /// Retourne toutes les espèces disponibles classées par pertinence pour le biome.
+    ///
+    /// Biome vide :
+    ///   Excellent  → 3+ relations dans le graphe global
+    ///   Good       → reste
+    ///
+    /// Biome peuplé :
+    ///   Excellent  → nourrit une espèce affamée/sous-alimentée ET stabilité conservée
+    ///   Good       → pas de boucle, ne prive personne, stabilité conservée
+    ///   Ok         → a de quoi manger ou peut être mangée, mais déséquilibre mineur
+    ///   Bad        → rien à manger ET rien ne la mange dans le biome
     /// </summary>
-    /// <returns></returns>
-    public async Task<List<Recommendation<Specie>>> RecommendationToAddForBiome(string? userId, bool isAdmin,
-        int biomeId, FoodChainGraph biomeGraph)
+    public async Task<List<Recommendation<Specie>>> RecommendationToAddForBiome(
+        string? userId, bool isAdmin, int biomeId, FoodChainGraph biomeGraph)
     {
-        var results = new List<Recommendation<Specie>>();
         var globalGraphResult = await foodChainRepo.GetFullGraphAsync(userId, isAdmin);
-        var allSpeciesResult =
-            await speciesRepo.FindAllAsDictAsync(userId, isAdmin); // get all public and available species
+        var allSpeciesResult = await speciesRepo.FindAllAsDictAsync(userId, isAdmin);
 
         if (!allSpeciesResult.IsSuccess
             || allSpeciesResult.Value is null
@@ -35,74 +35,38 @@ public class SpecieRecommendation(
         {
             return [];
         }
-        var globalGraph = globalGraphResult.Value!;
 
-        var allSpecies = allSpeciesResult.Value!;
-        var speciesIdAlreadyInBiomes = biomeGraph.Nodes.Select(n => n.SpecieId).ToHashSet();
+        var globalGraph = globalGraphResult.Value;
+        var allSpecies = allSpeciesResult.Value;
+        var candidates = allSpecies.Values
+            .ToList();
 
-        // basic case
-        if (biomeGraph.Nodes.Count == 0)
+        return biomeGraph.Nodes.Count == 0
+            ? HandleEmptyBiome(globalGraph, candidates, biomeId)
+            : HandlePopulatedBiome(biomeGraph, globalGraph, allSpecies, candidates, biomeId);
+    }
+
+    public async Task<BiomeAnalysis> AnalyzeBiome(string? userId, bool isAdmin, int biomeId)
+    {
+        var graphResult = await foodChainRepo.GetFullGraphForBiomeAsync(biomeId, userId, isAdmin);
+        var allSpeciesResult = await speciesRepo.FindAllAsDictAsync(userId, isAdmin);
+
+        if (!graphResult.IsSuccess
+            || graphResult.Value is null
+            || !allSpeciesResult.IsSuccess
+            || allSpeciesResult.Value is null)
         {
-            return HandleEmptyBiome(globalGraph, allSpecies, results, biomeId);
-        }
-
-        // handling the case where a specie does not have something to eat
-        var withoutPreys = biomeGraph.NoPreySpecies();
-        
-        foreach (var withoutPrey in withoutPreys)
-        {
-            var specie = allSpecies[withoutPrey.SpecieId];
-            
-            // find every species than it can eat, except those already in biome
-            var candidates = allSpecies
-                .Values
-                .Where(sp => !speciesIdAlreadyInBiomes.Contains(sp.Id))
-                .Where(sp => specie.Diet.CanEat(sp.Classification))
-                .Where(sp => sp.Id != specie.Id)
-                .ToList();
-            
-            // exclude boucle
-            var predatorIsPreyOf = biomeGraph.Edges
-                .Where(e => e.PreyId == withoutPrey.SpecieId)
-                .Select(e => e.PredatorId)
-                .ToHashSet();
-            candidates = candidates
-                .Where(sp => !predatorIsPreyOf.Contains(sp.Id))
-                .ToList();
-            
-            if (candidates.Count == 0) continue;
-
-            // make a set of the species id in the biodome
-            var biomeSpecieIds = biomeGraph.Nodes.Select(n => n.SpecieId).ToHashSet();
-
-            // score each candidate
-            foreach (var candidate in candidates)
+            return new BiomeAnalysis
             {
-                var candidateHasFoodInBiome = biomeGraph.Edges
-                    .Any(e => e.PredatorId == candidate.Id && biomeSpecieIds.Contains(e.PreyId));
-
-                var relationsAdded = globalGraph.Edges
-                    .Count(e => e.PredatorId == candidate.Id && biomeSpecieIds.Contains(e.PreyId)
-                                || e.PreyId == candidate.Id && biomeSpecieIds.Contains(e.PredatorId));
-
-                var type = relationsAdded >= 3
-                    ? RecommendationType.Excellent
-                    : candidateHasFoodInBiome
-                        ? RecommendationType.Good
-                        : RecommendationType.Ok;
-                
-                results.Add(new Recommendation<Specie>
-                {
-                    ActionId = $"add-biome-specie specie:{candidate.Id} count:1 biome:{biomeId}",
-                    Involved = candidate,
-                    Label = $"Proie pour {specie.Name}",
-                    Message = $"Ajoutez '{candidate.Name}' pour nourrir {specie.Name}",
-                    Type = type
-                });
-            }
+                Graph = new FoodChainGraph([], []),
+                Stats = new BiomeStats { AllSpeciesFed = true }
+            };
         }
 
-        return results;
+        var graph = graphResult.Value;
+        var stats = BiomeFoodChainStabilityAnalyzer.Analyze(graph, allSpeciesResult.Value);
+
+        return new BiomeAnalysis { Graph = graph, Stats = stats };
     }
 
     public async Task PerformAction(string actionId)
@@ -119,34 +83,118 @@ public class SpecieRecommendation(
         }
     }
 
-    private List<Recommendation<Specie>> HandleEmptyBiome(
-        FoodChainGraph globalGraph,
-        Dictionary<int, Specie> allSpecies,
-        List<Recommendation<Specie>> results,
+    private List<Recommendation<Specie>> HandleEmptyBiome(FoodChainGraph globalGraph, List<Specie> candidates,
         int biomeId)
     {
-        foreach (var (id, count) in globalGraph.CountRelations())
+        var relationCounts = globalGraph.CountRelations();
+
+        return candidates.Select(sp =>
         {
-            var specie = allSpecies[id];
+            var count = relationCounts.GetValueOrDefault(sp.Id, 0);
             var isExcellent = count >= 3;
 
-            var rec = new Recommendation<Specie>
+            return new Recommendation<Specie>
             {
-                ActionId = $"add-biome-specie specie:{id} count:1 biome:{biomeId}",
-                Involved = specie,
-                Label = $"Ajouter un {specie.Classification.Label}",
+                ActionId = BuildActionId(sp.Id, 1, biomeId),
+                Involved = sp,
+                Label = $"Ajouter un {sp.Classification.Label}",
                 Message = isExcellent
-                    ? $"Ajoutez '{specie.Name}' pour bien démarrer"
-                    : $"Ajoutez '{specie.Name}' pour commencer",
+                    ? $"Ajoutez '{sp.Name}' pour bien démarrer"
+                    : $"Ajoutez '{sp.Name}' pour commencer",
                 Type = isExcellent ? RecommendationType.Excellent : RecommendationType.Good
             };
+        }).ToList();
+    }
 
-            results.Add(rec);
+    private List<Recommendation<Specie>> HandlePopulatedBiome(
+        FoodChainGraph biomeGraph,
+        FoodChainGraph globalGraph,
+        Dictionary<int, Specie> allSpecies,
+        List<Specie> candidates,
+        int biomeId)
+    {
+        var currentStats = BiomeFoodChainStabilityAnalyzer.Analyze(biomeGraph, allSpecies);
+        var starvedIds = currentStats.StarvedSpecies.Select(n => n.SpecieId).ToHashSet();
+        var underfedIds = currentStats.UnderfedSpecies.Select(n => n.SpecieId).ToHashSet();
+        var needsFoodIds = starvedIds.Union(underfedIds).ToHashSet();
+
+        var results = new List<Recommendation<Specie>>();
+
+        foreach (var candidate in candidates)
+        {
+            // what the candidate eats in the biome
+            var candidatePreyIdsInBiome = globalGraph.Edges
+                .Where(e => e.PredatorId == candidate.Id)
+                .Select(e => e.PreyId)
+                .Where(id => biomeGraph.Nodes.Any(n => n.SpecieId == id))
+                .ToHashSet();
+
+            // what eats the candidate in the biome
+            var candidatePredatorIdsInBiome = globalGraph.Edges
+                .Where(e => e.PreyId == candidate.Id)
+                .Select(e => e.PredatorId)
+                .Where(id => biomeGraph.Nodes.Any(n => n.SpecieId == id))
+                .ToHashSet();
+
+            var hasFood = candidatePreyIdsInBiome.Count > 0;
+            var hasRole = candidatePredatorIdsInBiome.Count > 0; // something eats it
+
+            // candidate is prey of a starved/underfed species
+            var relievesHunger = biomeGraph.Nodes
+                .Where(n => needsFoodIds.Contains(n.SpecieId))
+                .Any(n => globalGraph.Edges.Any(e =>
+                    e.PredatorId == n.SpecieId && e.PreyId == candidate.Id));
+
+            var introducesLoop = BiomeFoodChainStabilityAnalyzer.IntroducesLoop(biomeGraph, candidate, globalGraph);
+            var stableAfterAdd =
+                BiomeFoodChainStabilityAnalyzer.IsStableAfterAdding(biomeGraph, candidate, globalGraph, allSpecies);
+
+            RecommendationType type;
+            string message;
+
+            if (relievesHunger && stableAfterAdd && !introducesLoop)
+            {
+                type = RecommendationType.Excellent;
+                var hungryNames = biomeGraph.Nodes
+                    .Where(n => needsFoodIds.Contains(n.SpecieId)
+                                && globalGraph.Edges.Any(e => e.PredatorId == n.SpecieId && e.PreyId == candidate.Id))
+                    .Select(n => n.Name);
+                message = $"Nourrit : {string.Join(", ", hungryNames)}";
+            }
+            else if (hasFood && !introducesLoop && stableAfterAdd)
+            {
+                type = RecommendationType.Good;
+                message = "N'impacte pas l'équilibre du biome";
+            }
+            else if (hasFood || hasRole)
+            {
+                type = RecommendationType.Ok;
+                message = hasFood
+                    ? "A de quoi manger mais peut déséquilibrer le biome"
+                    : "Peut être mangée mais n'a rien à manger";
+            }
+            else
+            {
+                type = RecommendationType.Bad;
+                message = "Aucune relation alimentaire avec le biome actuel";
+            }
+
+            results.Add(new Recommendation<Specie>
+            {
+                ActionId = BuildActionId(candidate.Id, 1, biomeId),
+                Involved = candidate,
+                Label = $"Ajouter '{candidate.Name}'",
+                Message = message,
+                Type = type
+            });
         }
 
         return results;
     }
-    
+
+    private static string BuildActionId(int specieId, int count, int biomeId)
+        => $"add-biome-specie specie:{specieId} count:{count} biome:{biomeId}";
+
     private static (string action, Dictionary<string, int> args) ParseActionId(string actionId)
     {
         var parts = actionId.Split(' ');

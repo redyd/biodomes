@@ -1,5 +1,5 @@
 @page "/biomes/{id:int}"
-@using BioDomes.Web.ViewModels
+@using System.Text.Json
 @model Detail
 
 @{
@@ -36,7 +36,6 @@
 
         <partial name="Shared/Sidebar/_EnvironmentSidebar" model="Model"/>
 
-        @* graph *@
         <div class="flex-grow-1 mt-3 position-relative">
             <button id="cy-recenter" class="position-absolute btn-add bg-transparent border-0 mx-3">
                 Recentre le graphe
@@ -57,6 +56,13 @@
 <partial name="Shared/Dialog/_AddSpecieDialog" model="Model"/>
 <partial name="Shared/Dialog/_RemoveSpecieDialog" model="Model"/>
 
+<div id="node-popper" class="node-tooltip" style="display:none; position:absolute; z-index:1000;">
+    <div class="tooltip-content">
+        <strong id="tooltip-name"></strong>
+        <p id="tooltip-status" class="m-0"></p>
+    </div>
+</div>
+
 @if (Model.ReopenAddSpecieDialog)
 {
     <script>
@@ -67,7 +73,7 @@
 <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
 
 <script>
-    window.foodChainData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.FoodChain));
+    window.data = @Html.Raw(JsonSerializer.Serialize(Model.Analyze));
 </script>
 
 <script src="~/js/biome-detail.js"></script>

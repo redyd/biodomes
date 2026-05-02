@@ -12,7 +12,7 @@
             <h6 class="text-bright m-0" id="existing-title">Les espèces</h6>
         </div>
         <ul class="list-unstyled d-flex flex-column gap-2">
-            @if (Model.FoodChain.Nodes.Count > 0)
+            @if (Model.Analyze.Graph.Nodes.Count > 0)
             {
                 <li class="li-info-card">
                     <div class="d-flex flex-column">
@@ -26,7 +26,7 @@
                     </button>
                 </li>
             }
-            @foreach (var specie in Model.FoodChain.Nodes)
+            @foreach (var specie in Model.Analyze.Graph.Nodes)
             {
                 <li class="li-info-card">
                     <div class="d-flex flex-column">
@@ -44,7 +44,7 @@
                     </button>
                 </li>
             }
-            @if (Model.FoodChain.Nodes.Count == 0)
+            @if (Model.Analyze.Graph.Nodes.Count == 0)
             {
                 <li class="li-info-card">
                     <div class="d-flex flex-column">
