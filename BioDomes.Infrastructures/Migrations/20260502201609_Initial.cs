@@ -97,7 +97,7 @@ namespace BioDomes.Infrastructures.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Label = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    RequireFood = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                    RequireFood = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -372,30 +372,32 @@ namespace BioDomes.Infrastructures.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "biome_equipments",
+                name: "biomes_equipments",
                 schema: "dbo",
                 columns: table => new
                 {
-                    BiomesId = table.Column<int>(type: "int", nullable: false),
-                    EquipmentsId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Inserted = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    BiomeId = table.Column<int>(type: "int", nullable: false),
+                    EquipmentId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_biome_equipments", x => new { x.BiomesId, x.EquipmentsId });
+                    table.PrimaryKey("PK_biomes_equipments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_biome_equipments_biomes_BiomesId",
-                        column: x => x.BiomesId,
+                        name: "FK_biomes_equipments_biomes_BiomeId",
+                        column: x => x.BiomeId,
                         principalSchema: "dbo",
                         principalTable: "biomes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_biome_equipments_equipments_EquipmentsId",
-                        column: x => x.EquipmentsId,
+                        name: "FK_biomes_equipments_equipments_EquipmentId",
+                        column: x => x.EquipmentId,
                         principalSchema: "dbo",
                         principalTable: "equipments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -460,8 +462,8 @@ namespace BioDomes.Infrastructures.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "Birthdate", "ConcurrencyStamp", "Email", "EmailConfirmed", "ImageUrl", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SearchOrganism", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "user-1", 0, new DateOnly(1990, 1, 1), "fef09869-1c01-4612-a5a9-0849bd0035d4", "admin@biodomes.com", true, null, false, null, "ADMIN@BIODOMES.COM", "ADMIN", null, null, false, "Saint Paul", "8ae30d4c-2542-4d7f-a28c-0e060ffb9fcf", false, "admin" },
-                    { "user-2", 0, new DateOnly(1995, 6, 15), "a22c9408-01b7-426d-b297-71739ad49deb", "john@biodomes.com", true, null, false, null, "JOHN@BIODOMES.COM", "JOHN", null, null, false, "Marie Thérèse", "9121d3d0-4d6f-41ae-8183-9b0c0045a2ea", false, "john" }
+                    { "user-1", 0, new DateOnly(1990, 1, 1), "867639e0-9fc9-4f62-9bfd-e357386a8045", "admin@biodomes.com", true, null, false, null, "ADMIN@BIODOMES.COM", "ADMIN", null, null, false, "Saint Paul", "352f2a90-a4de-4c24-b1e6-db1199ed2110", false, "admin" },
+                    { "user-2", 0, new DateOnly(1995, 6, 15), "b0f9ed51-6bf6-41ee-9423-69df6d218daa", "john@biodomes.com", true, null, false, null, "JOHN@BIODOMES.COM", "JOHN", null, null, false, "Marie Thérèse", "210e33e0-742a-475a-a2e1-e8c35f2c1168", false, "john" }
                 });
 
             migrationBuilder.InsertData(
@@ -510,20 +512,12 @@ namespace BioDomes.Infrastructures.Migrations
                     { 12, "Anélide", true },
                     { 13, "Cnidaire", true },
                     { 14, "Plathelminthe", true },
-                    { 15, "Porifère", true }
-                });
-
-            migrationBuilder.InsertData(
-                schema: "dbo",
-                table: "specie_classifications",
-                columns: new[] { "Id", "Label" },
-                values: new object[,]
-                {
-                    { 16, "Plante" },
-                    { 17, "Mousse" },
-                    { 18, "Algue" },
-                    { 19, "Lichen" },
-                    { 20, "Champignon" }
+                    { 15, "Porifère", true },
+                    { 16, "Plante", false },
+                    { 17, "Mousse", false },
+                    { 18, "Algue", false },
+                    { 19, "Lichen", false },
+                    { 20, "Champignon", false }
                 });
 
             migrationBuilder.InsertData(
@@ -541,6 +535,12 @@ namespace BioDomes.Infrastructures.Migrations
                     { 7, "Autotrophie (Photosynthèse)" },
                     { 8, "Hétérotrophie" }
                 });
+
+            migrationBuilder.InsertData(
+                schema: "dbo",
+                table: "biomes",
+                columns: new[] { "Id", "Humidity", "ImageUrl", "IsPublic", "Name", "Temperature", "UserId" },
+                values: new object[] { 1, 16.0, null, true, "Biotest Ultimate", 25.0, "user-1" });
 
             migrationBuilder.InsertData(
                 schema: "dbo",
@@ -710,6 +710,56 @@ namespace BioDomes.Infrastructures.Migrations
 
             migrationBuilder.InsertData(
                 schema: "dbo",
+                table: "biomes_equipments",
+                columns: new[] { "Id", "BiomeId", "EquipmentId" },
+                values: new object[,]
+                {
+                    { 1, 1, 3 },
+                    { 2, 1, 3 },
+                    { 3, 1, 1 },
+                    { 4, 1, 1 },
+                    { 5, 1, 1 },
+                    { 6, 1, 6 },
+                    { 7, 1, 6 }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "dbo",
+                table: "biomes_species",
+                columns: new[] { "Id", "BiomeId", "SpecieId" },
+                values: new object[,]
+                {
+                    { 1, 1, 2 },
+                    { 11, 1, 3 },
+                    { 12, 1, 3 },
+                    { 13, 1, 3 },
+                    { 14, 1, 3 },
+                    { 15, 1, 3 },
+                    { 16, 1, 3 },
+                    { 17, 1, 3 },
+                    { 18, 1, 3 },
+                    { 19, 1, 3 },
+                    { 21, 1, 5 },
+                    { 22, 1, 5 },
+                    { 23, 1, 5 },
+                    { 24, 1, 5 },
+                    { 25, 1, 5 },
+                    { 31, 1, 7 },
+                    { 32, 1, 7 },
+                    { 33, 1, 7 },
+                    { 34, 1, 7 },
+                    { 41, 1, 10 },
+                    { 42, 1, 10 },
+                    { 43, 1, 10 },
+                    { 44, 1, 10 },
+                    { 45, 1, 10 },
+                    { 46, 1, 10 },
+                    { 47, 1, 10 },
+                    { 48, 1, 10 }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "dbo",
                 table: "specie_food_chains",
                 columns: new[] { "PredatorId", "PreyId" },
                 values: new object[,]
@@ -776,16 +826,22 @@ namespace BioDomes.Infrastructures.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_biome_equipments_EquipmentsId",
-                schema: "dbo",
-                table: "biome_equipments",
-                column: "EquipmentsId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_biomes_UserId",
                 schema: "dbo",
                 table: "biomes",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_biomes_equipments_BiomeId",
+                schema: "dbo",
+                table: "biomes_equipments",
+                column: "BiomeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_biomes_equipments_EquipmentId",
+                schema: "dbo",
+                table: "biomes_equipments",
+                column: "EquipmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_biomes_species_BiomeId",
@@ -893,7 +949,7 @@ namespace BioDomes.Infrastructures.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "biome_equipments",
+                name: "biomes_equipments",
                 schema: "dbo");
 
             migrationBuilder.DropTable(

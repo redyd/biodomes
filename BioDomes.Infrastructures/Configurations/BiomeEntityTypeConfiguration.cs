@@ -21,5 +21,15 @@ public class BiomeEntityTypeConfiguration : IEntityTypeConfiguration<BiomeEntity
         
         builder.Property(e => e.Temperature)
             .IsRequired();
+
+        builder.HasData(new BiomeEntity
+        {
+            Id = 1,
+            UserId = "user-1",
+            Name = "Biotest Ultimate",
+            IsPublic = true,
+            Humidity = 16,
+            Temperature = 25,
+        });
     }
 }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BioDomes.Infrastructures.Migrations
 {
     [DbContext(typeof(BiodomeContext))]
-    [Migration("20260502144956_Initial")]
+    [Migration("20260502201609_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -60,6 +60,96 @@ namespace BioDomes.Infrastructures.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("biomes", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Humidity = 16.0,
+                            IsPublic = true,
+                            Name = "Biotest Ultimate",
+                            Temperature = 25.0,
+                            UserId = "user-1"
+                        });
+                });
+
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeEquipmentEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BiomeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EquipmentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Inserted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BiomeId");
+
+                    b.HasIndex("EquipmentId");
+
+                    b.ToTable("biomes_equipments", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BiomeId = 1,
+                            EquipmentId = 3,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            BiomeId = 1,
+                            EquipmentId = 3,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            BiomeId = 1,
+                            EquipmentId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            BiomeId = 1,
+                            EquipmentId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            BiomeId = 1,
+                            EquipmentId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 6,
+                            BiomeId = 1,
+                            EquipmentId = 6,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 7,
+                            BiomeId = 1,
+                            EquipmentId = 6,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeSpecieEntity", b =>
@@ -88,6 +178,197 @@ namespace BioDomes.Infrastructures.Migrations
                     b.HasIndex("SpecieId");
 
                     b.ToTable("biomes_species", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 2
+                        },
+                        new
+                        {
+                            Id = 11,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 3
+                        },
+                        new
+                        {
+                            Id = 12,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 3
+                        },
+                        new
+                        {
+                            Id = 13,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 3
+                        },
+                        new
+                        {
+                            Id = 14,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 3
+                        },
+                        new
+                        {
+                            Id = 15,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 3
+                        },
+                        new
+                        {
+                            Id = 16,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 3
+                        },
+                        new
+                        {
+                            Id = 17,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 3
+                        },
+                        new
+                        {
+                            Id = 18,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 3
+                        },
+                        new
+                        {
+                            Id = 19,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 3
+                        },
+                        new
+                        {
+                            Id = 21,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 5
+                        },
+                        new
+                        {
+                            Id = 22,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 5
+                        },
+                        new
+                        {
+                            Id = 23,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 5
+                        },
+                        new
+                        {
+                            Id = 24,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 5
+                        },
+                        new
+                        {
+                            Id = 25,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 5
+                        },
+                        new
+                        {
+                            Id = 31,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 7
+                        },
+                        new
+                        {
+                            Id = 32,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 7
+                        },
+                        new
+                        {
+                            Id = 33,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 7
+                        },
+                        new
+                        {
+                            Id = 34,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 7
+                        },
+                        new
+                        {
+                            Id = 41,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 10
+                        },
+                        new
+                        {
+                            Id = 42,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 10
+                        },
+                        new
+                        {
+                            Id = 43,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 10
+                        },
+                        new
+                        {
+                            Id = 44,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 10
+                        },
+                        new
+                        {
+                            Id = 45,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 10
+                        },
+                        new
+                        {
+                            Id = 46,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 10
+                        },
+                        new
+                        {
+                            Id = 47,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 10
+                        },
+                        new
+                        {
+                            Id = 48,
+                            BiomeId = 1,
+                            Inserted = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            SpecieId = 10
+                        });
                 });
 
             modelBuilder.Entity("BioDomes.Infrastructures.Models.EquipmentEntity", b =>
@@ -312,9 +593,7 @@ namespace BioDomes.Infrastructures.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("RequireFood")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -854,7 +1133,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "fef09869-1c01-4612-a5a9-0849bd0035d4",
+                            ConcurrencyStamp = "867639e0-9fc9-4f62-9bfd-e357386a8045",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -862,7 +1141,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "8ae30d4c-2542-4d7f-a28c-0e060ffb9fcf",
+                            SecurityStamp = "352f2a90-a4de-4c24-b1e6-db1199ed2110",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -871,7 +1150,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "a22c9408-01b7-426d-b297-71739ad49deb",
+                            ConcurrencyStamp = "b0f9ed51-6bf6-41ee-9423-69df6d218daa",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -879,25 +1158,10 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "9121d3d0-4d6f-41ae-8183-9b0c0045a2ea",
+                            SecurityStamp = "210e33e0-742a-475a-a2e1-e8c35f2c1168",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         });
-                });
-
-            modelBuilder.Entity("BiomeEntityEquipmentEntity", b =>
-                {
-                    b.Property<int>("BiomesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EquipmentsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BiomesId", "EquipmentsId");
-
-                    b.HasIndex("EquipmentsId");
-
-                    b.ToTable("biome_equipments", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1412,6 +1676,25 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeEquipmentEntity", b =>
+                {
+                    b.HasOne("BioDomes.Infrastructures.Models.BiomeEntity", "Biome")
+                        .WithMany("BiomeEquipments")
+                        .HasForeignKey("BiomeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BioDomes.Infrastructures.Models.EquipmentEntity", "Equipment")
+                        .WithMany("BiomesEquipment")
+                        .HasForeignKey("EquipmentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Biome");
+
+                    b.Navigation("Equipment");
+                });
+
             modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeSpecieEntity", b =>
                 {
                     b.HasOne("BioDomes.Infrastructures.Models.BiomeEntity", "Biome")
@@ -1504,21 +1787,6 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Navigation("Prey");
                 });
 
-            modelBuilder.Entity("BiomeEntityEquipmentEntity", b =>
-                {
-                    b.HasOne("BioDomes.Infrastructures.Models.BiomeEntity", null)
-                        .WithMany()
-                        .HasForeignKey("BiomesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BioDomes.Infrastructures.Models.EquipmentEntity", null)
-                        .WithMany()
-                        .HasForeignKey("EquipmentsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1587,7 +1855,14 @@ namespace BioDomes.Infrastructures.Migrations
 
             modelBuilder.Entity("BioDomes.Infrastructures.Models.BiomeEntity", b =>
                 {
+                    b.Navigation("BiomeEquipments");
+
                     b.Navigation("BiomeSpecies");
+                });
+
+            modelBuilder.Entity("BioDomes.Infrastructures.Models.EquipmentEntity", b =>
+                {
+                    b.Navigation("BiomesEquipment");
                 });
 
             modelBuilder.Entity("BioDomes.Infrastructures.Models.SpecieEntity", b =>
