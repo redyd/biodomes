@@ -18,7 +18,7 @@ public class Detail(
     : AppPageModel(env)
 {
     // BASICS
-    public BiomeView Biome { get; set; } = null!;
+    public BiomeView<ComplexBiome> Biome { get; set; } = null!;
     public BiomeAnalysis Analyze { get; set; } = null!;
     public List<Recommendation<Specie>> Recommendations { get; set; } = null!;
     public List<EquipmentView> AllEquipments { get; set; } = null!;
@@ -165,11 +165,11 @@ public class Detail(
 
     // HELPER 
 
-    private BiomeView BuildBiomeView(Biome b, string? userId)
+    private BiomeView<ComplexBiome> BuildBiomeView(ComplexBiome b, string? userId)
     {
         var rule = new HumidityRule(b.Temperature, b.Humidity);
 
-        return new BiomeView
+        return new BiomeView<ComplexBiome>
         {
             ImageUrl = !string.IsNullOrWhiteSpace(b.ImageUrl)
                 ? UseUploadedFromId(b.ImageUrl)

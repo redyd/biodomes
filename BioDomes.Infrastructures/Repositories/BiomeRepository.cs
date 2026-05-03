@@ -84,7 +84,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         }
     }
     
-    public async Task<ResultT<Biome>> FindComplexAsync(int id, string? userId, bool isAdmin)
+    public async Task<ResultT<ComplexBiome>> FindComplexAsync(int id, string? userId, bool isAdmin)
     {
         try
         {
@@ -115,20 +115,20 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
             
             if (entity is null)
             {
-                return ResultT<Biome>.NotFound($"Biome {id} not found");
+                return ResultT<ComplexBiome>.NotFound($"Biome {id} not found");
             }
 
             if (entity.IsPublic || entity.UserId == userId || isAdmin)
             {
-                return ResultT<Biome>.Ok(BiomeMapper.MapComplexBiome(entity));
+                return ResultT<ComplexBiome>.Ok(BiomeMapper.MapComplexBiome(entity));
             }
 
-            return ResultT<Biome>.Forbidden("Access denied.");
+            return ResultT<ComplexBiome>.Forbidden("Access denied.");
         }
         catch (DbUpdateException ex)
         {
             logger.LogWarning($"Database error: {ex.Message}");
-            return ResultT<Biome>.Failure("Database error");
+            return ResultT<ComplexBiome>.Failure("Database error");
         }
     }
 

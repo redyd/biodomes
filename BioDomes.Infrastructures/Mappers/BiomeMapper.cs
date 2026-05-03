@@ -15,13 +15,11 @@ public class BiomeMapper
             Humidity = entity.Humidity,
             ImageUrl = entity.ImageUrl,
             IsPublic = entity.IsPublic,
-            Equipments = [],
-            Species = []
         };
 
-    public static Biome MapComplexBiome(BiomeEntity entity)
+    public static ComplexBiome MapComplexBiome(BiomeEntity entity)
     {
-        return new Biome
+        return new ComplexBiome
         {
             Id = entity.Id,
             Name = entity.Name,

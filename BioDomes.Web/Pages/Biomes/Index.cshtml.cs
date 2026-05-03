@@ -9,7 +9,7 @@ namespace BioDomes.Web.Pages.Biomes;
 
 public class BiomePage(IBiomeRepository repository, IWebHostEnvironment env) : AppPageModel(env)
 {
-    public List<BiomeView>? Biomes { get; set; }
+    public List<BiomeView<Biome>>? Biomes { get; set; }
     
     public bool IsUserConnected { get; set; }
 
@@ -19,7 +19,7 @@ public class BiomePage(IBiomeRepository repository, IWebHostEnvironment env) : A
         
 
         var biomes = await repository.GetAllAsync(User.GetUserId(), User.IsAdmin());
-        Biomes = biomes.Select(b => new BiomeView
+        Biomes = biomes.Select(b => new BiomeView<Biome>
         {
             ImageUrl = !string.IsNullOrWhiteSpace(b.ImageUrl) ? UseUploadedFromId(b.ImageUrl) : null,
             CanEdit = IsUserConnected && (User.IsAdmin() || b.CreatedBy == User.GetUserId()),

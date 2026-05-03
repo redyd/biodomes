@@ -11,7 +11,7 @@ public interface IBiomeRepository
     Task<ResultT<int>> CountAsync();
 
     Task<ResultT<Biome>> FindAsync(int id, string? userId, bool isAdmin);
-    Task<ResultT<Biome>> FindComplexAsync(int id, string? userId, bool isAdmin);
+    Task<ResultT<ComplexBiome>> FindComplexAsync(int id, string? userId, bool isAdmin);
 
     Task<ResultT<Biome>> CreateBiomeAsync(CreateBiomeRequest createRequest, string userId);
 

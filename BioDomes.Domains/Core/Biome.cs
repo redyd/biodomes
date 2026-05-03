@@ -10,9 +10,6 @@ public class Biome
     public required string? ImageUrl { get; init; }
     public required bool IsPublic { get; init; }
 
-    public required List<Tracked<Specie>> Species { get; init; }
-    public required List<Tracked<Equipment>> Equipments { get; init; }
-
     public string State => Temperature switch
     {
         < -20 or > 40 => "Critique",
