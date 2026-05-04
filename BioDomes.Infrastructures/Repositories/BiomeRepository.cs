@@ -363,4 +363,43 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         
         return Result.Ok();
     }
+
+    public async Task<List<BiomeStatsDto>> GetStatsAsync(string? userId, bool isAdmin)
+    {
+        var query = context.Biomes
+            .Include(b => b.BiomeSpecies)
+            .ThenInclude(bs => bs.Specie)
+            .ThenInclude(s => s.DietEntity)
+            .Include(b => b.BiomeSpecies)
+            .ThenInclude(bs => bs.Specie)
+            .ThenInclude(s => s.ClassificationEntity)
+            .Include(b => b.BiomeEquipments)
+            .AsQueryable();
+
+        if (!isAdmin)
+        {
+            query = query.Where(b =>
+                b.IsPublic || (userId != null && b.UserId == userId));
+        }
+
+        var biomes = await query.ToListAsync();
+
+        return biomes.Select(b => new BiomeStatsDto
+        {
+            Id = b.Id,
+            Name = b.Name,
+            SpeciesCount = b.BiomeSpecies.Count,
+            EquipmentCount = b.BiomeEquipments.Count,
+            Temperature = b.Temperature,
+            Humidity = b.Humidity,
+
+            SpeciesByDiet = b.BiomeSpecies
+                .GroupBy(bs => bs.Specie.DietEntity.Label)
+                .ToDictionary(g => g.Key, g => g.Count()),
+
+            SpeciesByClassification = b.BiomeSpecies
+                .GroupBy(bs => bs.Specie.ClassificationEntity.Label)
+                .ToDictionary(g => g.Key, g => g.Count())
+        }).ToList();
+    }
 }

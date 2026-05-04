@@ -24,4 +24,5 @@ public interface IBiomeRepository
     
     Task<Result> AddEquipment(EquipmentToBiomeRequest request, int biomeId, string? userId, bool isAdmin);
     Task<Result> RemoveEquipment(EquipmentToBiomeRequest request, int biomeId, string? userId, bool isAdmin);
+    Task<List<BiomeStatsDto>> GetStatsAsync(string? userId, bool isAdmin);
 }

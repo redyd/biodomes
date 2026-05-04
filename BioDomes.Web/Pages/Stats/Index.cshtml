@@ -1,0 +1,205 @@
+﻿@page "/stats"
+@model BioDomes.Web.Pages.Stats.StatsModel
+
+@{
+Layout = "Shared/_Layout";
+ViewData["Title"] = "Statistiques";
+}
+
+<div class="main-container">
+    <div class="container-title">
+        <h1>Statistiques</h1>
+        <p>Vue d'ensemble de vos biomes</p>
+    </div>
+
+    <div class="stats-controls">
+        <span class="field-label">Biome</span>
+        <select class="field-input stats-select" id="biomeSelector">
+            <option value="all">Tous mes biomes</option>
+        </select>
+    </div>
+
+    <div class="stats-tabs">
+        <button class="stats-tab active" data-pane="species">Espèces</button>
+        <button class="stats-tab" data-pane="conditions">Conditions</button>
+        <button class="stats-tab" data-pane="trophic">Réseau trophique</button>
+    </div>
+
+    <div id="pane-species" class="stats-pane active">
+        <div class="stats-metrics">
+            <div class="stat-metric">
+                <div class="stat-metric-label">Total biomes</div>
+                <div class="stat-metric-value" id="m-biomes">—</div>
+            </div>
+            <div class="stat-metric">
+                <div class="stat-metric-label">Total espèces</div>
+                <div class="stat-metric-value" id="m-species">—</div>
+            </div>
+            <div class="stat-metric">
+                <div class="stat-metric-label">Moy. espèces / biome</div>
+                <div class="stat-metric-value" id="m-avg">—</div>
+            </div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-card-title">Nombre d'espèces par biome</div>
+            <div class="chart-legend" id="leg-species"></div>
+            <div class="chart-wrap" style="height:280px">
+                <canvas id="cSpecies" role="img" aria-label="Nombre d'espèces par biome">Graphique en barres du nombre d'espèces par biome.</canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="pane-conditions" class="stats-pane">
+        <div class="chart-card">
+            <div class="chart-card-title">Température par biome (°C)</div>
+            <div class="chart-wrap" style="height:260px">
+                <canvas id="cTemp" role="img" aria-label="Température par biome">Graphique de température par biome.</canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-card-title">Humidité absolue par biome (g/m³)</div>
+            <div class="chart-wrap" style="height:260px">
+                <canvas id="cHum" role="img" aria-label="Humidité absolue par biome">Graphique d'humidité par biome.</canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="pane-trophic" class="stats-pane">
+        <div class="chart-two-col">
+            <div class="chart-card">
+                <div class="chart-card-title">Par régime alimentaire</div>
+                <div class="chart-legend" id="leg-diet"></div>
+                <div class="chart-wrap" style="height:240px">
+                    <canvas id="cDiet" role="img" aria-label="Répartition par régime alimentaire">Graphique en anneau par régime alimentaire.</canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-card-title">Par classification</div>
+                <div class="chart-legend" id="leg-class"></div>
+                <div class="chart-wrap" style="height:240px">
+                    <canvas id="cClass" role="img" aria-label="Répartition par classification">Graphique en anneau par classification.</canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+    const TEAL='#00d2b4',AMBER='#f0a830',MID='#7aada8',MUTED='#3d6b66',SURFACE='#132830',BORDER='rgba(0,210,180,0.15)';
+    const PALETTE=['#00d2b4','#f0a830','#5b8fa8','#a78bfa','#fb7185','#34d399','#f97316','#60a5fa'];
+
+    let allData=[], charts={}, activeTab='species';
+
+    function getFiltered(){
+        const v=document.getElementById('biomeSelector').value;
+        return v==='all'?allData:allData.filter(b=>b.id==v);
+    }
+
+    function buildLegend(elId,labels,colors){
+        const el=document.getElementById(elId);
+        if(!el)return;
+        el.innerHTML=labels.map((l,i)=>`<span class="chart-legend-item"><span class="chart-legend-dot" style="background:${colors[i%colors.length]}"></span>${l}</span>`).join('');
+    }
+
+    function base(){
+        return{
+            responsive:true,maintainAspectRatio:false,
+            plugins:{legend:{display:false},tooltip:{backgroundColor:SURFACE,titleColor:TEAL,bodyColor:MID,borderColor:BORDER,borderWidth:1,titleFont:{family:'Space Mono'},bodyFont:{family:'Space Mono',size:11}}},
+        };
+    }
+
+    function axis(){
+        return{grid:{color:'rgba(0,210,180,0.06)'},ticks:{color:MUTED,font:{family:'Space Mono',size:10}},border:{color:'rgba(0,210,180,0.1)'}};
+    }
+
+    function renderSpecies(data){
+        if(charts.species) {
+            charts.species.destroy();
+        }
+        
+        const labels=data.map(b=>b.name);
+        const counts=data.map(b=>b.speciesCount);
+        
+        buildLegend('leg-species',labels,PALETTE);
+        document.getElementById('m-biomes').textContent=data.length;
+        const total=counts.reduce((a,b)=>a+b,0);
+        document.getElementById('m-species').textContent=total;
+        document.getElementById('m-avg').textContent=data.length?Math.round(total/data.length):0;
+        
+        charts.species=new Chart(document.getElementById('cSpecies'),{
+            type:'bar',
+            data:{labels,datasets:[{data:counts,backgroundColor:labels.map((_,i)=>PALETTE[i%PALETTE.length]),borderRadius:4,borderSkipped:false}]},
+            options:{...base(),scales:{x:axis(),y:{...axis(),beginAtZero:true,ticks:{...axis().ticks,stepSize:1}}}}
+        });
+    }
+
+    function renderConditions(data){
+        ['cTemp','cHum'].forEach(id=>{if(charts[id])charts[id].destroy();});
+        const labels=data.map(b=>b.name);
+        charts.cTemp=new Chart(document.getElementById('cTemp'),{
+            type:'bar',
+            data:{labels,datasets:[{data:data.map(b=>b.temperature),backgroundColor:labels.map((_,i)=>i%2===0?'#fb7185':'#f97316'),borderRadius:4,borderSkipped:false}]},
+            options:{...base(),scales:{x:axis(),y:{...axis(),ticks:{...axis().ticks,callback:v=>v+'°C'}}}}
+        });
+        charts.cHum=new Chart(document.getElementById('cHum'),{
+            type:'bar',
+            data:{labels,datasets:[{data:data.map(b=>b.humidity),backgroundColor:labels.map((_,i)=>i%2===0?TEAL:'#60a5fa'),borderRadius:4,borderSkipped:false}]},
+            options:{...base(),scales:{x:axis(),y:{...axis(),beginAtZero:true,ticks:{...axis().ticks,callback:v=>v+' g/m³'}}}}
+        });
+    }
+
+    function renderTrophic(data){
+        ['cDiet','cClass'].forEach(id=>{if(charts[id])charts[id].destroy();});
+        const dietTot={},classTot={};
+        data.forEach(b=>{
+            Object.entries(b.speciesByDiet||{}).forEach(([k,v])=>{dietTot[k]=(dietTot[k]||0)+v;});
+            Object.entries(b.speciesByClassification||{}).forEach(([k,v])=>{classTot[k]=(classTot[k]||0)+v;});
+        });
+        const dL=Object.keys(dietTot),dV=Object.values(dietTot);
+        const cL=Object.keys(classTot),cV=Object.values(classTot);
+        const dT=dV.reduce((a,b)=>a+b,0),cT=cV.reduce((a,b)=>a+b,0);
+        buildLegend('leg-diet',dL.map((l,i)=>l+' '+Math.round(dV[i]/dT*100)+'%'),PALETTE);
+        buildLegend('leg-class',cL.map((l,i)=>l+' '+Math.round(cV[i]/cT*100)+'%'),PALETTE);
+        const donutOpts={...base(),cutout:'68%'};
+        charts.cDiet=new Chart(document.getElementById('cDiet'),{type:'doughnut',data:{labels:dL,datasets:[{data:dV,backgroundColor:PALETTE.slice(0,dL.length),borderWidth:0,hoverOffset:4}]},options:donutOpts});
+        charts.cClass=new Chart(document.getElementById('cClass'),{type:'doughnut',data:{labels:cL,datasets:[{data:cV,backgroundColor:PALETTE.slice(0,cL.length),borderWidth:0,hoverOffset:4}]},options:donutOpts});
+    }
+
+    function renderAll(){
+        const data=getFiltered();
+        renderSpecies(data);
+        renderConditions(data);
+        renderTrophic(data);
+    }
+
+    document.querySelectorAll('.stats-tab').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+            document.querySelectorAll('.stats-tab').forEach(b=>b.classList.remove('active'));
+            document.querySelectorAll('.stats-pane').forEach(p=>p.classList.remove('active'));
+            btn.classList.add('active');
+            activeTab=btn.dataset.pane;
+            document.getElementById('pane-'+activeTab).classList.add('active');
+        });
+    });
+
+    document.getElementById('biomeSelector').addEventListener('change',renderAll);
+
+    async function loadData(){
+        try{
+            const r=await fetch('?handler=StatsData');
+            if(!r.ok)return;
+            allData=await r.json();
+            const sel=document.getElementById('biomeSelector');
+            sel.innerHTML='<option value="all">Tous mes biomes</option>';
+            allData.forEach(b=>{
+                const o=document.createElement('option');
+                o.value=b.id;o.textContent=b.name;
+                sel.appendChild(o);
+            });
+            renderAll();
+        }catch(e){console.error(e);}
+    }
+
+    loadData();
+</script>
