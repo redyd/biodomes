@@ -20,9 +20,50 @@ ViewData["Title"] = "Statistiques";
     </div>
 
     <div class="stats-tabs">
+        <button class="stats-tab" data-pane="history">Évolution</button>
         <button class="stats-tab active" data-pane="species">Espèces</button>
         <button class="stats-tab" data-pane="conditions">Conditions</button>
         <button class="stats-tab" data-pane="trophic">Réseau trophique</button>
+    </div>
+    
+    <div id="pane-history" class="stats-pane">
+
+        <!-- Filtre de période -->
+        <div class="stats-controls" style="margin-bottom:1rem">
+            <span class="field-label">Période</span>
+            <div class="period-btns">
+                <button class="period-btn" data-days="7">7 jours</button>
+                <button class="period-btn active" data-days="30">30 jours</button>
+                <button class="period-btn" data-days="90">90 jours</button>
+                <button class="period-btn" data-days="0">Tout</button>
+            </div>
+        </div>
+
+        <!-- Graphique 1 : évolution cumulée -->
+        <div class="chart-card">
+            <div class="chart-card-title">Évolution du nombre d'espèces</div>
+            <div class="chart-wrap" style="height:280px">
+                <canvas id="cHistory"></canvas>
+            </div>
+        </div>
+
+        <!-- Graphique 2 : par régime alimentaire -->
+        <div class="chart-card" style="margin-top:1rem">
+            <div class="chart-card-title">Espèces ajoutées par régime alimentaire</div>
+            <div class="chart-legend" id="leg-diet-history"></div>
+            <div class="chart-wrap" style="height:260px">
+                <canvas id="cDietHistory"></canvas>
+            </div>
+        </div>
+
+        <!-- Graphique 3 : par classification -->
+        <div class="chart-card" style="margin-top:1rem">
+            <div class="chart-card-title">Espèces ajoutées par classification</div>
+            <div class="chart-legend" id="leg-class-history"></div>
+            <div class="chart-wrap" style="height:260px">
+                <canvas id="cClassHistory"></canvas>
+            </div>
+        </div>
     </div>
 
     <div id="pane-species" class="stats-pane active">
@@ -86,119 +127,380 @@ ViewData["Title"] = "Statistiques";
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-    const TEAL='#00d2b4',AMBER='#f0a830',MID='#7aada8',MUTED='#3d6b66',SURFACE='#132830',BORDER='rgba(0,210,180,0.15)';
-    const PALETTE=['#00d2b4','#f0a830','#5b8fa8','#a78bfa','#fb7185','#34d399','#f97316','#60a5fa'];
+    // ═══════════════════════════════════════════════════════════
+    // CONSTANTES & STATE
+    // ═══════════════════════════════════════════════════════════
+    const TEAL   = '#00d2b4';
+    const AMBER  = '#f0a830';
+    const MID    = '#7aada8';
+    const MUTED  = '#3d6b66';
+    const SURFACE= '#132830';
+    const BORDER = 'rgba(0,210,180,0.15)';
+    const PALETTE= ['#00d2b4','#f0a830','#5b8fa8','#a78bfa','#fb7185','#34d399','#f97316','#60a5fa'];
 
-    let allData=[], charts={}, activeTab='species';
+    let allData     = [];
+    let charts      = {};
+    let activeTab   = 'species';
+    let currentDays = 30;
 
-    function getFiltered(){
-        const v=document.getElementById('biomeSelector').value;
-        return v==='all'?allData:allData.filter(b=>b.id==v);
+    // ═══════════════════════════════════════════════════════════
+    // UTILITAIRES
+    // ═══════════════════════════════════════════════════════════
+    function getFiltered() {
+        const v = document.getElementById('biomeSelector').value;
+        return v === 'all' ? allData : allData.filter(b => b.id == v);
     }
 
-    function buildLegend(elId,labels,colors){
-        const el=document.getElementById(elId);
-        if(!el)return;
-        el.innerHTML=labels.map((l,i)=>`<span class="chart-legend-item"><span class="chart-legend-dot" style="background:${colors[i%colors.length]}"></span>${l}</span>`).join('');
+    function buildLegend(elId, labels, colors) {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        el.innerHTML = labels.map((l, i) =>
+            `<span class="chart-legend-item">
+            <span class="chart-legend-dot" style="background:${colors[i % colors.length]}"></span>
+            ${l}
+        </span>`
+        ).join('');
     }
 
-    function base(){
-        return{
-            responsive:true,maintainAspectRatio:false,
-            plugins:{legend:{display:false},tooltip:{backgroundColor:SURFACE,titleColor:TEAL,bodyColor:MID,borderColor:BORDER,borderWidth:1,titleFont:{family:'Space Mono'},bodyFont:{family:'Space Mono',size:11}}},
+    function base() {
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: SURFACE,
+                    titleColor: TEAL,
+                    bodyColor: MID,
+                    borderColor: BORDER,
+                    borderWidth: 1,
+                    titleFont: { family: 'Space Mono' },
+                    bodyFont:  { family: 'Space Mono', size: 11 }
+                }
+            }
         };
     }
 
-    function axis(){
-        return{grid:{color:'rgba(0,210,180,0.06)'},ticks:{color:MUTED,font:{family:'Space Mono',size:10}},border:{color:'rgba(0,210,180,0.1)'}};
+    function axis() {
+        return {
+            grid:   { color: 'rgba(0,210,180,0.06)' },
+            ticks:  { color: MUTED, font: { family: 'Space Mono', size: 10 } },
+            border: { color: 'rgba(0,210,180,0.1)' }
+        };
     }
 
-    function renderSpecies(data){
-        if(charts.species) {
-            charts.species.destroy();
+    // ═══════════════════════════════════════════════════════════
+    // ONGLET ESPÈCES
+    // ═══════════════════════════════════════════════════════════
+    function renderSpecies(data) {
+        if (charts.species) charts.species.destroy();
+
+        const labels = data.map(b => b.name);
+        const counts = data.map(b => b.speciesCount);
+
+        buildLegend('leg-species', labels, PALETTE);
+        document.getElementById('m-biomes').textContent  = data.length;
+        const total = counts.reduce((a, b) => a + b, 0);
+        document.getElementById('m-species').textContent = total;
+        document.getElementById('m-avg').textContent     = data.length ? Math.round(total / data.length) : 0;
+
+        charts.species = new Chart(document.getElementById('cSpecies'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    data: counts,
+                    backgroundColor: labels.map((_, i) => PALETTE[i % PALETTE.length]),
+                    borderRadius: 4,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                ...base(),
+                scales: {
+                    x: axis(),
+                    y: { ...axis(), beginAtZero: true, ticks: { ...axis().ticks, stepSize: 1 } }
+                }
+            }
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // ONGLET CONDITIONS
+    // ═══════════════════════════════════════════════════════════
+    function renderConditions(data) {
+        ['cTemp', 'cHum'].forEach(id => { if (charts[id]) charts[id].destroy(); });
+
+        const labels = data.map(b => b.name);
+
+        charts.cTemp = new Chart(document.getElementById('cTemp'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    data: data.map(b => b.temperature),
+                    backgroundColor: labels.map((_, i) => i % 2 === 0 ? '#fb7185' : '#f97316'),
+                    borderRadius: 4,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                ...base(),
+                scales: {
+                    x: axis(),
+                    y: { ...axis(), ticks: { ...axis().ticks, callback: v => v + '°C' } }
+                }
+            }
+        });
+
+        charts.cHum = new Chart(document.getElementById('cHum'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    data: data.map(b => b.humidity),
+                    backgroundColor: labels.map((_, i) => i % 2 === 0 ? TEAL : '#60a5fa'),
+                    borderRadius: 4,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                ...base(),
+                scales: {
+                    x: axis(),
+                    y: { ...axis(), beginAtZero: true, ticks: { ...axis().ticks, callback: v => v + ' g/m³' } }
+                }
+            }
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // ONGLET RÉSEAU TROPHIQUE
+    // ═══════════════════════════════════════════════════════════
+    function renderTrophic(data) {
+        ['cDiet', 'cClass'].forEach(id => { if (charts[id]) charts[id].destroy(); });
+
+        const dietTot = {}, classTot = {};
+        data.forEach(b => {
+            Object.entries(b.speciesByDiet           || {}).forEach(([k, v]) => { dietTot[k]  = (dietTot[k]  || 0) + v; });
+            Object.entries(b.speciesByClassification || {}).forEach(([k, v]) => { classTot[k] = (classTot[k] || 0) + v; });
+        });
+
+        const dL = Object.keys(dietTot),  dV = Object.values(dietTot);
+        const cL = Object.keys(classTot), cV = Object.values(classTot);
+        const dT = dV.reduce((a, b) => a + b, 0);
+        const cT = cV.reduce((a, b) => a + b, 0);
+
+        buildLegend('leg-diet',  dL.map((l, i) => `${l} ${Math.round(dV[i] / dT * 100)}%`), PALETTE);
+        buildLegend('leg-class', cL.map((l, i) => `${l} ${Math.round(cV[i] / cT * 100)}%`), PALETTE);
+
+        const donutOpts = { ...base(), cutout: '68%' };
+
+        charts.cDiet = new Chart(document.getElementById('cDiet'), {
+            type: 'doughnut',
+            data: {
+                labels: dL,
+                datasets: [{ data: dV, backgroundColor: PALETTE.slice(0, dL.length), borderWidth: 0, hoverOffset: 4 }]
+            },
+            options: donutOpts
+        });
+
+        charts.cClass = new Chart(document.getElementById('cClass'), {
+            type: 'doughnut',
+            data: {
+                labels: cL,
+                datasets: [{ data: cV, backgroundColor: PALETTE.slice(0, cL.length), borderWidth: 0, hoverOffset: 4 }]
+            },
+            options: donutOpts
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // ONGLET ÉVOLUTION
+    // ═══════════════════════════════════════════════════════════
+    async function loadHistory() {
+        const biomeId = document.getElementById('biomeSelector').value;
+        const params  = new URLSearchParams({ days: currentDays });
+        if (biomeId !== 'all') params.append('biomeId', biomeId);
+
+        try {
+            const r = await fetch(`?handler=HistoryData&${params}`);
+            if (!r.ok) return;
+            const historyData = await r.json();
+            renderHistory(historyData);
+        } catch (e) {
+            console.error('Erreur chargement historique:', e);
         }
-        
-        const labels=data.map(b=>b.name);
-        const counts=data.map(b=>b.speciesCount);
-        
-        buildLegend('leg-species',labels,PALETTE);
-        document.getElementById('m-biomes').textContent=data.length;
-        const total=counts.reduce((a,b)=>a+b,0);
-        document.getElementById('m-species').textContent=total;
-        document.getElementById('m-avg').textContent=data.length?Math.round(total/data.length):0;
-        
-        charts.species=new Chart(document.getElementById('cSpecies'),{
-            type:'bar',
-            data:{labels,datasets:[{data:counts,backgroundColor:labels.map((_,i)=>PALETTE[i%PALETTE.length]),borderRadius:4,borderSkipped:false}]},
-            options:{...base(),scales:{x:axis(),y:{...axis(),beginAtZero:true,ticks:{...axis().ticks,stepSize:1}}}}
+    }
+
+    function renderHistory(historyData) {
+        ['cHistory', 'cDietHistory', 'cClassHistory'].forEach(id => {
+            if (charts[id]) charts[id].destroy();
+        });
+
+        if (!historyData.length) return;
+
+        // Toutes les dates uniques triées
+        const allDates = [...new Set(
+            historyData.flatMap(b => b.speciesOverTime.map(p => p.date))
+        )].sort();
+
+        // ── Graphique 1 : évolution cumulée par biome ──
+        const speciesDatasets = historyData.map((b, i) => ({
+            label: b.biomeName,
+            data: allDates.map(d => {
+                const pt = b.speciesOverTime.find(p => p.date === d);
+                return pt ? pt.count : null;
+            }),
+            borderColor:     PALETTE[i % PALETTE.length],
+            backgroundColor: PALETTE[i % PALETTE.length] + '22',
+            fill:       true,
+            tension:    0.4,
+            pointRadius:      4,
+            pointHoverRadius: 7,
+            spanGaps: true,
+        }));
+
+        charts.cHistory = new Chart(document.getElementById('cHistory'), {
+            type: 'line',
+            data: { labels: allDates, datasets: speciesDatasets },
+            options: {
+                ...base(),
+                plugins: {
+                    ...base().plugins,
+                    legend: {
+                        display: historyData.length > 1,
+                        labels: { color: MID, font: { family: 'Space Mono', size: 11 } }
+                    },
+                    tooltip: {
+                        ...base().plugins.tooltip,
+                        callbacks: {
+                            label: ctx => `${ctx.dataset.label} : ${ctx.parsed.y} espèce(s)`
+                        }
+                    }
+                },
+                scales: {
+                    x: { ...axis(), title: { display: true, text: 'Date',              color: MID } },
+                    y: { ...axis(), beginAtZero: true, title: { display: true, text: 'Nb espèces (cumulé)', color: MID } }
+                }
+            }
+        });
+
+        // ── Graphique 2 : par régime alimentaire ──
+        renderGroupedHistory('cDietHistory',  'leg-diet-history',   historyData, 'byDietOverTime');
+
+        // ── Graphique 3 : par classification ──
+        renderGroupedHistory('cClassHistory', 'leg-class-history',  historyData, 'byClassificationOverTime');
+    }
+
+    function renderGroupedHistory(canvasId, legendId, historyData, field) {
+        const allDates = [...new Set(
+            historyData.flatMap(b => b[field].map(p => p.date))
+        )].sort();
+
+        const allLabels = [...new Set(
+            historyData.flatMap(b => b[field].map(p => p.label))
+        )];
+
+        const datasets = allLabels.map((label, i) => ({
+            label,
+            data: allDates.map(d =>
+                historyData.reduce((sum, b) => {
+                    const pt = b[field].find(p => p.date === d && p.label === label);
+                    return sum + (pt ? pt.count : 0);
+                }, 0)
+            ),
+            borderColor:     PALETTE[i % PALETTE.length],
+            backgroundColor: PALETTE[i % PALETTE.length] + '33',
+            fill:       false,
+            tension:    0.4,
+            pointRadius:      4,
+            pointHoverRadius: 7,
+        }));
+
+        buildLegend(legendId, allLabels, PALETTE);
+
+        charts[canvasId] = new Chart(document.getElementById(canvasId), {
+            type: 'line',
+            data: { labels: allDates, datasets },
+            options: {
+                ...base(),
+                scales: {
+                    x: axis(),
+                    y: { ...axis(), beginAtZero: true }
+                }
+            }
         });
     }
 
-    function renderConditions(data){
-        ['cTemp','cHum'].forEach(id=>{if(charts[id])charts[id].destroy();});
-        const labels=data.map(b=>b.name);
-        charts.cTemp=new Chart(document.getElementById('cTemp'),{
-            type:'bar',
-            data:{labels,datasets:[{data:data.map(b=>b.temperature),backgroundColor:labels.map((_,i)=>i%2===0?'#fb7185':'#f97316'),borderRadius:4,borderSkipped:false}]},
-            options:{...base(),scales:{x:axis(),y:{...axis(),ticks:{...axis().ticks,callback:v=>v+'°C'}}}}
-        });
-        charts.cHum=new Chart(document.getElementById('cHum'),{
-            type:'bar',
-            data:{labels,datasets:[{data:data.map(b=>b.humidity),backgroundColor:labels.map((_,i)=>i%2===0?TEAL:'#60a5fa'),borderRadius:4,borderSkipped:false}]},
-            options:{...base(),scales:{x:axis(),y:{...axis(),beginAtZero:true,ticks:{...axis().ticks,callback:v=>v+' g/m³'}}}}
-        });
-    }
-
-    function renderTrophic(data){
-        ['cDiet','cClass'].forEach(id=>{if(charts[id])charts[id].destroy();});
-        const dietTot={},classTot={};
-        data.forEach(b=>{
-            Object.entries(b.speciesByDiet||{}).forEach(([k,v])=>{dietTot[k]=(dietTot[k]||0)+v;});
-            Object.entries(b.speciesByClassification||{}).forEach(([k,v])=>{classTot[k]=(classTot[k]||0)+v;});
-        });
-        const dL=Object.keys(dietTot),dV=Object.values(dietTot);
-        const cL=Object.keys(classTot),cV=Object.values(classTot);
-        const dT=dV.reduce((a,b)=>a+b,0),cT=cV.reduce((a,b)=>a+b,0);
-        buildLegend('leg-diet',dL.map((l,i)=>l+' '+Math.round(dV[i]/dT*100)+'%'),PALETTE);
-        buildLegend('leg-class',cL.map((l,i)=>l+' '+Math.round(cV[i]/cT*100)+'%'),PALETTE);
-        const donutOpts={...base(),cutout:'68%'};
-        charts.cDiet=new Chart(document.getElementById('cDiet'),{type:'doughnut',data:{labels:dL,datasets:[{data:dV,backgroundColor:PALETTE.slice(0,dL.length),borderWidth:0,hoverOffset:4}]},options:donutOpts});
-        charts.cClass=new Chart(document.getElementById('cClass'),{type:'doughnut',data:{labels:cL,datasets:[{data:cV,backgroundColor:PALETTE.slice(0,cL.length),borderWidth:0,hoverOffset:4}]},options:donutOpts});
-    }
-
-    function renderAll(){
-        const data=getFiltered();
+    // ═══════════════════════════════════════════════════════════
+    // RENDER GLOBAL (espèces + conditions + trophique)
+    // ═══════════════════════════════════════════════════════════
+    function renderAll() {
+        const data = getFiltered();
         renderSpecies(data);
         renderConditions(data);
         renderTrophic(data);
     }
 
-    document.querySelectorAll('.stats-tab').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-            document.querySelectorAll('.stats-tab').forEach(b=>b.classList.remove('active'));
-            document.querySelectorAll('.stats-pane').forEach(p=>p.classList.remove('active'));
+    // ═══════════════════════════════════════════════════════════
+    // ÉVÉNEMENTS — ONGLETS
+    // ═══════════════════════════════════════════════════════════
+    document.querySelectorAll('.stats-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.stats-tab') .forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.stats-pane').forEach(p => p.classList.remove('active'));
             btn.classList.add('active');
-            activeTab=btn.dataset.pane;
-            document.getElementById('pane-'+activeTab).classList.add('active');
+            activeTab = btn.dataset.pane;
+            document.getElementById('pane-' + activeTab).classList.add('active');
+
+            // Charge l'historique uniquement quand on arrive sur cet onglet
+            if (activeTab === 'history') loadHistory();
         });
     });
 
-    document.getElementById('biomeSelector').addEventListener('change',renderAll);
+    // ═══════════════════════════════════════════════════════════
+    // ÉVÉNEMENTS — SÉLECTEUR DE BIOME
+    // ═══════════════════════════════════════════════════════════
+    document.getElementById('biomeSelector').addEventListener('change', () => {
+        renderAll();
+        if (activeTab === 'history') loadHistory();
+    });
 
-    async function loadData(){
-        try{
-            const r=await fetch('?handler=StatsData');
-            if(!r.ok)return;
-            allData=await r.json();
-            const sel=document.getElementById('biomeSelector');
-            sel.innerHTML='<option value="all">Tous mes biomes</option>';
-            allData.forEach(b=>{
-                const o=document.createElement('option');
-                o.value=b.id;o.textContent=b.name;
+    // ═══════════════════════════════════════════════════════════
+    // ÉVÉNEMENTS — BOUTONS DE PÉRIODE
+    // ═══════════════════════════════════════════════════════════
+    document.querySelectorAll('.period-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentDays = parseInt(btn.dataset.days);
+            loadHistory();
+        });
+    });
+
+    // ═══════════════════════════════════════════════════════════
+    // INIT — CHARGEMENT DES DONNÉES PRINCIPALES
+    // ═══════════════════════════════════════════════════════════
+    async function loadData() {
+        try {
+            const r = await fetch('?handler=StatsData');
+            if (!r.ok) return;
+            allData = await r.json();
+
+            const sel = document.getElementById('biomeSelector');
+            sel.innerHTML = '<option value="all">Tous mes biomes</option>';
+            allData.forEach(b => {
+                const o = document.createElement('option');
+                o.value       = b.id;
+                o.textContent = b.name;
                 sel.appendChild(o);
             });
+
             renderAll();
-        }catch(e){console.error(e);}
+        } catch (e) {
+            console.error('Erreur chargement stats:', e);
+        }
     }
 
     loadData();

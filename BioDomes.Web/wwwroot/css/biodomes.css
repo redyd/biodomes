@@ -1481,3 +1481,20 @@ dialog::backdrop {
     .chart-two-col { grid-template-columns: 1fr; }
     .btn-export { margin-left: 0; }
 }
+
+.period-btns { display: flex; gap: .5rem; flex-wrap: wrap; }
+
+.period-btn {
+    padding: .35rem .9rem;
+    border: 1px solid rgba(0,210,180,0.3);
+    border-radius: 20px;
+    background: transparent;
+    color: #7aada8;
+    font-family: 'Space Mono', monospace;
+    font-size: .8rem;
+    cursor: pointer;
+    transition: all .2s;
+}
+
+.period-btn:hover  { border-color: #00d2b4; color: #00d2b4; }
+.period-btn.active { background: #00d2b4; color: #132830; border-color: #00d2b4; }

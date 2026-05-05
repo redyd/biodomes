@@ -23,6 +23,15 @@ public class StatsModel : PageModel
         var stats = await _biomeRepository.GetStatsAsync(userId, isAdmin);
         return new JsonResult(stats);
     }
+    
+    public async Task<IActionResult> OnGetHistoryDataAsync(int? biomeId, int days = 30)
+    {
+        var userId  = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var isAdmin = User.IsInRole("Admin");
+
+        var history = await _biomeRepository.GetHistoryAsync(userId, isAdmin, biomeId, days);
+        return new JsonResult(history);
+    }
 
     public IActionResult OnGet()
     {

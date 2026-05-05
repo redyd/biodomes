@@ -402,4 +402,92 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
                 .ToDictionary(g => g.Key, g => g.Count())
         }).ToList();
     }
+
+    public async Task<List<BiomeHistoryDto>> GetHistoryAsync(
+    string? userId, bool isAdmin, int? biomeId, int days)
+{
+    var since = days == 0 ? DateTime.MinValue : DateTime.UtcNow.AddDays(-days);
+
+    var query = context.Biomes
+        .Include(b => b.BiomeSpecies)
+            .ThenInclude(bs => bs.Specie)
+                .ThenInclude(s => s.DietEntity)
+        .Include(b => b.BiomeSpecies)
+            .ThenInclude(bs => bs.Specie)
+                .ThenInclude(s => s.ClassificationEntity)
+        .AsQueryable();
+
+    if (!isAdmin)
+        query = query.Where(b => b.IsPublic || (userId != null && b.UserId == userId));
+
+    if (biomeId.HasValue)
+        query = query.Where(b => b.Id == biomeId.Value);
+
+    var biomes = await query.ToListAsync();
+
+    return biomes.Select(b =>
+    {
+        var speciesInRange = b.BiomeSpecies
+            .Where(bs => bs.Inserted >= since)
+            .OrderBy(bs => bs.Inserted)
+            .ToList();
+
+        var speciesOverTime = speciesInRange
+            .GroupBy(bs => bs.Inserted.ToString("yyyy-MM-dd"))
+            .Select(g => new HistoryPoint
+            {
+                Date = g.Key,
+                Label = "Espèces",
+                Count = g.Count()
+            })
+            .OrderBy(p => p.Date)
+            .ToList();
+
+        var cumul = 0;
+        foreach (var point in speciesOverTime)
+        {
+            cumul += point.Count;
+            point.Count = cumul;
+        }
+
+        var byDiet = speciesInRange
+            .GroupBy(bs => new
+            {
+                Date = bs.Inserted.ToString("yyyy-MM-dd"),
+                Diet = bs.Specie.DietEntity.Label
+            })
+            .Select(g => new HistoryPoint
+            {
+                Date = g.Key.Date,
+                Label = g.Key.Diet,
+                Count = g.Count()
+            })
+            .OrderBy(p => p.Date)
+            .ToList();
+
+        var byClassification = speciesInRange
+            .GroupBy(bs => new
+            {
+                Date = bs.Inserted.ToString("yyyy-MM-dd"),
+                Class = bs.Specie.ClassificationEntity.Label
+            })
+            .Select(g => new HistoryPoint
+            {
+                Date = g.Key.Date,
+                Label = g.Key.Class,
+                Count = g.Count()
+            })
+            .OrderBy(p => p.Date)
+            .ToList();
+
+        return new BiomeHistoryDto
+        {
+            BiomeId = b.Id,
+            BiomeName = b.Name,
+            SpeciesOverTime = speciesOverTime,
+            ByDietOverTime = byDiet,
+            ByClassificationOverTime = byClassification
+        };
+    }).ToList();
+}
 }
