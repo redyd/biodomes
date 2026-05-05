@@ -378,8 +378,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
 
         if (!isAdmin)
         {
-            query = query.Where(b =>
-                b.IsPublic || (userId != null && b.UserId == userId));
+            query = query.Where(b => userId != null && b.UserId == userId);
         }
 
         var biomes = await query.ToListAsync();
@@ -418,7 +417,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         .AsQueryable();
 
     if (!isAdmin)
-        query = query.Where(b => b.IsPublic || (userId != null && b.UserId == userId));
+        query = query.Where(b => userId != null && b.UserId == userId);
 
     if (biomeId.HasValue)
         query = query.Where(b => b.Id == biomeId.Value);

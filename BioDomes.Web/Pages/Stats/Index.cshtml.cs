@@ -14,7 +14,9 @@ public class StatsModel : PageModel
     {
         _biomeRepository = biomeRepository;
     }
-
+    
+    public bool HasBiomes { get; set; }
+    
     public async Task<IActionResult> OnGetStatsDataAsync()
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -33,8 +35,13 @@ public class StatsModel : PageModel
         return new JsonResult(history);
     }
 
-    public IActionResult OnGet()
+    public async Task<IActionResult> OnGet()
     {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var isAdmin = User.IsInRole("Admin");
+
+        var stats = await _biomeRepository.GetStatsAsync(userId, isAdmin);
+        HasBiomes = stats.Count > 0;
         return Page();
     }
 }

@@ -1498,3 +1498,25 @@ dialog::backdrop {
 
 .period-btn:hover  { border-color: #00d2b4; color: #00d2b4; }
 .period-btn.active { background: #00d2b4; color: #132830; border-color: #00d2b4; }
+
+.stats-empty {
+    text-align: center;
+    padding: 5rem 2rem;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+}
+
+.stats-empty-title {
+    font-family: var(--sans), serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 0.5rem;
+}
+
+.stats-empty-desc {
+    font-family: var(--mono), serif;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
