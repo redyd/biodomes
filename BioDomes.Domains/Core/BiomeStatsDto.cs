@@ -10,4 +10,5 @@ public class BiomeStatsDto
     public double Humidity { get; set; }
     public Dictionary<string, int> SpeciesByDiet { get; set; } = new();
     public Dictionary<string, int> SpeciesByClassification { get; set; } = new();
+    public Dictionary<string, int> SpeciesByName { get; set; }
 }

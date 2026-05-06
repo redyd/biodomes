@@ -398,7 +398,11 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
 
             SpeciesByClassification = b.BiomeSpecies
                 .GroupBy(bs => bs.Specie.ClassificationEntity.Label)
-                .ToDictionary(g => g.Key, g => g.Count())
+                .ToDictionary(g => g.Key, g => g.Count()),
+            
+            SpeciesByName = b.BiomeSpecies
+            .GroupBy(bs => bs.Specie.Name)
+            .ToDictionary(g => g.Key, g => g.Count()),
         }).ToList();
     }
 
