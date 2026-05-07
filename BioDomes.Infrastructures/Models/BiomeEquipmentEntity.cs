@@ -6,8 +6,8 @@ public class BiomeEquipmentEntity
     public DateTime Inserted { get; set; }
     
     public int BiomeId { get; set; }
-    public BiomeEntity Biome { get; set; }
+    public BiomeEntity Biome { get; set; } = null!;
     
     public int EquipmentId { get; set; }
-    public EquipmentEntity Equipment { get; set; }
+    public EquipmentEntity Equipment { get; set; } = null!;
 }

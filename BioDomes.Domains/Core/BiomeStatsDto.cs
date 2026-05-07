@@ -8,7 +8,7 @@ public class BiomeStatsDto
     public int EquipmentCount { get; set; }
     public double Temperature { get; set; }
     public double Humidity { get; set; }
-    public Dictionary<string, int> SpeciesByDiet { get; set; } = new();
-    public Dictionary<string, int> SpeciesByClassification { get; set; } = new();
-    public Dictionary<string, int> SpeciesByName { get; set; }
+    public Dictionary<string, int> SpeciesByDiet { get; set; } = [];
+    public Dictionary<string, int> SpeciesByClassification { get; set; } = [];
+    public Dictionary<string, int> SpeciesByName { get; set; } = [];
 }
