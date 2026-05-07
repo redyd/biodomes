@@ -4,11 +4,13 @@ using BioDomes.Domains.Requests;
 using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BioDomes.Web.Pages.Species;
 
+[Authorize]
 public class AddModel(
     ISpeciesRepository speciesRepository,
     ISpecieAttributesRepository attributesRepository,
@@ -19,13 +21,18 @@ public class AddModel(
     public SelectList Classifications { get; set; } = null!;
     public SelectList Diets { get; set; } = null!;
 
-    private async Task LoadSelectLists()
+    private async Task<IActionResult?> LoadSelectLists()
     {
         var classifications = await attributesRepository.GetClassifications();
         var diets = await attributesRepository.GetDiets();
+        
+        if (classifications.Failed) return classifications.ToPageResult(this);
+        if (diets.Failed) return diets.ToPageResult(this);
 
-        Classifications = new SelectList(classifications, "Id", "Label", Input?.ClassificationId);
-        Diets = new SelectList(diets, "Id", "Label", Input?.DietId);
+        Classifications = new SelectList(classifications.Value!, "Id", "Label", Input?.ClassificationId);
+        Diets = new SelectList(diets.Value!, "Id", "Label", Input?.DietId);
+        
+        return null;
     }
 
     public async Task<IActionResult> OnGetAsync()
@@ -36,7 +43,9 @@ public class AddModel(
             return Forbid();
         }
 
-        await LoadSelectLists();
+        var loaded = await LoadSelectLists();
+        if (loaded is not null) return loaded;
+        
         return Page();
     }
 
@@ -44,7 +53,8 @@ public class AddModel(
     {
         if (Input == null || !ModelState.IsValid)
         {
-            await LoadSelectLists();
+            var loaded = await LoadSelectLists();
+            if (loaded is not null) return loaded;
             return Page();
         }
 
@@ -75,7 +85,9 @@ public class AddModel(
                 {
                     DeleteImage(imageName);
                 }
-                await LoadSelectLists();
+                var loaded = await LoadSelectLists();
+                if (loaded is not null) return loaded;
+                
                 return Page();
             }
 
@@ -90,7 +102,8 @@ public class AddModel(
         catch (InvalidOperationException ex)
         {
             ModelState.AddModelError("Input.Name", ex.Message);
-            await LoadSelectLists();
+            var loaded = await LoadSelectLists();
+            if (loaded is not null) return loaded;
             return Page();
         }
     }

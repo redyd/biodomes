@@ -10,10 +10,10 @@ public class Biome
     public required string? ImageUrl { get; init; }
     public required bool IsPublic { get; init; }
 
-    public string State => Temperature switch
+    public BiomeState State => Temperature switch
     {
-        < -20 or > 40 => "Critique",
-        < 0 or > 30 => "Instable",
-        _ => "Optimal"
+        < -20 or > 40 => BiomeState.Critic,
+        < 0 or > 30 => BiomeState.Instable,
+        _ => BiomeState.Optimal
     };
 }

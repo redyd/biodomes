@@ -2,6 +2,7 @@ using BioDomes.Domains.Core;
 using BioDomes.Domains.Extensions;
 using BioDomes.Domains.Repository;
 using BioDomes.Domains.Requests;
+using BioDomes.Infrastructures.Errors;
 using BioDomes.Infrastructures.Mappers;
 using BioDomes.Infrastructures.Models;
 using Microsoft.EntityFrameworkCore;
@@ -31,10 +32,10 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
             var result = await query.ToListAsync();
             return ResultT<List<Specie>>.Ok(result.Select(SpecieMapper.MapSpecie).ToList());
         }
-        catch (Exception ex)
+        catch (DbUpdateException e)
         {
-            logger.LogWarning($"Database error: {ex.Message}");
-            return ResultT<List<Specie>>.Failure("Database error");
+            logger.LogError("Database error: {EMessage}", e.Message);
+            return ResultT<List<Specie>>.Failure($"Database error: {e.Message}");
         }
     }
 
@@ -59,24 +60,10 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
             var result = await query.ToDictionaryAsync(s => s.Id, SpecieMapper.MapSpecie);
             return ResultT<Dictionary<int, Specie>>.Ok(result);
         }
-        catch (Exception ex)
+        catch (DbUpdateException e)
         {
-            logger.LogWarning($"Database error: {ex.Message}");
-            return ResultT<Dictionary<int, Specie>>.Failure("Database error");
-        }
-    }
-
-    public async Task<ResultT<int>> CountAsync()
-    {
-        try
-        {
-            var count = await context.Species.CountAsync();
-            return ResultT<int>.Ok(count);
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning($"Database error: {ex.Message}");
-            return ResultT<int>.Failure("Database error");
+            logger.LogError("Database error: {EMessage}", e.Message);
+            return ResultT<Dictionary<int, Specie>>.Failure($"Database error: {e.Message}");
         }
     }
 
@@ -98,10 +85,10 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
 
             return ResultT<Specie>.Ok(SpecieMapper.MapSpecie(result));
         }
-        catch (Exception ex)
+        catch (DbUpdateException e)
         {
-            logger.LogWarning($"Database error: {ex.Message}");
-            return ResultT<Specie>.Failure("Database error");
+            logger.LogError("Database error: {EMessage}", e.Message);
+            return ResultT<Specie>.Failure($"Database error: {e.Message}");
         }
     }
 
@@ -113,7 +100,7 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
                 .Where(s => s.Id != toUpdate.Id)
                 .Select(s => s.Name)
                 .ToListAsync();
-            
+
             var updateKebab = toUpdate.Name.ToKebabCase();
             if (allName.Any(n => n.ToKebabCase() == updateKebab))
             {
@@ -154,7 +141,7 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
                 .Include(s => s.ClassificationEntity)
                 .ThenInclude(ce => ce.EatenByDiets)
                 .FirstAsync(s => s.Id == toUpdate.Id);
-            
+
             return ResultT<Specie>.Ok(SpecieMapper.MapSpecie(specie));
         }
         catch (DbUpdateException ex) when (SqlServerError.IsUniqueConstraintViolation(ex) ||
@@ -177,14 +164,14 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
             {
                 return ResultT<Specie>.Forbidden("You should be authenticate to add a specie");
             }
-            
+
             var allName = await context.Species.Select(s => s.Name).ToListAsync();
             var updateKebab = toAdd.Name.ToKebabCase();
             if (allName.Any(n => n.ToKebabCase() == updateKebab))
             {
                 return ResultT<Specie>.Conflict($"Une espèce nommée '{toAdd.Name}' existe déjà.");
             }
-            
+
             var entity = new SpecieEntity
             {
                 UserId = userId,

@@ -1,7 +1,7 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
-namespace BioDomes.Infrastructures.Repositories;
+namespace BioDomes.Infrastructures.Errors;
 
 public static class SqlServerError
 {

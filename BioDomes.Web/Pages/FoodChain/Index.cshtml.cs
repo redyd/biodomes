@@ -7,53 +7,53 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.FoodChain;
 
-public class Index(IWebHostEnvironment env, IFoodChainRepository repo)
-    : AppPageModel(env)
+public class Index(IWebHostEnvironment env, IFoodChainRepository repo) : AppPageModel(env)
 {
-    public FoodChainGraph? Graph { get; set; }
+    public FoodChainGraph Graph { get; set; } = null!;
 
     public async Task<IActionResult> OnGetAsync()
     {
         var result = await repo.GetFullGraphAsync(User.GetUserId(), User.IsAdmin());
-        if (result.Failed || result.Value is null)
-        {
-            return result.ToPageResult(this);
-        }
-        
+        if (result.Failed) return result.ToPageResult(this);
+
         Graph = result.Value!;
 
         return Page();
     }
 
-    public async Task OnPostAddRelation([FromBody] NodeActionDto action)
+    public async Task<IActionResult> OnPostAddRelation([FromBody] NodeActionDto action)
     {
-        await repo.AddRelation(action.PredatorId, action.PreyId);
+        var result = await repo.AddRelation(action.PredatorId, action.PreyId);
+        if (result.Failed) return result.ToPageResult(this);
+
+        return Page();
     }
 
-    public async Task OnPostRemoveRelation([FromBody] NodeActionDto action)
+    public async Task<IActionResult> OnPostRemoveRelation([FromBody] NodeActionDto action)
     {
-        await repo.DeleteRelation(action.PredatorId, action.PreyId);
+        var result = await repo.DeleteRelation(action.PredatorId, action.PreyId);
+        if (result.Failed) return result.ToPageResult(this);
+        
+        return Page();
     }
-    
+
     public async Task<IActionResult> OnPostNodeClicked([FromBody] NodeClickDto node)
     {
         var result = await repo.GetFullGraphAsync(User.GetUserId(), User.IsAdmin());
-        if (result.Failed || result.Value is null)
-        {
-            return result.ToPageResult(this);
-        }
+        if (result.Failed) return result.ToPageResult(this);
+
         var graph = result.Value!;
-        var specie = graph.Nodes.FirstOrDefault(x => x.SpecieId == node.SpecieId);
+        var specie = graph.Nodes.First(x => x.SpecieId == node.SpecieId);
         var preys = graph.PreyOf(node.SpecieId);
         var available = graph.AvailablePreyFor(node.SpecieId);
 
-        return new JsonResult(new
+        return new JsonResult(new NodeClickedDetailDto
         {
-            id = specie?.SpecieId,
-            name = specie?.Name,
-            classification = specie?.Classification,
-            preys,
-            available,
+            Id = specie.SpecieId,
+            Name = specie.Name,
+            Classification = specie.Classification,
+            Preys = preys,
+            Available = available
         });
     }
 }

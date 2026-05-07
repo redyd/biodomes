@@ -1,14 +1,15 @@
-using System.Security.Claims;
 using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Domains.Requests;
 using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Equipments;
 
+[Authorize]
 public class Add(IWebHostEnvironment env, IEquipmentRepository repository, ILogger<Add> logger)
     : AppPageModel(env)
 {
@@ -22,8 +23,10 @@ public class Add(IWebHostEnvironment env, IEquipmentRepository repository, ILogg
         {
             return Forbid();
         }
+        var resourcesResult = await repository.GetResourcesAsync();
+        if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
         
-        Resources = await repository.GetResourcesAsync();
+        Resources = resourcesResult.Value!; 
         return Page();
     }
 
@@ -31,7 +34,10 @@ public class Add(IWebHostEnvironment env, IEquipmentRepository repository, ILogg
     {
         if (!ModelState.IsValid)
         {
-            Resources = await repository.GetResourcesAsync();
+            var resourcesResult = await repository.GetResourcesAsync();
+            if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
+        
+            Resources = resourcesResult.Value!; 
             return Page();
         }
 
@@ -57,7 +63,10 @@ public class Add(IWebHostEnvironment env, IEquipmentRepository repository, ILogg
         if (result.Status == ResultStatus.Conflict)
         {
             ErrorNotification("Un équipement de ce nom existe déjà.");
-            Resources = await repository.GetResourcesAsync();
+            var resourcesResult = await repository.GetResourcesAsync();
+            if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
+        
+            Resources = resourcesResult.Value!; 
             return Page();
         }
 

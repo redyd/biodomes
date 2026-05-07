@@ -4,6 +4,6 @@ namespace BioDomes.Domains.Repository;
 
 public interface ISpecieAttributesRepository
 {
-    Task<List<Classification>> GetClassifications();
-    Task<List<Diet>> GetDiets();
+    Task<ResultT<List<Classification>>> GetClassifications();
+    Task<ResultT<List<Diet>>> GetDiets();
 }

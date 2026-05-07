@@ -2,9 +2,9 @@
 
 namespace BioDomes.Web.ViewModels;
 
-public class BiomeView<T> where  T : Biome
+public class BiomeView<T> where T : Biome
 {
-    public required string? ImageUrl { get; init; }
+    public required string ImageUrl { get; init; }
     public required bool CanEdit { get; init; }
     public required bool IsPublic { get; init; }
     public required T Model { get; init; }

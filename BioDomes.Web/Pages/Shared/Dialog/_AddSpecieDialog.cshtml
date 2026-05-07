@@ -12,8 +12,8 @@
 
             <div class="field-group">
                 @foreach (var group in Model.Recommendations
-                              .GroupBy(r => r.Type)
-                              .OrderBy(g => g.Key))
+                                  .GroupBy(r => r.Type)
+                                  .OrderBy(g => g.Key))
                 {
                     <p class="suggestion-group-label">@group.Key.GetDisplayName()</p>
                     <div class="suggestion-group">
@@ -21,12 +21,9 @@
                         {
                             <label class="suggestion-card">
                                 <input type="radio" asp-for="SpecieInput.SpecieId" value="@specie.Id" hidden/>
-                                @if (!string.IsNullOrWhiteSpace(specie.ImageUrl))
-                                {
-                                    <img class="suggestion-card-img"
-                                         src="@Model.UseUploadedFromId(specie.ImageUrl)"
-                                         alt="@specie.Name"/>
-                                }
+                                <img class="suggestion-card-img"
+                                     src="@Model.UseImageWithDefault(specie.ImageUrl, "specie.png")"
+                                     alt="@specie.Name"/>
                                 <span class="suggestion-name">@specie.Name</span>
                             </label>
                         }

@@ -1,4 +1,5 @@
 @page "/biomes"
+@using BioDomes.Web.Extensions
 @model BiomePage
 
 @{
@@ -19,9 +20,9 @@
         </div>
 
         <div class="biomes-list">
-            @if (Model.Biomes is not null && Model.Biomes.Any())
+            @if (Model.Biomes.Any())
             {
-                foreach (var biome in Model.Biomes)
+                @foreach (var biome in Model.Biomes)
                 {
                     <div class="biome-row">
                         <div class="biome-row-image">
@@ -33,7 +34,7 @@
                             {
                                 <div class="biome-row-image-placeholder"></div>
                             }
-                            <span class="biome-state biome-state-badge biome-state-@biome.Model.State.ToLower()">@biome.Model.State</span>
+                            <span class="biome-state biome-state-badge biome-state-@biome.Model.State.GetDisplayName().ToLower()">@biome.Model.State</span>
                         </div>
 
                         <a class="biome-row-body" asp-page="/Biomes/Detail" asp-route-id="@biome.Model.Id">

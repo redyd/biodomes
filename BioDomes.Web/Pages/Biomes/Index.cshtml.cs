@@ -1,33 +1,30 @@
 using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Web.Extensions;
+using BioDomes.Web.Mapper;
 using BioDomes.Web.PageModels;
 using BioDomes.Web.ViewModels;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Biomes;
 
-public class BiomePage(IBiomeRepository repository, IWebHostEnvironment env) : AppPageModel(env)
+public class BiomePage(IWebHostEnvironment env, IBiomeRepository repository, IBiomeViewMapper mapper)
+    : AppPageModel(env)
 {
-    public List<BiomeView<Biome>>? Biomes { get; set; }
-    
+    public List<BiomeView<Biome>> Biomes { get; set; } = [];
     public bool IsUserConnected { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
-        IsUserConnected = User.GetUserId() is not null;
+        var biomesResult = await repository.GetAllAsync(User.GetUserId(), User.IsAdmin());
+        if (biomesResult.Failed) return biomesResult.ToPageResult(this);
         
-
-        var biomes = await repository.GetAllAsync(User.GetUserId(), User.IsAdmin());
-        Biomes = biomes.Select(b => new BiomeView<Biome>
-        {
-            ImageUrl = !string.IsNullOrWhiteSpace(b.ImageUrl) ? UseUploadedFromId(b.ImageUrl) : null,
-            CanEdit = IsUserConnected && (User.IsAdmin() || b.CreatedBy == User.GetUserId()),
-            IsPublic = true,
-            Model = b
-        })
-            .ToList();
-
+        Biomes = mapper.MapAll(
+            biomesResult.Value!,
+            User.IsAdmin(),
+            User.GetUserId(),
+            b => UseImageWithDefault(b, "dome.png"));
+        
+        return Page();
     }
-
 }

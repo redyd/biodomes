@@ -1,4 +1,5 @@
 ﻿using BioDomes.Domains.Repository;
+using BioDomes.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -6,15 +7,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace BioDomes.Web.Pages.Stats;
 
 [Authorize]
-public class StatsModel : PageModel
+public class StatsModel(IBiomeStatRepository repo) : PageModel
 {
-    private readonly IBiomeRepository _biomeRepository;
-
-    public StatsModel(IBiomeRepository biomeRepository)
-    {
-        _biomeRepository = biomeRepository;
-    }
-    
     public bool HasBiomes { get; set; }
     
     public async Task<IActionResult> OnGetStatsDataAsync()
@@ -22,8 +16,10 @@ public class StatsModel : PageModel
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         var isAdmin = User.IsInRole("Admin");
 
-        var stats = await _biomeRepository.GetStatsAsync(userId, isAdmin);
-        return new JsonResult(stats);
+        var statsResults = await repo.GetStatsAsync(userId, isAdmin);
+        if (statsResults.Failed) return statsResults.ToPageResult(this);
+        
+        return new JsonResult(statsResults.Value!);
     }
     
     public async Task<IActionResult> OnGetHistoryDataAsync(int? biomeId, int days = 30)
@@ -31,8 +27,10 @@ public class StatsModel : PageModel
         var userId  = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         var isAdmin = User.IsInRole("Admin");
 
-        var history = await _biomeRepository.GetHistoryAsync(userId, isAdmin, biomeId, days);
-        return new JsonResult(history);
+        var historyResults = await repo.GetHistoryAsync(userId, isAdmin, biomeId, days);
+        if (historyResults.Failed) return historyResults.ToPageResult(this);
+        
+        return new JsonResult(historyResults.Value!);
     }
 
     public async Task<IActionResult> OnGet()
@@ -40,8 +38,10 @@ public class StatsModel : PageModel
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         var isAdmin = User.IsInRole("Admin");
 
-        var stats = await _biomeRepository.GetStatsAsync(userId, isAdmin);
-        HasBiomes = stats.Count > 0;
+        var statsResults = await repo.GetStatsAsync(userId, isAdmin);
+        if (statsResults.Failed) return statsResults.ToPageResult(this);
+        
+        HasBiomes = statsResults.Value!.Count > 0;
         return Page();
     }
 }

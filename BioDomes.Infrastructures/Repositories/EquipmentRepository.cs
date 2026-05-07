@@ -1,6 +1,7 @@
 using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Domains.Requests;
+using BioDomes.Infrastructures.Errors;
 using BioDomes.Infrastructures.Mappers;
 using BioDomes.Infrastructures.Models;
 using Microsoft.EntityFrameworkCore;
@@ -10,45 +11,47 @@ namespace BioDomes.Infrastructures.Repositories;
 
 public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentRepository> logger) : IEquipmentRepository
 {
-    public async Task<List<Equipment>> GetAllAsync(string? userId, bool isAdmin)
-    {
-        var query = context.Equipments
-            .Include(e => e.ConsumedResourceEntity)
-            .Include(e => e.ProducedResourceEntity)
-            .AsQueryable();
-
-        if (!isAdmin)
-        {
-            query = query.Where(e =>
-                e.IsPublic
-                || (userId != null && e.UserId == userId));
-        }
-
-        var result = await query.ToListAsync();
-        return result.Select(EquipmentMapper.MapEquipment).ToList();
-    }
-
-    public async Task<List<EquipmentResource>> GetResourcesAsync()
-    {
-        var result = await context.EquipmentResources.ToListAsync();
-        return result.Select(r => new EquipmentResource
-        {
-            Id = r.Id,
-            Label = r.Label
-        }).ToList();
-    }
-
-    public async Task<ResultT<int>> CountAsync()
+    public async Task<ResultT<List<Equipment>>> GetAllAsync(string? userId, bool isAdmin)
     {
         try
         {
-            var count = await context.Equipments.CountAsync();
-            return ResultT<int>.Ok(count);
+            var query = context.Equipments
+                .Include(e => e.ConsumedResourceEntity)
+                .Include(e => e.ProducedResourceEntity)
+                .AsQueryable();
+
+            if (!isAdmin)
+            {
+                query = query.Where(e =>
+                    e.IsPublic
+                    || (userId != null && e.UserId == userId));
+            }
+
+            var result = await query.ToListAsync();
+            return ResultT<List<Equipment>>.Ok(result.Select(EquipmentMapper.MapEquipment).ToList());
         }
-        catch (Exception ex)
+        catch (DbUpdateException e)
         {
-            logger.LogWarning($"Database error: {ex.Message}");
-            return ResultT<int>.Failure("Database error");
+            logger.LogError("Database error: {ExMessage}", e.Message);
+            return ResultT<List<Equipment>>.Failure($"Database error: {e.Message}");
+        }
+    }
+
+    public async Task<ResultT<List<EquipmentResource>>> GetResourcesAsync()
+    {
+        try
+        {
+            var result = await context.EquipmentResources.ToListAsync();
+            return ResultT<List<EquipmentResource>>.Ok(result.Select(r => new EquipmentResource
+            {
+                Id = r.Id,
+                Label = r.Label
+            }).ToList());
+        }
+        catch (DbUpdateException e)
+        {
+            logger.LogError("Database error: {ExMessage}", e.Message);            
+            return ResultT<List<EquipmentResource>>.Failure($"Database error: {e.Message}");
         }
     }
 
@@ -92,7 +95,34 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
         }
         catch (DbUpdateException ex)
         {
-            logger.LogWarning($"Database error: {ex.Message}");
+            logger.LogError("Database error: {ExMessage}", ex.Message);
+            return ResultT<Equipment>.Failure("Database error");
+        }
+    }
+    
+    public async Task<ResultT<Equipment>> DeleteAsync(int id, string? userId, bool isAdmin)
+    {
+        try
+        {
+            var entity = await context.Equipments
+                .Include(e => e.ConsumedResourceEntity)
+                .Include(e => e.ProducedResourceEntity)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (entity is null)
+                return ResultT<Equipment>.NotFound($"Equipment {id} not found.");
+
+            if (!isAdmin && entity.UserId != userId)
+                return ResultT<Equipment>.Forbidden("Access denied.");
+
+            var model = EquipmentMapper.MapEquipment(entity);
+            context.Equipments.Remove(entity);
+            await context.SaveChangesAsync();
+            return ResultT<Equipment>.Ok(model);
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogError("Database error: {ExMessage}", ex.Message);
             return ResultT<Equipment>.Failure("Database error");
         }
     }
@@ -120,34 +150,7 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
         }
         catch (DbUpdateException ex)
         {
-            logger.LogWarning($"Database error: {ex.Message}");
-            return ResultT<Equipment>.Failure("Database error");
-        }
-    }
-    
-    public async Task<ResultT<Equipment>> DeleteAsync(int id, string? userId, bool isAdmin)
-    {
-        try
-        {
-            var entity = await context.Equipments
-                .Include(e => e.ConsumedResourceEntity)
-                .Include(e => e.ProducedResourceEntity)
-                .FirstOrDefaultAsync(e => e.Id == id);
-
-            if (entity is null)
-                return ResultT<Equipment>.NotFound($"Equipment {id} not found.");
-
-            if (!isAdmin && entity.UserId != userId)
-                return ResultT<Equipment>.Forbidden("Access denied.");
-
-            var model = EquipmentMapper.MapEquipment(entity);
-            context.Equipments.Remove(entity);
-            await context.SaveChangesAsync();
-            return ResultT<Equipment>.Ok(model);
-        }
-        catch (DbUpdateException ex)
-        {
-            logger.LogWarning($"Database error: {ex.Message}");
+            logger.LogError("Database error: {ExMessage}", ex.Message);
             return ResultT<Equipment>.Failure("Database error");
         }
     }

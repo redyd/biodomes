@@ -1,7 +1,6 @@
 ﻿using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
 using BioDomes.Domains.Requests;
@@ -13,13 +12,12 @@ namespace BioDomes.Web.Pages.Biomes;
 [Authorize]
 public class AddPage(IWebHostEnvironment env, IBiomeRepository repository) : AppPageModel(env)
 {
-    [BindProperty]
-    public BiomeInputModel Input { get; set; } = new();
-    
+    [BindProperty] public BiomeInputModel Input { get; set; } = new();
     public string? Humidity { get; set; }
-    
 
-    public void OnGet() { }
+    public void OnGet()
+    {
+    }
 
     public async Task<IActionResult> OnPostAsync()
     {
@@ -30,7 +28,8 @@ public class AddPage(IWebHostEnvironment env, IBiomeRepository repository) : App
 
         if (!rule.IsValid)
         {
-            ErrorNotification($"Un biome avec une température de {temp}° a une humidité max de {rule.MaxHumidity:F2} g/m³.");
+            ErrorNotification(
+                $"Un biome avec une température de {temp}° a une humidité max de {rule.MaxHumidity:F2} g/m³.");
             Humidity = $"Humidité maximale autorisée pour {temp}° : {rule.MaxHumidity:F2} g/m³";
             return Page();
         }
@@ -40,7 +39,7 @@ public class AddPage(IWebHostEnvironment env, IBiomeRepository repository) : App
         {
             return Forbid();
         }
-        
+
         var imageName = Input.ImageUrl == null ? null : await SaveImage(Input.ImageUrl);
 
         var createRequest = new CreateBiomeRequest
@@ -51,16 +50,17 @@ public class AddPage(IWebHostEnvironment env, IBiomeRepository repository) : App
             ImageUrl = imageName,
             IsPublic = true
         };
-        
+
         var result = await repository.CreateBiomeAsync(createRequest, userId);
+        
         if (result.Failed)
         {
-            ErrorNotification($"Erreur dans la création du biome");
+            ErrorNotification("Erreur dans la création du biome");
             return Page();
         }
-        
+
         var value = result.Value!;
-        
+
         SuccessNotification($"Biome créé avec succès ! État : {value.State}.");
         return RedirectToPage("/Biomes/Index");
     }
