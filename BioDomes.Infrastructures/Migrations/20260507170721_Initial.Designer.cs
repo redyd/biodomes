@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BioDomes.Infrastructures.Migrations
 {
     [DbContext(typeof(BiodomeContext))]
-    [Migration("20260502201609_Initial")]
+    [Migration("20260507170721_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -1133,7 +1133,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "867639e0-9fc9-4f62-9bfd-e357386a8045",
+                            ConcurrencyStamp = "4369c6d3-e51f-4b84-bb37-ad481dad36f7",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -1141,7 +1141,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "352f2a90-a4de-4c24-b1e6-db1199ed2110",
+                            SecurityStamp = "8e247e76-c804-4ebc-a4bb-5a8728a959a2",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -1150,7 +1150,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "b0f9ed51-6bf6-41ee-9423-69df6d218daa",
+                            ConcurrencyStamp = "577a70db-2826-4d84-97bd-4b17dbd88079",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -1158,7 +1158,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "210e33e0-742a-475a-a2e1-e8c35f2c1168",
+                            SecurityStamp = "3f009e7c-0a2c-4730-93e4-ca4c15630a34",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         });
