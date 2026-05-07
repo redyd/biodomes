@@ -57,14 +57,9 @@
                 </div>
 
                 <div class="field-group">
-                    @if (Model.ImageUrl != null)
-                    {
-                        <span class="image-current-label">Image actuelle</span>
-                        <img src="@Model.ImageUrl" class="card-image" alt="@Model?.Specie?.Name"/>
-                    }
-                    <label class="image-upload-hint">
-                        @(Model?.Specie?.ImageUrl != null ? "Changer l'image" : "Ajouter une image")
-                    </label>
+                    <span class="image-current-label">Image actuelle</span>
+                    <img src="@Model.ImageUrl" class="card-image" alt="@Model?.Specie?.Name"/>
+                    <label class="image-upload-hint">Changer l'image</label>
                     <div class="image-upload-zone">
                         <input type="file" asp-for="Input.Image" accept="image/*"/>
                     </div>

@@ -1,6 +1,6 @@
 ﻿namespace BioDomes.Domains.Core;
 
-public class BiomeHistoryDto
+public class BiomeHistory
 {
     public int BiomeId { get; set; }
     public string BiomeName { get; set; } = string.Empty;

@@ -7,7 +7,8 @@ namespace BioDomes.Domains.Services;
 public class BiomeAnalyzer(
     IFoodChainRepository foodChainRepo,
     ISpeciesRepository speciesRepo,
-    IBiomeRepository biomeRepo) : IBiomeAnalyzer
+    IBiomeRepository biomeRepo,
+    IBiomeManagementRepository managementRepo) : IBiomeAnalyzer
 {
     /// <summary>
     /// Retourne toutes les espèces disponibles classées par pertinence pour le biome.
@@ -59,14 +60,27 @@ public class BiomeAnalyzer(
             return new BiomeAnalysis
             {
                 Graph = new FoodChainGraph([], []),
-                Stats = new BiomeStats { AllSpeciesFed = true }
+                Stats = new BiomeStats { AllSpeciesFed = true, TotalsSpecies = 0, BiomeId = biomeId },
             };
         }
 
         var graph = graphResult.Value;
-        var stats = BiomeFoodChainStabilityAnalyzer.Analyze(graph, allSpeciesResult.Value);
+        var stats = BiomeFoodChainStabilityAnalyzer.Analyze(graph, allSpeciesResult.Value, biomeId);
 
         return new BiomeAnalysis { Graph = graph, Stats = stats };
+    }
+
+    public async Task<GlobalStatistic> GlobalAnalyze(string? userId, bool isAdmin)
+    {
+        var allResult = await biomeRepo.GetAllComplexAsync(userId, isAdmin);
+        if (allResult.Failed) return new GlobalStatistic { All = [] };
+
+        var ana = new GlobalStatistic
+        {
+            All = allResult.Value!
+        };
+
+        return ana;
     }
 
     public async Task<Result> PerformAction(string actionId, string? userId, bool isAdmin)
@@ -75,7 +89,7 @@ public class BiomeAnalyzer(
 
         if (action == "add-biome-specie")
         {
-            return await biomeRepo.AddSpecie(new SpecieToBiomeRequest
+            return await managementRepo.AddSpecieToBiome(new SpecieToBiomeRequest
             {
                 SpecieId = args["specie"],
                 Count = args["count"]
@@ -115,7 +129,7 @@ public class BiomeAnalyzer(
         List<Specie> candidates,
         int biomeId)
     {
-        var currentStats = BiomeFoodChainStabilityAnalyzer.Analyze(biomeGraph, allSpecies);
+        var currentStats = BiomeFoodChainStabilityAnalyzer.Analyze(biomeGraph, allSpecies, biomeId);
         var starvedIds = currentStats.StarvedSpecies.Select(n => n.SpecieId).ToHashSet();
         var underfedIds = currentStats.UnderfedSpecies.Select(n => n.SpecieId).ToHashSet();
         var needsFoodIds = starvedIds.Union(underfedIds).ToHashSet();
@@ -149,7 +163,8 @@ public class BiomeAnalyzer(
 
             var introducesLoop = BiomeFoodChainStabilityAnalyzer.IntroducesLoop(biomeGraph, candidate, globalGraph);
             var stableAfterAdd =
-                BiomeFoodChainStabilityAnalyzer.IsStableAfterAdding(biomeGraph, candidate, globalGraph, allSpecies);
+                BiomeFoodChainStabilityAnalyzer.IsStableAfterAdding(biomeId, biomeGraph, candidate, globalGraph,
+                    allSpecies);
 
             RecommendationType type;
             string message;

@@ -16,20 +16,18 @@
         Catalogue scientifique des espèces du Terrarium Zéro.<br>
         Consultez, analysez et gérez les données biologiques.
     </p>
-
+    
     <div class="hero-stats">
-        <div class="hero-stat">
-            <span class="hero-stat-value">@Model.SpeciesCount</span>
-            <span class="hero-stat-label">Espèces</span>
-        </div>
-        <div class="hero-stat">
-            <span class="hero-stat-value">@Model.BiomeCount</span>
-            <span class="hero-stat-label">Dômes</span>
-        </div>
-        <div class="hero-stat">
-            <span class="hero-stat-value">@Model.EquipmentCount</span>
-            <span class="hero-stat-label">Equipements</span>
-        </div>
+        @foreach (var dome in Model.RankedBiomes)
+        {
+            <div class="hero-stat">
+                <div>
+                    <img src="@dome.ImageUrl" alt="@dome.Model.Name" class="card-image"/>
+                </div>
+                <span class="hero-stat-value">@dome.Model.Name</span>
+                <span class="hero-stat-label">@dome.Model.SpeciesVariety variétées</span>
+            </div>
+        }
     </div>
 
     <a class="hero-cta" asp-page="/Species/Index">

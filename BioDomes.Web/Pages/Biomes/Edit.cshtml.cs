@@ -4,7 +4,6 @@ using BioDomes.Web.Extensions;
 using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 using BioDomes.Domains.Core;
 using BioDomes.Web.InputModel;
 
@@ -14,11 +13,10 @@ namespace BioDomes.Web.Pages.Biomes;
 public class EditPage(IBiomeRepository repository, IWebHostEnvironment env) : AppPageModel(env)
 {
     [BindProperty(SupportsGet = true)] public int Id { get; set; }
-
     [BindProperty] public UpdateBiomeInputModel Input { get; set; } = new();
 
-    public string? CurrentImageUrl { get; set; }
-    public string? BiomeName { get; set; }
+    public string CurrentImageUrl { get; set; } = null!;
+    public string BiomeName { get; set; } = null!;
     public bool IsAdmin { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
@@ -29,15 +27,11 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env) : Ap
         IsAdmin = User.IsAdmin();
 
         var result = await repository.FindAsync(Id, userId, IsAdmin);
-        if (result.Failed)
-            return result.ToPageResult(this);
+        if (result.Failed) return result.ToPageResult(this);
 
         var biome = result.Value!;
         BiomeName = biome.Name;
-        if (biome.ImageUrl is not null)
-        {
-            CurrentImageUrl = UseUploadedFromId(biome.ImageUrl);
-        }
+        CurrentImageUrl = UseImageWithDefault(biome.ImageUrl, "dome.png");
 
         Input = new UpdateBiomeInputModel
         {
@@ -80,7 +74,7 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env) : Ap
             var biomeForImage = await repository.FindAsync(Id, userId, IsAdmin);
             if (!biomeForImage.Failed)
             {
-                CurrentImageUrl = biomeForImage.Value!.ImageUrl;
+                CurrentImageUrl = UseImageWithDefault(biomeForImage.Value!.ImageUrl, "dome.png");
             }
 
             return Page();
@@ -91,9 +85,10 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env) : Ap
         {
             ErrorNotification($"Humidité max pour {Input.Temperature}° : {rule.MaxHumidity:F2} g/m³.");
             var biomeForImage = await repository.FindAsync(Id, userId, IsAdmin);
+            
             if (!biomeForImage.Failed)
             {
-                CurrentImageUrl = biomeForImage.Value!.ImageUrl;
+                CurrentImageUrl = UseImageWithDefault(biomeForImage.Value!.ImageUrl, "dome.png");
             }
 
             return Page();

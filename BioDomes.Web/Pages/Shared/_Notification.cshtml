@@ -14,7 +14,23 @@
 
 @if (notification is not null)
 {
-    <div class="@classType-banner mx-5" id="notification-banner">
+    <div class="@classType-banner" id="notification-banner">
         @notification.Message
     </div>
+
+    <script>
+        const el = document.getElementById('notification-banner');
+        if (el) {
+            requestAnimationFrame(() => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateX(0)';
+            });
+
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateX(2rem)';
+                setTimeout(() => el.remove(), 300);
+            }, 4000);
+        }
+    </script>
 }

@@ -1,5 +1,6 @@
 @page "/biomes/{id:int}"
 @using System.Text.Json
+@using BioDomes.Web.Extensions
 @model Detail
 
 @{
@@ -13,7 +14,7 @@
             <div class="container-title">
                 <div class="d-flex justify-content-center align-items-center gap-3 flex-row">
                     <h1 id="top">@Model.Biome.Model.Name</h1>
-                    <span class="biome-state biome-state-@Model.Biome.Model.State.ToLower()">
+                    <span class="biome-state biome-state-@Model.Biome.Model.State.GetDisplayName().ToLower()">
                         @Model.Biome.Model.State
                     </span>
                 </div>

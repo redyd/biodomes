@@ -4,19 +4,21 @@ using BioDomes.Domains.Requests;
 using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Equipments;
 
+[Authorize]
 public class Edit(IWebHostEnvironment env, ILogger<Edit> logger, IEquipmentRepository repository)
     : AppPageModel(env)
 {
     [BindProperty] public UpdateEquipmentInputModel Input { get; set; } = new();
-
-    public string ImageSource { get; set; } = string.Empty;
-    public List<EquipmentResource> Resources { get; set; } = [];
-    public bool IsAdmin { get; set; }
     
+    public List<EquipmentResource> Resources { get; set; } = [];
+    public string ImageSource { get; set; } = null!;
+    public bool IsAdmin { get; set; }
+
     public async Task<IActionResult> OnGetAsync(int id)
     {
         var userId = User.GetUserId();
@@ -25,13 +27,16 @@ public class Edit(IWebHostEnvironment env, ILogger<Edit> logger, IEquipmentRepos
             return Forbid();
         }
 
-        var result = await repository.FindAsync(id, userId, User.IsAdmin());
-        if (result.Failed)
+        var equipmentResult = await repository.FindAsync(id, userId, User.IsAdmin());
+        if (equipmentResult.Failed)
         {
-            return result.ToPageResult(this);
+            return equipmentResult.ToPageResult(this);
         }
-
-        var equipment = result.Value!;
+        
+        var resourcesResult = await repository.GetResourcesAsync();
+        if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
+        
+        var equipment = equipmentResult.Value!;
 
         if (!User.IsAdmin() && equipment.CreatedBy != userId)
         {
@@ -39,8 +44,8 @@ public class Edit(IWebHostEnvironment env, ILogger<Edit> logger, IEquipmentRepos
         }
 
         IsAdmin = User.IsAdmin();
-        ImageSource = UseUploadedFromId(equipment.ImageId);
-        Resources = await repository.GetResourcesAsync();
+        ImageSource = UseImageWithDefault(equipment.ImageId, "tool.png");
+        Resources = resourcesResult.Value!;
 
         Input = new UpdateEquipmentInputModel
         {

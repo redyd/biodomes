@@ -4,6 +4,7 @@ using BioDomes.Infrastructures;
 using BioDomes.Infrastructures.Models;
 using BioDomes.Infrastructures.Repositories;
 using BioDomes.Web.Constraints;
+using BioDomes.Web.Mapper;
 using BioDomes.Web.Middlewares;
 using BioDomes.Web.Middlewares.extensions;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,8 @@ builder.Services.AddDefaultIdentity<UserEntity>(options => { options.SignIn.Requ
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<BiodomeContext>();
 
+builder.Services.AddScoped<IBiomeManagementRepository, BiomeManagementRepository>();
+builder.Services.AddScoped<IBiomeStatRepository, BiomeStatRepository>();
 builder.Services.AddScoped<ISpeciesRepository, SpeciesRepository>();
 builder.Services.AddScoped<IEquipmentRepository, EquipmentRepository>();
 builder.Services.AddScoped<IBiomeRepository, BiomeRepository>();
@@ -38,6 +41,10 @@ builder.Services.AddScoped<ISpecieAttributesRepository, SpecieAttributesReposito
 builder.Services.AddScoped<IFoodChainRepository, FoodChainRepository>();
 
 builder.Services.AddScoped<IBiomeAnalyzer, BiomeAnalyzer>();
+
+builder.Services.AddScoped<IBiomeViewMapper, BiomeViewMapper>();
+builder.Services.AddScoped<IEquipmentViewMapper, EquipmentViewMapper>();
+builder.Services.AddScoped<ISpecieViewMapper, SpecieViewMapper>();
 
 var app = builder.Build();
 

@@ -8,7 +8,14 @@ public abstract class AppPageModel(IWebHostEnvironment env) : PageModel
     public static string BasePathForUploads = Path.Combine("img", "uploads");
     public static string BasePathForDefault = Path.Combine("img", "defaults");
 
-    public string UseUploadedFromId(string fileName)
+    public string UseImageWithDefault(string? fileName, string defaultImageName)
+    {
+        return string.IsNullOrWhiteSpace(fileName) 
+                ? UseStaticImage(defaultImageName) 
+                : UseUploadedFromId(fileName);
+    }
+
+    private string UseUploadedFromId(string fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
         {
@@ -20,7 +27,7 @@ public abstract class AppPageModel(IWebHostEnvironment env) : PageModel
         return $"{Request.PathBase}/{BasePathForUploads}/{safeFileName}".Replace("\\", "/");
     }
     
-    public string UseStaticImage(string fileName)
+    private string UseStaticImage(string fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
         {
@@ -78,7 +85,6 @@ public abstract class AppPageModel(IWebHostEnvironment env) : PageModel
         return filename;
     }
 
-
     protected void SuccessNotification(string message)
     {
         TempData.PushNotification(new Notification
@@ -95,51 +101,5 @@ public abstract class AppPageModel(IWebHostEnvironment env) : PageModel
             Type = NotificationType.Error,
             Message = message,
         });
-    }
-
-    protected string FormatGram(long grams)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegative(grams);
-
-        string[] units = { "gramme", "kilogramme", "tonne", "kilotonne", "mégatonne" };
-
-        double value = grams;
-        var unitIndex = 0;
-
-        while (value >= 1000 && unitIndex < units.Length - 1)
-        {
-            value /= 1000;
-            unitIndex++;
-        }
-
-        var unit = units[unitIndex];
-
-        if (value > 1)
-        {
-            unit += "s";
-        }
-
-        return $"{value:0.##} {unit}";
-    }
-
-    protected string FormatCentimeter(long centimeters)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegative(centimeters);
-        var tolerance = 0.1;
-        double value;
-        string unit;
-
-        if (centimeters >= 100)
-        {
-            value = centimeters / 100.0;
-            unit = Math.Abs(value - 1) < tolerance ? "mètre" : "mètres";
-        }
-        else
-        {
-            value = centimeters;
-            unit = Math.Abs(value - 1) < tolerance ? "centimètre" : "centimètres";
-        }
-
-        return $"{value:0.##} {unit}";
     }
 }

@@ -13,7 +13,7 @@ public static class BiomeFoodChainStabilityAnalyzer
     /// <summary>
     /// Calcule les stats de stabilité du biome.
     /// </summary>
-    public static BiomeStats Analyze(FoodChainGraph graph, Dictionary<int, Specie> allSpecies)
+    public static BiomeStats Analyze(FoodChainGraph graph, Dictionary<int, Specie> allSpecies, int biomeId)
     {
         var starved = new List<FoodChainNode>();
         var underfed = new List<FoodChainNode>();
@@ -55,6 +55,8 @@ public static class BiomeFoodChainStabilityAnalyzer
 
         return new BiomeStats
         {
+            BiomeId = biomeId,
+            TotalsSpecies = allSpecies.Count,
             AllSpeciesFed = starved.Count == 0 && underfed.Count == 0,
             StarvedSpecies = starved,
             UnderfedSpecies = underfed,
@@ -62,7 +64,7 @@ public static class BiomeFoodChainStabilityAnalyzer
                 .Select(s => s.SpecieId)
                 .Concat(underfed.Select(s => s.SpecieId))
                 .Distinct()
-                .Count()
+                .Count(),
         };
     }
 
@@ -153,6 +155,7 @@ public static class BiomeFoodChainStabilityAnalyzer
     /// Simule l'ajout d'un candidat dans le graphe et retourne si le biome reste stable.
     /// </summary>
     public static bool IsStableAfterAdding(
+        int biomeId,
         FoodChainGraph currentGraph,
         Specie candidate,
         FoodChainGraph globalGraph,
@@ -181,12 +184,12 @@ public static class BiomeFoodChainStabilityAnalyzer
             .ToList();
         var simulatedGraph = new FoodChainGraph(simulatedNodes, simulatedEdges);
 
-        var previouslyUnderfedIds = Analyze(currentGraph, allSpecies)
+        var previouslyUnderfedIds = Analyze(currentGraph, allSpecies, biomeId)
             .UnderfedSpecies
             .Select(n => n.SpecieId)
             .ToHashSet();
 
-        var newStats = Analyze(simulatedGraph, allSpecies);
+        var newStats = Analyze(simulatedGraph, allSpecies, biomeId);
         var newUnderfed = newStats.UnderfedSpecies
             .Any(n => !previouslyUnderfedIds.Contains(n.SpecieId));
 

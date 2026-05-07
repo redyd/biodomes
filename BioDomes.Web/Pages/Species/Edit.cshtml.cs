@@ -4,10 +4,12 @@ using BioDomes.Domains.Requests;
 using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Species;
 
+[Authorize]
 public class EditModel(
     ISpeciesRepository repository,
     ISpecieAttributesRepository attributesRepository,
@@ -15,8 +17,8 @@ public class EditModel(
 {
     [BindProperty] public SpeciesInputModel Input { get; set; } = new();
 
-    public Specie? Specie { get; set; }
-    public string? ImageUrl { get; set; }
+    public Specie Specie { get; set; } = null!;
+    public string ImageUrl { get; set; } = null!;
     public bool IsAdmin { get; set; }
 
     public List<Classification> Classifications { get; set; } = [];
@@ -46,10 +48,16 @@ public class EditModel(
         IsAdmin = User.IsAdmin();
         Specie = specie;
 
-        Classifications = await attributesRepository.GetClassifications();
-        Diets = await attributesRepository.GetDiets();
+        var classificationsResult = await attributesRepository.GetClassifications();
+        if (classificationsResult.Failed) return classificationsResult.ToPageResult(this);
+        
+        var dietsResult = await attributesRepository.GetDiets();
+        if (dietsResult.Failed) return dietsResult.ToPageResult(this);
+        
+        Classifications = classificationsResult.Value!;
+        Diets = dietsResult.Value!;
 
-        ImageUrl = specie.ImageUrl == null ? null : UseUploadedFromId(specie.ImageUrl);
+        ImageUrl = UseImageWithDefault(specie.ImageUrl, "specie.png");
 
         Input = new SpeciesInputModel
         {
@@ -106,8 +114,15 @@ public class EditModel(
     {
         if (!ModelState.IsValid)
         {
-            Classifications = await attributesRepository.GetClassifications();
-            Diets = await attributesRepository.GetDiets();
+            var classificationsResult = await attributesRepository.GetClassifications();
+            if (classificationsResult.Failed) return classificationsResult.ToPageResult(this);
+        
+            var dietsResult = await attributesRepository.GetDiets();
+            if (dietsResult.Failed) return dietsResult.ToPageResult(this);
+        
+            Classifications = classificationsResult.Value!;
+            Diets = dietsResult.Value!;
+            
             return Page();
         }
 

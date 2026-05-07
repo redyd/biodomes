@@ -3,7 +3,7 @@ namespace BioDomes.Infrastructures.Models;
 public class BiomeEntity
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public double Temperature { get; set; }
     public double Humidity { get; set; }
     public string? ImageUrl { get; set; }
@@ -11,8 +11,8 @@ public class BiomeEntity
     public bool IsPublic { get; set; }
 
     // User
-    public string UserId { get; set; }
-    public UserEntity User { get; set; }
+    public string UserId { get; set; } = null!;
+    public UserEntity User { get; set; } = null!;
 
     // relations
     public List<BiomeSpecieEntity> BiomeSpecies { get; set; } = new();

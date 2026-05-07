@@ -1,10 +1,12 @@
-@page
+@page "/404"
 @model BioDomes.Web.Pages.Errors.NotFoundModel
 
 @{
     ViewData["Title"] = "Introuvable";
 }
 
-<h1>404 — Page introuvable</h1>
-<p>La ressource demandée n'existe pas.</p>
-<a asp-page="/Index">Retour à l'accueil</a>
+<div class="main-container">
+    <h1>404 — Page introuvable</h1>
+    <p>La ressource demandée n'existe pas.</p>
+    <a asp-page="/Index" class="btn-save">Retour à l'accueil</a>
+</div>

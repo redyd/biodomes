@@ -14,4 +14,32 @@ public class Classification
         EatenByDiets = eatenByDiets;
         RequireFood = requireFood;
     }
+    
+    protected bool Equals(Classification other)
+    {
+        return Id == other.Id && Label == other.Label && EatenByDiets.Equals(other.EatenByDiets) && RequireFood == other.RequireFood;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != GetType()) return false;
+        return Equals((Classification)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id, Label, EatenByDiets, RequireFood);
+    }
+    
+    public static bool operator ==(Classification a, Classification b)
+    {
+        return a.Id == b.Id && a.Label == b.Label;
+    }
+
+    public static bool operator !=(Classification a, Classification b)
+    {
+        return !(a == b);
+    }
 }

@@ -85,30 +85,9 @@
     @RenderBody()
 </main>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const banner = document.getElementById('notification-banner');
-        if (banner) {
-            setTimeout(() => {
-                banner.style.opacity = '0';
-
-                banner.style.height = '0';
-                banner.style.marginTop = '0';
-                banner.style.marginBottom = '0';
-                banner.style.paddingTop = '0';
-                banner.style.paddingBottom = '0';
-
-                setTimeout(() => banner.remove(), 600);
-            }, 3000);
-        }
-    });
-
-</script>
-
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial"/>

@@ -4,6 +4,7 @@ using BioDomes.Domains.Requests;
 using BioDomes.Domains.Services;
 using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
+using BioDomes.Web.Mapper;
 using BioDomes.Web.PageModels;
 using BioDomes.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,10 @@ public class Detail(
     IWebHostEnvironment env,
     IBiomeRepository biomeRepo,
     IBiomeAnalyzer analyzer,
-    IEquipmentRepository equipmentRepo)
+    IEquipmentRepository equipmentRepo,
+    IBiomeManagementRepository managementRepo,
+    IBiomeViewMapper biomeMapper,
+    IEquipmentViewMapper equipmentMapper)
     : AppPageModel(env)
 {
     // BASICS
@@ -34,10 +38,11 @@ public class Detail(
     public async Task<IActionResult> OnGetAsync(int id)
     {
         var loadResult = await LoadPageDataAsync(id);
-        if (loadResult != null) return loadResult;
+        if (loadResult is not null) return loadResult;
 
         SpecieInput = new BiomeSpecieInputModel();
         EquipmentInput = new BiomeEquipmentInputModel();
+
         return Page();
     }
 
@@ -53,7 +58,7 @@ public class Detail(
             return Page();
         }
 
-        var result = await biomeRepo.AddEquipment(new EquipmentToBiomeRequest
+        var result = await managementRepo.AddEquipmentToBiome(new EquipmentToBiomeRequest
         {
             EquipmentId = (int)EquipmentInput.EquipmentId!,
             Count = (int)EquipmentInput.Count!
@@ -63,12 +68,12 @@ public class Detail(
         {
             return result.ToPageResult(this);
         }
-        
+
         ReopenAddEquipmentDialog = false;
         SuccessNotification("Equipement ajouté avec succès");
         return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { id }, fragment: "title-section");
     }
-    
+
     public async Task<IActionResult> OnPostRemoveEquipmentAsync(int id)
     {
         ModelState.Clear();
@@ -79,7 +84,7 @@ public class Detail(
             return Page();
         }
 
-        var result = await biomeRepo.RemoveEquipment(new EquipmentToBiomeRequest
+        var result = await managementRepo.RemoveEquipmentToBiome(new EquipmentToBiomeRequest
         {
             EquipmentId = (int)EquipmentInput.EquipmentId!,
             Count = (int)EquipmentInput.Count!
@@ -107,7 +112,7 @@ public class Detail(
             return Page();
         }
 
-        var result = await biomeRepo.AddSpecie(new SpecieToBiomeRequest
+        var result = await managementRepo.AddSpecieToBiome(new SpecieToBiomeRequest
         {
             SpecieId = (int)SpecieInput.SpecieId!,
             Count = (int)SpecieInput.Count!
@@ -133,7 +138,7 @@ public class Detail(
             return Page();
         }
 
-        var result = await biomeRepo.RemoveSpecie(new SpecieToBiomeRequest
+        var result = await managementRepo.RemoveSpecieToBiome(new SpecieToBiomeRequest
         {
             SpecieId = (int)SpecieInput.SpecieId!,
             Count = (int)SpecieInput.Count!
@@ -156,60 +161,44 @@ public class Detail(
 
         if (result.Failed)
         {
+            ErrorNotification("Une erreur est survenue lors de l'action");
             return result.ToPageResult(this);
         }
 
+        SuccessNotification("Action correctement effectuée");
         return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { id = biomeId },
             fragment: "title-section");
     }
 
     // HELPER 
-
-    private BiomeView<ComplexBiome> BuildBiomeView(ComplexBiome b, string? userId)
-    {
-        var rule = new HumidityRule(b.Temperature, b.Humidity);
-
-        return new BiomeView<ComplexBiome>
-        {
-            ImageUrl = !string.IsNullOrWhiteSpace(b.ImageUrl)
-                ? UseUploadedFromId(b.ImageUrl)
-                : UseStaticImage("biome_bg.png"),
-            CanEdit = userId is not null && (User.IsAdmin() || b.CreatedBy == User.GetUserId()),
-            IsPublic = true,
-            MaxHumidity = rule.MaxHumidity,
-            HumidityPercent = rule.HumidityPercent,
-            Model = b
-        };
-    }
-
     private async Task<IActionResult?> LoadPageDataAsync(int id)
     {
         var userId = User.GetUserId();
 
         var biomeResult = await biomeRepo.FindComplexAsync(id, userId, User.IsAdmin());
-        if (biomeResult.Failed || biomeResult.Value is null)
-            return biomeResult.ToPageResult(this);
+        if (biomeResult.Failed) return biomeResult.ToPageResult(this);
 
-        var creatorResult = await biomeRepo.GetCreatorAsync(biomeResult.Value.Id);
-        if (creatorResult.Failed || creatorResult.Value is null)
-            return creatorResult.ToPageResult(this);
-        
+        var creatorResult = await biomeRepo.GetCreatorAsync(biomeResult.Value!.Id);
+        if (creatorResult.Failed) return creatorResult.ToPageResult(this);
+
         var equipmentsResults = await equipmentRepo.GetAllAsync(User.GetUserId(), User.IsAdmin());
+        if (equipmentsResults.Failed) return equipmentsResults.ToPageResult(this);
 
-        Creator = creatorResult.Value;
-        Biome = BuildBiomeView(biomeResult.Value, userId);
-        
+        Biome = biomeMapper.MapSingle(
+            biomeResult.Value,
+            User.IsAdmin(),
+            userId,
+            image => UseImageWithDefault(image, "biome_bg.png"));
+
+        AllEquipments = equipmentMapper.MapAll(
+            equipmentsResults.Value!,
+            User.IsAdmin(),
+            userId,
+            image => UseImageWithDefault(image, "tool.png"));
+
         Analyze = await analyzer.AnalyzeBiome(userId, User.IsAdmin(), id);
         Recommendations = await analyzer.RecommendationToAddForBiome(userId, User.IsAdmin(), id, Analyze.Graph);
-        AllEquipments = equipmentsResults.Select(e => new EquipmentView
-        {
-            Id = e.Id,
-            Name = e.Name,
-            Consumed = e.Consumed.Label,
-            Image = UseUploadedFromId(e.ImageId),
-            Produced = e.Produced.Label,
-            CanEdit = e.CreatedBy == userId || User.IsAdmin()
-        }).ToList();
+        Creator = creatorResult.Value!;
 
         return null;
     }

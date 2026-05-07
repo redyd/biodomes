@@ -9,15 +9,31 @@ namespace BioDomes.Infrastructures.Repositories;
 public class SpecieAttributesRepository(BiodomeContext context, ILogger<SpecieAttributesRepository> logger)
     : ISpecieAttributesRepository
 {
-    public async Task<List<Classification>> GetClassifications()
+    public async Task<ResultT<List<Classification>>> GetClassifications()
     {
-        var results = await context.SpecieClassifications.ToListAsync();
-        return results.Select(SpecieMapper.MapClassification).ToList();
+        try
+        {
+            var results = await context.SpecieClassifications.ToListAsync();
+            return ResultT<List<Classification>>.Ok(results.Select(SpecieMapper.MapClassification).ToList());
+        }
+        catch (DbUpdateException e)
+        {
+            logger.LogError("Database error: {ExMessage}", e.Message);
+            return ResultT<List<Classification>>.Failure($"Database error: {e.Message}");
+        }
     }
 
-    public async Task<List<Diet>> GetDiets()
+    public async Task<ResultT<List<Diet>>> GetDiets()
     {
-        var results = await context.SpecieDiets.ToListAsync();
-        return results.Select(SpecieMapper.MapDiet).ToList();
+        try
+        {
+            var results = await context.SpecieDiets.ToListAsync();
+            return ResultT<List<Diet>>.Ok(results.Select(SpecieMapper.MapDiet).ToList());
+        }
+        catch (DbUpdateException e)
+        {
+            logger.LogError("Database error: {ExMessage}", e.Message);
+            return ResultT<List<Diet>>.Failure($"Database error: {e.Message}");
+        }
     }
 }

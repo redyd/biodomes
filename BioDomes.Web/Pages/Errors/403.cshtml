@@ -1,10 +1,12 @@
-@page
+@page "/403"
 @model BioDomes.Web.Pages.Errors.ForbidenModel
 
 @{
     ViewData["Title"] = "Interdit";
 }
 
-<h1>403 — Accès refusé</h1>
-<p>Vous n'avez pas les droits pour accéder à cette ressource.</p>
-<a asp-page="/Index">Retour à l'accueil</a>
+<div class="main-container">
+    <h1>403 — Accès refusé</h1>
+    <p>Vous n'avez pas les droits pour accéder à cette ressource.</p>
+    <a asp-page="/Index" class="btn-save">Retour à l'accueil</a>
+</div>
