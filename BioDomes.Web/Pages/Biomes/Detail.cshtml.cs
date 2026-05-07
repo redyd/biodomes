@@ -161,9 +161,11 @@ public class Detail(
 
         if (result.Failed)
         {
+            ErrorNotification("Une erreur est survenue lors de l'action");
             return result.ToPageResult(this);
         }
 
+        SuccessNotification("Action correctement effectuée");
         return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { id = biomeId },
             fragment: "title-section");
     }

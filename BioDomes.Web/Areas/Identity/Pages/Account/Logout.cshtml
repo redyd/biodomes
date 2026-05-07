@@ -1,16 +1,16 @@
-﻿@page
+﻿@page "/logout"
 @model LogoutModel
 @{
     ViewData["Title"] = "Log out";
 }
 
-<header>
+<div class="main-container">
     <h1>@ViewData["Title"]</h1>
     @{
         if (User.Identity?.IsAuthenticated ?? false)
         {
             <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
-                <button type="submit" class="nav-link btn btn-link text-dark">Cliquer ici pour vous déconnecter</button>
+                <button type="submit" class="btn-save">Cliquer ici pour vous déconnecter</button>
             </form>
         }
         else
@@ -18,4 +18,4 @@
             <p>Vous êtes maintenant déconnecté.</p>
         }
     }
-</header>
+</div>

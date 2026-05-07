@@ -1,12 +1,12 @@
-@page
+@page "/500"
 @model BioDomes.Web.Pages.Errors.ServerErrorModel
 
 @{
     ViewData["Title"] = "Cassé";
 }
 
-<div class="container">
+<div class="main-container">
     <h1>500 — Erreur serveur</h1>
     <p>Une erreur inattendue s'est produite.</p>
-    <a asp-page="/Index">Retour à l'accueil</a>
+    <a asp-page="/Index" class="btn-save">Retour à l'accueil</a>
 </div>

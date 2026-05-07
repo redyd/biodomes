@@ -26,6 +26,11 @@ public class BiomeViewMapper : IBiomeViewMapper
         return biomes.Select(b => MapSingle(b, isAdmin, userId, resolveImage)).ToList();
     }
 
+    public List<BiomeView<ComplexBiome>> MapAll(List<ComplexBiome> biomes, bool isAdmin, string? userId, Func<string?, string> resolveImage)
+    {
+        return biomes.Select(b => MapSingle(b, isAdmin, userId, resolveImage)).ToList();
+    }
+
     public BiomeView<Biome> MapSingle(Biome biome, bool isAdmin, string? userId, Func<string?, string> resolveImage)
     {
         return new BiomeView<Biome>

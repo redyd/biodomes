@@ -2,35 +2,19 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
+using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
 
 namespace BioDomes.Web.Pages.Account;
 
 [Authorize]
-public class Index(UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager, IWebHostEnvironment env) : AppPageModel(env)
+public class Index(
+    UserManager<UserEntity> userManager,
+    SignInManager<UserEntity> signInManager,
+    IWebHostEnvironment env) : AppPageModel(env)
 {
-    [BindProperty]
-    public InputModel Input { get; set; }
-
-    public class InputModel
-    {
-        [Required, EmailAddress]
-        public string Email { get; set; }
-
-        public DateOnly? Birthdate { get; set; }
-        public string? SearchOrganism { get; set; }
-        public string? ImageUrl { get; set; }
-
-        [DataType(DataType.Password)]
-        public string? CurrentPassword { get; set; }
-
-        [DataType(DataType.Password), StringLength(100, MinimumLength = 6)]
-        public string? NewPassword { get; set; }
-
-        [DataType(DataType.Password), Compare("NewPassword")]
-        public string? ConfirmPassword { get; set; }
-    }
+    [BindProperty] public UserInputModel Input { get; set; } = new();
+    public string CurrentImageUrl { get; set; } = null!;
 
     private bool WantsToChangePassword =>
         !string.IsNullOrEmpty(Input.CurrentPassword) ||
@@ -45,12 +29,14 @@ public class Index(UserManager<UserEntity> userManager, SignInManager<UserEntity
             return;
         }
 
-        Input = new InputModel
+        CurrentImageUrl = UseImageWithDefault(user.ImageUrl, "user.png");
+
+        Input = new UserInputModel
         {
-            Email = user.Email,
+            Email = user.Email!,
             Birthdate = user.Birthdate,
             SearchOrganism = user.SearchOrganism,
-            ImageUrl = user.ImageUrl
+            Name = user.UserName
         };
     }
 
@@ -63,19 +49,17 @@ public class Index(UserManager<UserEntity> userManager, SignInManager<UserEntity
             ModelState.Remove(nameof(Input.ConfirmPassword));
         }
 
-        if (!ModelState.IsValid)
-        {
-            return Page();
-        }
+        if (!ModelState.IsValid) return Page();
 
         var user = await userManager.GetUserAsync(User);
-        if (user == null)
-        {
-            return NotFound();
-        }
+        if (user == null) return NotFound();
 
-        if (WantsToChangePassword && !await ValidateAndChangePasswordAsync(user) || !await UpdateProfileAsync(user))
+        var imageName = Input.ImageUpload is not null ? await SaveImage(Input.ImageUpload) : user.ImageUrl;
+
+        if (WantsToChangePassword && !await ValidateAndChangePasswordAsync(user)
+            || !await UpdateProfileAsync(user, imageName))
         {
+            CurrentImageUrl = UseImageWithDefault(user.ImageUrl, "user.png");
             return Page();
         }
 
@@ -115,14 +99,22 @@ public class Index(UserManager<UserEntity> userManager, SignInManager<UserEntity
         return result.Succeeded;
     }
 
-    private async Task<bool> UpdateProfileAsync(UserEntity user)
+    private async Task<bool> UpdateProfileAsync(UserEntity user, string? imageName)
     {
-        var hasError = RestoreIfEmpty(Input.SearchOrganism, user.SearchOrganism, "L'organisme de recherche ne peut pas être vide.",
-                           v => { Input.SearchOrganism = v; ModelState.Remove($"{nameof(Input)}.{nameof(Input.SearchOrganism)}"); })
-                     | RestoreIfEmpty(Input.ImageUrl, user.ImageUrl, "L'avatar ne peut pas être vide.",
-                           v => { Input.ImageUrl = v; ModelState.Remove($"{nameof(Input)}.{nameof(Input.ImageUrl)}"); })
-                     | RestoreIfEmpty(Input.Birthdate?.ToString(), user.Birthdate?.ToString(), "La date de naissance ne peut pas être vide.",
-                           _ => { Input.Birthdate = user.Birthdate; ModelState.Remove($"{nameof(Input)}.{nameof(Input.Birthdate)}"); });
+        var hasError = RestoreIfEmpty(Input.SearchOrganism, user.SearchOrganism,
+                           "L'organisme de recherche ne peut pas être vide.",
+                           v =>
+                           {
+                               Input.SearchOrganism = v;
+                               ModelState.Remove($"{nameof(Input)}.{nameof(Input.SearchOrganism)}");
+                           })
+                       | RestoreIfEmpty(Input.Birthdate?.ToString(), user.Birthdate?.ToString(),
+                           "La date de naissance ne peut pas être vide.",
+                           _ =>
+                           {
+                               Input.Birthdate = user.Birthdate;
+                               ModelState.Remove($"{nameof(Input)}.{nameof(Input.Birthdate)}");
+                           });
 
         if (hasError)
         {
@@ -130,13 +122,22 @@ public class Index(UserManager<UserEntity> userManager, SignInManager<UserEntity
         }
 
         user.Email = Input.Email;
-        user.UserName = Input.Email;
+        user.UserName = Input.Name;
         user.Birthdate = Input.Birthdate;
         user.SearchOrganism = Input.SearchOrganism;
-        user.ImageUrl = Input.ImageUrl;
+
+        if (imageName is not null)
+        {
+            if (user.ImageUrl is not null)
+            {
+                DeleteImage(user.ImageUrl);
+            }
+            
+            user.ImageUrl = imageName;
+        }
 
         var result = await userManager.UpdateAsync(user);
-        
+
         return result.Succeeded;
     }
 

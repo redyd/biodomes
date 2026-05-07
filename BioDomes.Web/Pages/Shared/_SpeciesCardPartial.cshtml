@@ -1,16 +1,9 @@
 ﻿@model BioDomes.Web.ViewModels.SpecieView
 
 <div class="card">
-    @if (Model.ImageUrl != null)
-    {
-        <div>
-            <img src="@Model.ImageUrl" alt="@Model.Name" class="card-image"/>
-        </div>
-    }
-    else
-    {
-        <div class="card-image-placeholder"></div>
-    }
+    <div>
+        <img src="@Model.ImageUrl" alt="@Model.Name" class="card-image"/>
+    </div>
     <div class="card-body">
         <div class="card-name">@Model.Name</div>
         <div class="card-info"><span class="card-label">Type :</span> @Model.Type</div>

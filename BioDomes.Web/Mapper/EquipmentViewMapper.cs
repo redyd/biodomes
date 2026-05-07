@@ -12,7 +12,7 @@ public class EquipmentViewMapper : IEquipmentViewMapper
             Id = equipment.Id,
             Name = equipment.Name,
             Consumed = equipment.Consumed.Label,
-            Image = equipment.ImageId,
+            Image = resolveImage(equipment.ImageId),
             Produced = equipment.Produced.Label,
             CanEdit = equipment.CreatedBy == userId || isAdmin
         };
