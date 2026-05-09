@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BioDomes.Domains.Core;
 using BioDomes.Infrastructures.Models;
+using BioDomes.Web.PageModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -23,7 +24,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BioDomes.Web.Areas.Identity.Pages.Account
 {
-    public class RegisterModel : PageModel
+    public class RegisterModel : AppPageModel
     {
         private readonly SignInManager<UserEntity> _signInManager;
         private readonly UserManager<UserEntity> _userManager;
@@ -32,7 +33,7 @@ namespace BioDomes.Web.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
-        public RegisterModel(UserManager<UserEntity> userManager, IUserStore<UserEntity> userStore, SignInManager<UserEntity> signInManager, ILogger<RegisterModel> logger, IEmailSender emailSender)
+        public RegisterModel(UserManager<UserEntity> userManager, IUserStore<UserEntity> userStore, SignInManager<UserEntity> signInManager, ILogger<RegisterModel> logger, IEmailSender emailSender, IWebHostEnvironment env) : base(env)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -102,7 +103,7 @@ namespace BioDomes.Web.Areas.Identity.Pages.Account
             public string SearchOrganism { get; set; }
 
             [Required]
-            public string ImageUrl { get; set; }
+            public IFormFile ImageUrl { get; set; }
         }
 
 
@@ -125,7 +126,7 @@ namespace BioDomes.Web.Areas.Identity.Pages.Account
                 
                 user.Birthdate = Input.Birthdate;
                 user.SearchOrganism = Input.SearchOrganism;
-                user.ImageUrl = Input.ImageUrl;
+                user.ImageUrl = await SaveImage(Input.ImageUrl);
                 
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
