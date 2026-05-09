@@ -10,7 +10,7 @@
 
         <div class="edit-header">
             <p class="edit-breadcrumb">Biodômes · Espèces</p>
-            <h1 class="edit-title">Éditer : <em>@Model.Specie?.Name</em></h1>
+            <h1 class="edit-title">Éditer : <em>@Model.Specie.Name</em></h1>
         </div>
 
         <div class="edit-body">
@@ -23,24 +23,20 @@
 
                 <div class="field-group">
                     <label class="field-label" asp-for="Input.ClassificationId">Classification</label>
-                    <select class="field-input" asp-for="Input.ClassificationId">
+                    <select class="field-input" 
+                            asp-for="Input.ClassificationId"
+                            asp-items="Model.Classifications">
                         <option value="">-- Choisir --</option>
-                        @foreach (var classification in Model.Classifications)
-                        {
-                            <option value="@classification.Id">@classification.Label</option>
-                        }
                     </select>
                     <span asp-validation-for="Input.ClassificationId" class="field-error"></span>
                 </div>
 
                 <div class="field-group">
                     <label class="field-label" asp-for="Input.DietId">Régime</label>
-                    <select class="field-input" asp-for="Input.DietId">
+                    <select class="field-input" 
+                            asp-for="Input.DietId"
+                            asp-items="Model.Diets">
                         <option value="">-- Choisir --</option>
-                        @foreach (var diet in Model.Diets)
-                        {
-                            <option value="@diet.Id">@diet.Label</option>
-                        }
                     </select>
                     <span asp-validation-for="Input.DietId" class="field-error"></span>
                 </div>
@@ -58,7 +54,7 @@
 
                 <div class="field-group">
                     <span class="image-current-label">Image actuelle</span>
-                    <img src="@Model.ImageUrl" class="card-image" alt="@Model?.Specie?.Name"/>
+                    <img src="@Model.ImageUrl" class="card-image" alt="@Model?.Specie.Name"/>
                     <label class="image-upload-hint">Changer l'image</label>
                     <div class="image-upload-zone">
                         <input type="file" asp-for="Input.Image" accept="image/*"/>

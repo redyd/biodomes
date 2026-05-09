@@ -195,6 +195,15 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
     {
         try
         {
+            var exist = await context.Biomes
+                .Where(b => b.Id != toUpdate.Id)
+                .AnyAsync(b => b.Name.ToLower() == toUpdate.Name.ToLower());
+
+            if (exist)
+            {
+                return ResultT<Biome>.Conflict("A biome with this name already exist.");
+            }
+            
             var entity = await context.Biomes
                 .FirstOrDefaultAsync(b => b.Id == toUpdate.Id);
 

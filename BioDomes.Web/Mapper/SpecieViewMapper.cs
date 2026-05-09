@@ -9,14 +9,11 @@ public class SpecieViewMapper : ISpecieViewMapper
     {
         return new SpecieView
         {
-            Slug = specie.Slug,
-            Name = specie.Name,
-            Type = specie.Classification.Label,
-            Diet = specie.Diet.Label,
-            Height = FormatCentimeter(specie.Height),
-            Weight = FormatGram(specie.Weight),
+            FormatedHeight = FormatCentimeter(specie.Height),
+            FormatedWeight = FormatGram(specie.Weight),
             ImageUrl = resolveImage(specie.ImageUrl),
             CanEdit = userId is not null && (isAdmin || userId == specie.CreatedBy),
+            Model = specie
         };
     }
 

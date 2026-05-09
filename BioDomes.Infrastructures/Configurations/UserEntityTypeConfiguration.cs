@@ -23,6 +23,7 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<UserEntity>
             Id = "user-1",
             UserName = "admin",
             NormalizedUserName = "ADMIN",
+            ImageUrl = "1637ca51-6139-4ec4-aa5a-3e824212b0e3.jpg",
             Email = "admin@biodomes.com",
             NormalizedEmail = "ADMIN@BIODOMES.COM",
             EmailConfirmed = true,

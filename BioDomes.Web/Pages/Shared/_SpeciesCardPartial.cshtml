@@ -2,17 +2,17 @@
 
 <div class="card">
     <div>
-        <img src="@Model.ImageUrl" alt="@Model.Name" class="card-image"/>
+        <img src="@Model.ImageUrl" alt="@Model.Model.Name" class="card-image"/>
     </div>
     <div class="card-body">
-        <div class="card-name">@Model.Name</div>
-        <div class="card-info"><span class="card-label">Type :</span> @Model.Type</div>
-        <div class="card-info"><span class="card-label">Régime :</span> @Model.Diet</div>
-        <div class="card-info"><span class="card-label">Taille :</span> @Model.Height</div>
-        <div class="card-info"><span class="card-label">Poids :</span> @Model.Weight</div>
+        <div class="card-name">@Model.Model.Name</div>
+        <div class="card-info"><span class="card-label">Type :</span> @Model.Model.Classification.Label</div>
+        <div class="card-info"><span class="card-label">Régime :</span> @Model.Model.Diet.Label</div>
+        <div class="card-info"><span class="card-label">Taille :</span> @Model.FormatedHeight</div>
+        <div class="card-info"><span class="card-label">Poids :</span> @Model.FormatedWeight</div>
         @if (@Model.CanEdit)
         {
-            <a asp-page="/Species/Edit" asp-route-slug="@Model.Slug">Éditer</a>
+            <a asp-page="/Species/Edit" asp-route-slug="@Model.Model.Slug">Éditer</a>
         }
     </div>
 </div>

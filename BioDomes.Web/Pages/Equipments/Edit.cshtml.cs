@@ -4,48 +4,42 @@ using BioDomes.Domains.Requests;
 using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
+using BioDomes.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BioDomes.Web.Pages.Equipments;
 
 [Authorize]
-public class Edit(IWebHostEnvironment env, ILogger<Edit> logger, IEquipmentRepository repository)
-    : AppPageModel(env)
+public class Edit(
+    IWebHostEnvironment env,
+    IImagePathResolver imageResolver,
+    ILogger<Edit> logger,
+    IEquipmentRepository repository)
+    : AppPageModel
 {
     [BindProperty] public UpdateEquipmentInputModel Input { get; set; } = new();
-    
-    public List<EquipmentResource> Resources { get; set; } = [];
+
+    public SelectList Productions { get; set; } = null!;
+    public SelectList Consomations { get; set; } = null!;
     public string ImageSource { get; set; } = null!;
     public bool IsAdmin { get; set; }
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
         var userId = User.GetUserId();
-        if (userId == null)
-        {
-            return Forbid();
-        }
+        if (userId == null) return Forbid();
 
         var equipmentResult = await repository.FindAsync(id, userId, User.IsAdmin());
-        if (equipmentResult.Failed)
-        {
-            return equipmentResult.ToPageResult(this);
-        }
-        
-        var resourcesResult = await repository.GetResourcesAsync();
-        if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
-        
+        if (equipmentResult.Failed) return equipmentResult.ToPageResult(this);
+
         var equipment = equipmentResult.Value!;
 
-        if (!User.IsAdmin() && equipment.CreatedBy != userId)
-        {
-            return Forbid();
-        }
+        if (!User.IsAdmin() && equipment.CreatedBy != userId) return Forbid();
 
         IsAdmin = User.IsAdmin();
-        ImageSource = UseImageWithDefault(equipment.ImageId, "tool.png");
-        Resources = resourcesResult.Value!;
+        ImageSource = imageResolver.UseImageWithDefault(equipment.ImageId, "tool.png");
 
         Input = new UpdateEquipmentInputModel
         {
@@ -55,25 +49,20 @@ public class Edit(IWebHostEnvironment env, ILogger<Edit> logger, IEquipmentRepos
             Public = equipment.IsPublic
         };
 
-        logger.LogInformation($"Editing {id}");
+        var loaded = await LoadSelectLists();
+        if (loaded is not null) return loaded;
+
+        logger.LogInformation("Editing {Id}", id);
         return Page();
     }
 
     public async Task<IActionResult> OnPostAsync(int id, string action)
     {
-        // block unauth user
         var userId = User.GetUserId();
-        if (userId == null)
-        {
-            return Forbid();
-        }
+        if (userId == null) return Forbid();
 
-        // find the result
         var equipmentResult = await repository.FindAsync(id, userId, User.IsAdmin());
-        if (equipmentResult.Failed)
-        {
-            return equipmentResult.ToPageResult(this);
-        }
+        if (equipmentResult.Failed) return equipmentResult.ToPageResult(this);
 
         var equipment = equipmentResult.Value!;
 
@@ -89,6 +78,11 @@ public class Edit(IWebHostEnvironment env, ILogger<Edit> logger, IEquipmentRepos
     {
         if (!ModelState.IsValid)
         {
+            var loaded = await LoadSelectLists();
+            if (loaded is not null) return loaded;
+
+            ImageSource = imageResolver.UseImageWithDefault(equipment.ImageId, "tool.png");
+            IsAdmin = User.IsAdmin();
             return Page();
         }
 
@@ -96,8 +90,8 @@ public class Edit(IWebHostEnvironment env, ILogger<Edit> logger, IEquipmentRepos
         {
             Id = equipment.Id,
             Name = Input.Name,
-            ConsumedResourceId = Input.ConsumedResourceId,
-            ProducedResourceId = Input.ProducedResourceId,
+            ConsumedResourceId = (int)Input.ConsumedResourceId!,
+            ProducedResourceId = (int)Input.ProducedResourceId!,
             Image = equipment.ImageId
         };
 
@@ -108,30 +102,49 @@ public class Edit(IWebHostEnvironment env, ILogger<Edit> logger, IEquipmentRepos
 
         if (Input.Image is not null)
         {
-            var newImage = await SaveImage(Input.Image);
-            DeleteImage(equipment.ImageId);
+            var newImage = await imageResolver.SaveImage(Input.Image, env);
+            imageResolver.DeleteImage(equipment.ImageId, env);
             request.Image = newImage;
         }
 
-        await repository.UpdateAsync(request, userId, User.IsAdmin());
-        SuccessNotification($"Equipement {Input.Name} modifié avec succès");
+        var result = await repository.UpdateAsync(request, userId, User.IsAdmin());
 
+        if (result.Status == ResultStatus.Conflict)
+        {
+            ErrorNotification("Un équipement de ce nom existe déjà.");
+
+            var loaded = await LoadSelectLists();
+            if (loaded is not null) return loaded;
+
+            ImageSource = imageResolver.UseImageWithDefault(equipment.ImageId, "tool.png");
+            IsAdmin = User.IsAdmin();
+            return Page();
+        }
+
+        if (result.Failed) return result.ToPageResult(this);
+
+        SuccessNotification($"Equipement {Input.Name} modifié avec succès");
         return RedirectToPage("/Equipments/Index");
     }
 
     private async Task<IActionResult> PerformDelete(int id, string userId, Equipment equipment)
     {
         var deletedResult = await repository.DeleteAsync(id, userId, User.IsAdmin());
-        if (deletedResult.Failed)
-        {
-            return deletedResult.ToPageResult(this);
-        }
+        if (deletedResult.Failed) return deletedResult.ToPageResult(this);
 
-        var deleted = deletedResult.Value!;
-
-        DeleteImage(equipment.ImageId);
-        SuccessNotification($"L'équipement {deleted.Name} a été supprimé");
+        imageResolver.DeleteImage(equipment.ImageId, env);
+        SuccessNotification($"L'équipement {deletedResult.Value!.Name} a été supprimé");
 
         return RedirectToPage("/Equipments/Index");
+    }
+
+    private async Task<IActionResult?> LoadSelectLists()
+    {
+        var resourcesResult = await repository.GetResourcesAsync();
+        if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
+
+        Productions = new SelectList(resourcesResult.Value!, "Id", "Label", Input.ProducedResourceId);
+        Consomations = new SelectList(resourcesResult.Value!, "Id", "Label", Input.ConsumedResourceId);
+        return null;
     }
 }

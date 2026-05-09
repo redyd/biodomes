@@ -11,20 +11,18 @@
         <form method="post" asp-page-handler="AddSpecie" class="edit-body">
 
             <div class="field-group">
-                @foreach (var group in Model.Recommendations
-                                  .GroupBy(r => r.Type)
-                                  .OrderBy(g => g.Key))
+                @foreach (var species in Model.Recommendations)
                 {
-                    <p class="suggestion-group-label">@group.Key.GetDisplayName()</p>
+                    <p class="suggestion-group-label">@species.Key.GetDisplayName()</p>
                     <div class="suggestion-group">
-                        @foreach (var specie in group.Select(r => r.Involved))
+                        @foreach (var specie in species.Value.Select(sp => sp.Involved))
                         {
                             <label class="suggestion-card">
-                                <input type="radio" asp-for="SpecieInput.SpecieId" value="@specie.Id" hidden/>
+                                <input type="radio" asp-for="SpecieInput.SpecieId" value="@specie.Model.Id" hidden/>
                                 <img class="suggestion-card-img"
-                                     src="@Model.UseImageWithDefault(specie.ImageUrl, "specie.png")"
-                                     alt="@specie.Name"/>
-                                <span class="suggestion-name">@specie.Name</span>
+                                     src="@specie.ImageUrl"
+                                     alt="@specie.Model.Name"/>
+                                <span class="suggestion-name">@specie.Model.Name</span>
                             </label>
                         }
                     </div>

@@ -1,0 +1,43 @@
+@using BioDomes.Web.Extensions
+@model BioDomes.Web.ViewModels.BiomeView<BioDomes.Domains.Core.Biome>
+
+<div class="biome-row-wrap" data-id="@Model.Model.Id">
+    <div class="biome-row">
+        <div class="biome-row-image">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" alt="@Model.Model.Name" />
+            }
+            else
+            {
+                <div class="biome-row-image-placeholder"></div>
+            }
+            <span class="biome-state biome-state-badge biome-state-@Model.Model.State.GetDisplayName().ToLower()">@Model.Model.State</span>
+        </div>
+
+        <a class="biome-row-body" asp-page="/Biomes/Detail" asp-route-id="@Model.Model.Id">
+            <div class="biome-row-header">
+                <h2 class="biome-row-name">@Model.Model.Name</h2>
+                @if (Model.IsPublic)
+                {
+                    <span class="biome-badge-public">public</span>
+                }
+            </div>
+            <div class="biome-row-stats">
+                <div class="biome-stat">
+                    <span class="biome-stat-label">Température</span>
+                    <span class="biome-stat-value">@Model.Model.Temperature °C</span>
+                </div>
+                <div class="biome-stat">
+                    <span class="biome-stat-label">Humidité</span>
+                    <span class="biome-stat-value">@Model.Model.Humidity g/m³</span>
+                </div>
+            </div>
+        </a>
+
+        @if (Model.CanEdit)
+        {
+            <a class="biome-row-actions biome-row-edit" asp-page="/Biomes/Edit" asp-route-id="@Model.Model.Id">Modifier →</a>
+        }
+    </div>
+</div>

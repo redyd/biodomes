@@ -890,6 +890,28 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
+.biome-row-wrap {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.biome-row-wrap .biome-row {
+    border-radius: 0;
+    border-bottom: none;
+}
+
+.biome-row-wrap .search-meta-tags {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: 1px solid var(--border-bright);
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
 /* Image */
 .biome-row-image {
     position: relative;

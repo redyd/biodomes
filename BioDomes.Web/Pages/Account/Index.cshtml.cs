@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
+using BioDomes.Web.Services;
 
 namespace BioDomes.Web.Pages.Account;
 
@@ -11,7 +12,8 @@ namespace BioDomes.Web.Pages.Account;
 public class Index(
     UserManager<UserEntity> userManager,
     SignInManager<UserEntity> signInManager,
-    IWebHostEnvironment env) : AppPageModel(env)
+    IWebHostEnvironment env,
+    IImagePathResolver imageResolver) : AppPageModel
 {
     [BindProperty] public UserInputModel Input { get; set; } = new();
     public string CurrentImageUrl { get; set; } = null!;
@@ -29,7 +31,7 @@ public class Index(
             return;
         }
 
-        CurrentImageUrl = UseImageWithDefault(user.ImageUrl, "user.png");
+        CurrentImageUrl = imageResolver.UseImageWithDefault(user.ImageUrl, "user.png");
 
         Input = new UserInputModel
         {
@@ -54,12 +56,12 @@ public class Index(
         var user = await userManager.GetUserAsync(User);
         if (user == null) return NotFound();
 
-        var imageName = Input.ImageUpload is not null ? await SaveImage(Input.ImageUpload) : user.ImageUrl;
+        var imageName = Input.ImageUpload is not null ? await imageResolver.SaveImage(Input.ImageUpload, env) : user.ImageUrl;
 
         if (WantsToChangePassword && !await ValidateAndChangePasswordAsync(user)
             || !await UpdateProfileAsync(user, imageName))
         {
-            CurrentImageUrl = UseImageWithDefault(user.ImageUrl, "user.png");
+            CurrentImageUrl = imageResolver.UseImageWithDefault(user.ImageUrl, "user.png");
             return Page();
         }
 
@@ -130,9 +132,9 @@ public class Index(
         {
             if (user.ImageUrl is not null)
             {
-                DeleteImage(user.ImageUrl);
+                imageResolver.DeleteImage(user.ImageUrl, env);
             }
-            
+
             user.ImageUrl = imageName;
         }
 

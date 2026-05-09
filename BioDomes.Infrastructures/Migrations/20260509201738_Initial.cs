@@ -462,8 +462,8 @@ namespace BioDomes.Infrastructures.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "Birthdate", "ConcurrencyStamp", "Email", "EmailConfirmed", "ImageUrl", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SearchOrganism", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "user-1", 0, new DateOnly(1990, 1, 1), "4369c6d3-e51f-4b84-bb37-ad481dad36f7", "admin@biodomes.com", true, null, false, null, "ADMIN@BIODOMES.COM", "ADMIN", null, null, false, "Saint Paul", "8e247e76-c804-4ebc-a4bb-5a8728a959a2", false, "admin" },
-                    { "user-2", 0, new DateOnly(1995, 6, 15), "577a70db-2826-4d84-97bd-4b17dbd88079", "john@biodomes.com", true, null, false, null, "JOHN@BIODOMES.COM", "JOHN", null, null, false, "Marie Thérèse", "3f009e7c-0a2c-4730-93e4-ca4c15630a34", false, "john" }
+                    { "user-1", 0, new DateOnly(1990, 1, 1), "dd846e1f-d948-420b-af1f-4c36fb9ba85d", "admin@biodomes.com", true, "1637ca51-6139-4ec4-aa5a-3e824212b0e3.jpg", false, null, "ADMIN@BIODOMES.COM", "ADMIN", null, null, false, "Saint Paul", "8937fe83-549e-493f-a4b6-79f1ae4fdb94", false, "admin" },
+                    { "user-2", 0, new DateOnly(1995, 6, 15), "2c59a1a3-9e94-46c6-9824-4da3fef7a162", "john@biodomes.com", true, null, false, null, "JOHN@BIODOMES.COM", "JOHN", null, null, false, "Marie Thérèse", "ad5877b3-25a8-4dbc-ba2e-4f6ea086f57d", false, "john" }
                 });
 
             migrationBuilder.InsertData(

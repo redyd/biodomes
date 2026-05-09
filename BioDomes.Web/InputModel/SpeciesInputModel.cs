@@ -10,15 +10,15 @@ public class SpeciesInputModel
     public string Name { get; set; } = string.Empty;
     
     [Required(ErrorMessage = "Le type est requis.")]
-    public int ClassificationId { get; set; }
+    public int? ClassificationId { get; set; }
     
     [Required(ErrorMessage = "Le régime alimentaire est requis.")]
-    public int DietId { get; set; }
+    public int? DietId { get; set; }
     
-    [Range(0, 10000, ErrorMessage = "La taille doit être entre 0 et 10000")]
+    [Range(1, 10000, ErrorMessage = "La taille doit être entre 1 et 10000")]
     public int Height { get; set; }
 
-    [Range(0, 100000000, ErrorMessage = "Le poids doit être entre 0 et 100000000")]
+    [Range(1, 100000000, ErrorMessage = "Le poids doit être entre 1 et 100000000")]
     public int Weight { get; set; }
 
     public bool Public { get; set; }
