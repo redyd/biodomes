@@ -57,4 +57,7 @@ L'application démarra sur le port `5298`.
 ## Éléments techniques notables
 
 - Utilisation de Cytoscape.js, Chart.js et Hammer.js pour les graphiques.
-- Modélisation d'une chaine alimentaire globale utilisée pour créer des sous-chaine au sein des biomes.
+- Découplage et utilisations de vues partielles
+- Intégrations de javascript
+- Gestion d'image par défaut
+- Utilisation du Result Pattern pour une gestion propre d'erreur dans les repository
