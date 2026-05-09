@@ -1597,3 +1597,98 @@ dialog::backdrop {
     color: #00d2b4;
     background: rgba(0,210,180,0.08);
 }
+
+.search-bar-wrap {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.search-input {
+    width: 100%;
+    padding: .65rem 1rem .65rem 2.6rem;
+    background: rgba(0, 210, 180, 0.05);
+    border: 1px solid rgba(0, 210, 180, 0.2);
+    border-radius: 8px;
+    color: #c8e6e4;
+    font-family: 'Space Mono', monospace;
+    font-size: .9rem;
+    transition: border-color .2s, box-shadow .2s;
+    box-sizing: border-box;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #00d2b4;
+    box-shadow: 0 0 0 3px rgba(0, 210, 180, 0.12);
+}
+
+.search-input::placeholder { color: #3d6b66; }
+
+.search-icon {
+    position: absolute;
+    left: .9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #3d6b66;
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+
+.search-results-count {
+    color: #3d6b66;
+    font-family: 'Space Mono', monospace;
+    font-size: .8rem;
+    margin-bottom: .75rem;
+}
+
+.search-result-card {
+    background: rgba(0, 210, 180, 0.04);
+    border: 1px solid rgba(0, 210, 180, 0.12);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: .75rem;
+    transition: border-color .2s;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+}
+
+.search-result-card:hover { border-color: rgba(0, 210, 180, 0.4); }
+
+.search-result-name {
+    color: #00d2b4;
+    font-family: 'Space Mono', monospace;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: .4rem;
+}
+
+.search-result-meta {
+    display: flex;
+    gap: 1.5rem;
+    font-size: .8rem;
+    color: #7aada8;
+    font-family: 'Space Mono', monospace;
+    margin-bottom: .5rem;
+}
+
+.search-result-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin-top: .5rem;
+}
+
+.search-tag {
+    background: rgba(0, 210, 180, 0.08);
+    border: 1px solid rgba(0, 210, 180, 0.15);
+    border-radius: 20px;
+    padding: .15rem .6rem;
+    font-size: .75rem;
+    color: #7aada8;
+    font-family: 'Space Mono', monospace;
+}
+
+.search-tag.species   { border-color: rgba(0, 210, 180, 0.3); color: #00d2b4; }
+.search-tag.equipment { border-color: rgba(240, 168, 48, 0.3); color: #f0a830; }
