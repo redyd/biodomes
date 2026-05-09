@@ -20,13 +20,15 @@
     <div class="hero-stats">
         @foreach (var dome in Model.RankedBiomes)
         {
-            <div class="hero-stat">
-                <div>
-                    <img src="@dome.ImageUrl" alt="@dome.Model.Name" class="card-image"/>
+            <a asp-page="/Biomes/Detail" asp-route-id="@dome.Model.Id">
+                <div class="hero-stat">
+                    <div>
+                        <img src="@dome.ImageUrl" alt="@dome.Model.Name" class="card-image"/>
+                    </div>
+                    <span class="hero-stat-value">@dome.Model.Name</span>
+                    <span class="hero-stat-label">@dome.Model.SpeciesVariety variétées</span>
                 </div>
-                <span class="hero-stat-value">@dome.Model.Name</span>
-                <span class="hero-stat-label">@dome.Model.SpeciesVariety variétées</span>
-            </div>
+            </a>
         }
     </div>
 
