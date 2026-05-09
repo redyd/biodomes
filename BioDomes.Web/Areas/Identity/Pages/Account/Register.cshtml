@@ -11,7 +11,7 @@
             <h1 class="edit-title">Créer un <em>compte</em></h1>
         </div>
         <div class="edit-body">
-            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="validation-summary" role="alert"></div>
 
                 <div class="field-group">
@@ -48,7 +48,9 @@
 
                 <div class="field-group">
                     <label asp-for="Input.ImageUrl" class="field-label">Avatar</label>
-                    <input asp-for="Input.ImageUrl" class="field-input" placeholder=""/>
+                    <div class="image-upload-zone">
+                        <input type="file" asp-for="Input.ImageUrl" accept="image/*"/>
+                    </div>
                     <span asp-validation-for="Input.ImageUrl" class="field-error"></span>
                 </div>
 
