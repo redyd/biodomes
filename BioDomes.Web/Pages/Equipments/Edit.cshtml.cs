@@ -11,11 +11,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace BioDomes.Web.Pages.Equipments;
 
 [Authorize]
-public class Edit(IWebHostEnvironment env, IImagePathResolver imageResolver, ILogger<Edit> logger, IEquipmentRepository repository)
+public class Edit(
+    IWebHostEnvironment env,
+    IImagePathResolver imageResolver,
+    ILogger<Edit> logger,
+    IEquipmentRepository repository)
     : AppPageModel
 {
     [BindProperty] public UpdateEquipmentInputModel Input { get; set; } = new();
-    
+
     public List<EquipmentResource> Resources { get; set; } = [];
     public string ImageSource { get; set; } = null!;
     public bool IsAdmin { get; set; }
@@ -33,10 +37,10 @@ public class Edit(IWebHostEnvironment env, IImagePathResolver imageResolver, ILo
         {
             return equipmentResult.ToPageResult(this);
         }
-        
+
         var resourcesResult = await repository.GetResourcesAsync();
         if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
-        
+
         var equipment = equipmentResult.Value!;
 
         if (!User.IsAdmin() && equipment.CreatedBy != userId)

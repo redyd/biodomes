@@ -18,24 +18,10 @@ public class AddModel(
     IImagePathResolver imageResolver,
     IWebHostEnvironment env) : AppPageModel
 {
-    [BindProperty] public SpeciesInputModel? Input { get; set; }
+    [BindProperty] public SpeciesInputModel Input { get; set; } = new();
 
     public SelectList Classifications { get; set; } = null!;
     public SelectList Diets { get; set; } = null!;
-
-    private async Task<IActionResult?> LoadSelectLists()
-    {
-        var classifications = await attributesRepository.GetClassifications();
-        var diets = await attributesRepository.GetDiets();
-
-        if (classifications.Failed) return classifications.ToPageResult(this);
-        if (diets.Failed) return diets.ToPageResult(this);
-
-        Classifications = new SelectList(classifications.Value!, "Id", "Label", Input?.ClassificationId);
-        Diets = new SelectList(diets.Value!, "Id", "Label", Input?.DietId);
-
-        return null;
-    }
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -53,7 +39,7 @@ public class AddModel(
 
     public async Task<IActionResult> OnPost()
     {
-        if (Input == null || !ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
             var loaded = await LoadSelectLists();
             if (loaded is not null) return loaded;
@@ -75,8 +61,8 @@ public class AddModel(
                 Image = imageName,
                 Height = Input.Height,
                 Weight = Input.Weight,
-                DietId = Input.DietId,
-                ClassificationId = Input.ClassificationId
+                DietId = (int)Input.DietId!,
+                ClassificationId = (int)Input.ClassificationId!
             };
 
             var result = await speciesRepository.AddAsync(specie, userId);
@@ -109,5 +95,19 @@ public class AddModel(
             if (loaded is not null) return loaded;
             return Page();
         }
+    }
+    
+    private async Task<IActionResult?> LoadSelectLists()
+    {
+        var classifications = await attributesRepository.GetClassifications();
+        var diets = await attributesRepository.GetDiets();
+
+        if (classifications.Failed) return classifications.ToPageResult(this);
+        if (diets.Failed) return diets.ToPageResult(this);
+
+        Classifications = new SelectList(classifications.Value!, "Id", "Label", Input.ClassificationId);
+        Diets = new SelectList(diets.Value!, "Id", "Label", Input?.DietId);
+
+        return null;
     }
 }

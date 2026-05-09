@@ -7,6 +7,7 @@ using BioDomes.Web.PageModels;
 using BioDomes.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BioDomes.Web.Pages.Species;
 
@@ -23,8 +24,8 @@ public class EditModel(
     public string ImageUrl { get; set; } = null!;
     public bool IsAdmin { get; set; }
 
-    public List<Classification> Classifications { get; set; } = [];
-    public List<Diet> Diets { get; set; } = [];
+    public SelectList Classifications { get; set; } = null!;
+    public SelectList Diets { get; set; } = null!;
 
     public async Task<IActionResult> OnGetAsync(string slug)
     {
@@ -50,15 +51,6 @@ public class EditModel(
         IsAdmin = User.IsAdmin();
         Specie = specie;
 
-        var classificationsResult = await attributesRepository.GetClassifications();
-        if (classificationsResult.Failed) return classificationsResult.ToPageResult(this);
-        
-        var dietsResult = await attributesRepository.GetDiets();
-        if (dietsResult.Failed) return dietsResult.ToPageResult(this);
-        
-        Classifications = classificationsResult.Value!;
-        Diets = dietsResult.Value!;
-
         ImageUrl = imageResolver.UseImageWithDefault(specie.ImageUrl, "specie.png");
 
         Input = new SpeciesInputModel
@@ -70,6 +62,9 @@ public class EditModel(
             Weight = specie.Weight,
             Public = specie.IsPublic
         };
+        
+        var loaded = await LoadSelectLists();
+        if (loaded is not null) return loaded;
 
         return Page();
     }
@@ -116,15 +111,10 @@ public class EditModel(
     {
         if (!ModelState.IsValid)
         {
-            var classificationsResult = await attributesRepository.GetClassifications();
-            if (classificationsResult.Failed) return classificationsResult.ToPageResult(this);
-        
-            var dietsResult = await attributesRepository.GetDiets();
-            if (dietsResult.Failed) return dietsResult.ToPageResult(this);
-        
-            Classifications = classificationsResult.Value!;
-            Diets = dietsResult.Value!;
-            
+            var loaded = await LoadSelectLists();
+            if (loaded is not null) return loaded;
+            ImageUrl = imageResolver.UseImageWithDefault(specie.ImageUrl, "specie.png");
+
             return Page();
         }
 
@@ -132,8 +122,8 @@ public class EditModel(
         {
             Id = specie.Id,
             Name = Input.Name,
-            ClassificationId = Input.ClassificationId,
-            DietId = Input.DietId,
+            ClassificationId = (int)Input.ClassificationId!,
+            DietId = (int)Input.DietId!,
             Height = Input.Height,
             Weight = Input.Weight
         };
@@ -158,6 +148,11 @@ public class EditModel(
         if (result.Status == ResultStatus.Conflict)
         {
             ErrorNotification("Une espèce avec ce nom existe déjà");
+            
+            var loaded = await LoadSelectLists();
+            if (loaded is not null) return loaded;
+            ImageUrl = imageResolver.UseImageWithDefault(specie.ImageUrl, "specie.png");
+            
             return Page();
         }
 
@@ -170,5 +165,19 @@ public class EditModel(
 
         SuccessNotification($"Espèce {updated.Name} correctement modifiée");
         return RedirectToPage("/Species/Index");
+    }
+    
+    private async Task<IActionResult?> LoadSelectLists()
+    {
+        var classificationsResult = await attributesRepository.GetClassifications();
+        if (classificationsResult.Failed) return classificationsResult.ToPageResult(this);
+
+        var dietsResult = await attributesRepository.GetDiets();
+        if (dietsResult.Failed) return dietsResult.ToPageResult(this);
+
+        Classifications = new SelectList(classificationsResult.Value!, "Id", "Label", Input.ClassificationId);
+        Diets = new SelectList(dietsResult.Value!, "Id", "Label", Input.DietId);
+
+        return null;
     }
 }

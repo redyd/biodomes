@@ -11,11 +11,11 @@ public class EquipmentInputModel
 
     [Required(ErrorMessage = "La ressource produite est requise.")]
     [Range(1, int.MaxValue, ErrorMessage = "La ressource produite doit être un ID valide.")]
-    public int ProducedResourceId { get; set; }
+    public int? ProducedResourceId { get; set; }
 
     [Required(ErrorMessage = "La ressource consommée est requise.")]
     [Range(1, int.MaxValue, ErrorMessage = "La ressource consommée doit être un ID valide.")]
-    public int ConsumedResourceId { get; set; }
+    public int? ConsumedResourceId { get; set; }
 
     [Required(ErrorMessage = "Une image est requise.")]
     [DataType(DataType.Upload)]

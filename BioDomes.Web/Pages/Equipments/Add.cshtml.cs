@@ -7,6 +7,7 @@ using BioDomes.Web.PageModels;
 using BioDomes.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BioDomes.Web.Pages.Equipments;
 
@@ -15,7 +16,8 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
     : AppPageModel
 {
     [BindProperty] public EquipmentInputModel Input { get; set; } = new();
-    [BindProperty] public List<EquipmentResource> Resources { get; set; } = [];
+    public SelectList Productions { get; set; } = null!;
+    public SelectList Consomations { get; set; } = null!;
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -24,10 +26,10 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
         {
             return Forbid();
         }
-        var resourcesResult = await repository.GetResourcesAsync();
-        if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
         
-        Resources = resourcesResult.Value!; 
+        var loaded = await LoadSelectLists();
+        if (loaded is not null) return loaded;
+        
         return Page();
     }
 
@@ -35,10 +37,9 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
     {
         if (!ModelState.IsValid)
         {
-            var resourcesResult = await repository.GetResourcesAsync();
-            if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
-        
-            Resources = resourcesResult.Value!; 
+            var loaded = await LoadSelectLists();
+            if (loaded is not null) return loaded;
+            
             return Page();
         }
 
@@ -54,8 +55,8 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
         {
             Name = Input.Name,
             Image = imageId,
-            ConsumedResourceId = Input.ConsumedResourceId,
-            ProducedResourceId = Input.ProducedResourceId,
+            ConsumedResourceId = (int)Input.ConsumedResourceId!,
+            ProducedResourceId = (int)Input.ProducedResourceId!,
             UserId = userId
         };
 
@@ -64,10 +65,10 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
         if (result.Status == ResultStatus.Conflict)
         {
             ErrorNotification("Un équipement de ce nom existe déjà.");
-            var resourcesResult = await repository.GetResourcesAsync();
-            if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
-        
-            Resources = resourcesResult.Value!; 
+            
+            var loaded = await LoadSelectLists();
+            if (loaded is not null) return loaded;
+            
             return Page();
         }
 
@@ -80,5 +81,15 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
         SuccessNotification($"L'équipement {Input.Name} a été créé avec succès");
 
         return RedirectToPage("/Equipments/Index");
+    }
+    
+    private async Task<IActionResult?> LoadSelectLists()
+    {
+        var resourcesResult = await repository.GetResourcesAsync();
+        if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
+        
+        Productions = new SelectList(resourcesResult.Value!, "Id", "Label", Input.ProducedResourceId);
+        Consomations = new SelectList(resourcesResult.Value!, "Id", "Label", Input.ConsumedResourceId);
+        return null;
     }
 }

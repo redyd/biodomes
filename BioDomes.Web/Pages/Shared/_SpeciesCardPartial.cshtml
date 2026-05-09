@@ -7,7 +7,7 @@
     <div class="card-body">
         <div class="card-name">@Model.Model.Name</div>
         <div class="card-info"><span class="card-label">Type :</span> @Model.Model.Classification.Label</div>
-        <div class="card-info"><span class="card-label">Régime :</span> @Model.Model.Diet</div>
+        <div class="card-info"><span class="card-label">Régime :</span> @Model.Model.Diet.Label</div>
         <div class="card-info"><span class="card-label">Taille :</span> @Model.FormatedHeight</div>
         <div class="card-info"><span class="card-label">Poids :</span> @Model.FormatedWeight</div>
         @if (@Model.CanEdit)

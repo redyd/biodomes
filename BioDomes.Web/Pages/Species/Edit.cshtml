@@ -23,24 +23,20 @@
 
                 <div class="field-group">
                     <label class="field-label" asp-for="Input.ClassificationId">Classification</label>
-                    <select class="field-input" asp-for="Input.ClassificationId">
+                    <select class="field-input" 
+                            asp-for="Input.ClassificationId"
+                            asp-items="Model.Classifications">
                         <option value="">-- Choisir --</option>
-                        @foreach (var classification in Model.Classifications)
-                        {
-                            <option value="@classification.Id">@classification.Label</option>
-                        }
                     </select>
                     <span asp-validation-for="Input.ClassificationId" class="field-error"></span>
                 </div>
 
                 <div class="field-group">
                     <label class="field-label" asp-for="Input.DietId">Régime</label>
-                    <select class="field-input" asp-for="Input.DietId">
+                    <select class="field-input" 
+                            asp-for="Input.DietId"
+                            asp-items="Model.Diets">
                         <option value="">-- Choisir --</option>
-                        @foreach (var diet in Model.Diets)
-                        {
-                            <option value="@diet.Id">@diet.Label</option>
-                        }
                     </select>
                     <span asp-validation-for="Input.DietId" class="field-error"></span>
                 </div>
