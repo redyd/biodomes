@@ -4,6 +4,7 @@ using BioDomes.Domains.Requests;
 using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
+using BioDomes.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +14,8 @@ namespace BioDomes.Web.Pages.Species;
 public class EditModel(
     ISpeciesRepository repository,
     ISpecieAttributesRepository attributesRepository,
-    IWebHostEnvironment env) : AppPageModel(env)
+    IImagePathResolver imageResolver,
+    IWebHostEnvironment env) : AppPageModel
 {
     [BindProperty] public SpeciesInputModel Input { get; set; } = new();
 
@@ -57,7 +59,7 @@ public class EditModel(
         Classifications = classificationsResult.Value!;
         Diets = dietsResult.Value!;
 
-        ImageUrl = UseImageWithDefault(specie.ImageUrl, "specie.png");
+        ImageUrl = imageResolver.UseImageWithDefault(specie.ImageUrl, "specie.png");
 
         Input = new SpeciesInputModel
         {
@@ -103,7 +105,7 @@ public class EditModel(
 
         if (!string.IsNullOrEmpty(specie.ImageUrl))
         {
-            DeleteImage(specie.ImageUrl);
+            imageResolver.DeleteImage(specie.ImageUrl, env);
         }
 
         SuccessNotification($"Espèce {specie.Name} correctement supprimée");
@@ -145,10 +147,10 @@ public class EditModel(
         {
             if (!string.IsNullOrEmpty(specie.ImageUrl))
             {
-                DeleteImage(specie.ImageUrl);
+                imageResolver.DeleteImage(specie.ImageUrl, env);
             }
 
-            var imageName = await SaveImage(Input.Image);
+            var imageName = await imageResolver.SaveImage(Input.Image, env);
             updatedSpecie.ImageUrl = imageName;
         }
 

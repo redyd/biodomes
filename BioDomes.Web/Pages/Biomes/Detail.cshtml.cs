@@ -6,25 +6,27 @@ using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.Mapper;
 using BioDomes.Web.PageModels;
+using BioDomes.Web.Services;
 using BioDomes.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Biomes;
 
 public class Detail(
-    IWebHostEnvironment env,
+    IImagePathResolver imageResolver,
     IBiomeRepository biomeRepo,
     IBiomeAnalyzer analyzer,
     IEquipmentRepository equipmentRepo,
     IBiomeManagementRepository managementRepo,
     IBiomeViewMapper biomeMapper,
-    IEquipmentViewMapper equipmentMapper)
-    : AppPageModel(env)
+    IEquipmentViewMapper equipmentMapper,
+    ISpecieViewMapper specieMapper)
+    : AppPageModel
 {
     // BASICS
     public BiomeView<ComplexBiome> Biome { get; set; } = null!;
     public BiomeAnalysis Analyze { get; set; } = null!;
-    public List<Recommendation<Specie>> Recommendations { get; set; } = null!;
+    public Dictionary<RecommendationType, List<Recommendation<SpecieView>>> Recommendations { get; set; } = null!;
     public List<EquipmentView> AllEquipments { get; set; } = null!;
     public string Creator { get; set; } = string.Empty;
 
@@ -183,22 +185,41 @@ public class Detail(
 
         var equipmentsResults = await equipmentRepo.GetAllAsync(User.GetUserId(), User.IsAdmin());
         if (equipmentsResults.Failed) return equipmentsResults.ToPageResult(this);
-
+        
+        Analyze = await analyzer.AnalyzeBiome(userId, User.IsAdmin(), id);
+        Creator = creatorResult.Value!;
+        
+        var species = await analyzer.RecommendationToAddForBiome(userId, User.IsAdmin(), id, Analyze.Graph);
+        
         Biome = biomeMapper.MapSingle(
             biomeResult.Value,
             User.IsAdmin(),
             userId,
-            image => UseImageWithDefault(image, "biome_bg.png"));
+            image => imageResolver.UseImageWithDefault(image, "biome_bg.png"));
 
         AllEquipments = equipmentMapper.MapAll(
             equipmentsResults.Value!,
             User.IsAdmin(),
             userId,
-            image => UseImageWithDefault(image, "tool.png"));
+            image => imageResolver.UseImageWithDefault(image, "tool.png"));
 
-        Analyze = await analyzer.AnalyzeBiome(userId, User.IsAdmin(), id);
-        Recommendations = await analyzer.RecommendationToAddForBiome(userId, User.IsAdmin(), id, Analyze.Graph);
-        Creator = creatorResult.Value!;
+        Recommendations = species
+            .GroupBy(r => r.Type)
+            .OrderBy(g => g.Key)
+            .ToDictionary(
+                rt => rt.Key,
+                sps => sps.Select(sp => new Recommendation<SpecieView>
+                {
+                    ActionId = sp.ActionId,
+                    Label = sp.Label,
+                    Message = sp.Message,
+                    Type = sp.Type,
+                    Involved = specieMapper.MapSingle(
+                        sp.Involved,
+                        User.IsAdmin(), 
+                        userId, 
+                        image => imageResolver.UseImageWithDefault(image, "specie.png"))
+                }).ToList());
 
         return null;
     }

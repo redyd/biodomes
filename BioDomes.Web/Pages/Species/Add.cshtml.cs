@@ -4,6 +4,7 @@ using BioDomes.Domains.Requests;
 using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
+using BioDomes.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -14,7 +15,8 @@ namespace BioDomes.Web.Pages.Species;
 public class AddModel(
     ISpeciesRepository speciesRepository,
     ISpecieAttributesRepository attributesRepository,
-    IWebHostEnvironment env) : AppPageModel(env)
+    IImagePathResolver imageResolver,
+    IWebHostEnvironment env) : AppPageModel
 {
     [BindProperty] public SpeciesInputModel? Input { get; set; }
 
@@ -25,13 +27,13 @@ public class AddModel(
     {
         var classifications = await attributesRepository.GetClassifications();
         var diets = await attributesRepository.GetDiets();
-        
+
         if (classifications.Failed) return classifications.ToPageResult(this);
         if (diets.Failed) return diets.ToPageResult(this);
 
         Classifications = new SelectList(classifications.Value!, "Id", "Label", Input?.ClassificationId);
         Diets = new SelectList(diets.Value!, "Id", "Label", Input?.DietId);
-        
+
         return null;
     }
 
@@ -45,7 +47,7 @@ public class AddModel(
 
         var loaded = await LoadSelectLists();
         if (loaded is not null) return loaded;
-        
+
         return Page();
     }
 
@@ -66,7 +68,7 @@ public class AddModel(
 
         try
         {
-            var imageName = Input.Image == null ? null : await SaveImage(Input.Image);
+            var imageName = Input.Image == null ? null : await imageResolver.SaveImage(Input.Image, env);
             var specie = new CreateSpecieRequest
             {
                 Name = Input.Name,
@@ -83,11 +85,12 @@ public class AddModel(
                 ErrorNotification("Une espèce avec ce nom existe déjà");
                 if (imageName is not null)
                 {
-                    DeleteImage(imageName);
+                    imageResolver.DeleteImage(imageName, env);
                 }
+
                 var loaded = await LoadSelectLists();
                 if (loaded is not null) return loaded;
-                
+
                 return Page();
             }
 

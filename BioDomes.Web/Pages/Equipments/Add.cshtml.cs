@@ -4,14 +4,15 @@ using BioDomes.Domains.Requests;
 using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
+using BioDomes.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Equipments;
 
 [Authorize]
-public class Add(IWebHostEnvironment env, IEquipmentRepository repository, ILogger<Add> logger)
-    : AppPageModel(env)
+public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEquipmentRepository repository, ILogger<Add> logger)
+    : AppPageModel
 {
     [BindProperty] public EquipmentInputModel Input { get; set; } = new();
     [BindProperty] public List<EquipmentResource> Resources { get; set; } = [];
@@ -47,7 +48,7 @@ public class Add(IWebHostEnvironment env, IEquipmentRepository repository, ILogg
             return Forbid();
         }
 
-        var imageId = await SaveImage(Input.Image);
+        var imageId = await imageResolver.SaveImage(Input.Image, env);
 
         var createRequest = new CreateEquipmentRequest
         {

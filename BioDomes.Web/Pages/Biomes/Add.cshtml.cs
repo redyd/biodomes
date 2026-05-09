@@ -6,11 +6,12 @@ using BioDomes.Domains.Repository;
 using BioDomes.Domains.Requests;
 using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
+using BioDomes.Web.Services;
 
 namespace BioDomes.Web.Pages.Biomes;
 
 [Authorize]
-public class AddPage(IWebHostEnvironment env, IBiomeRepository repository) : AppPageModel(env)
+public class AddPage(IWebHostEnvironment env, IImagePathResolver imageResolver, IBiomeRepository repository) : AppPageModel
 {
     [BindProperty] public BiomeInputModel Input { get; set; } = new();
     public string? Humidity { get; set; }
@@ -40,7 +41,7 @@ public class AddPage(IWebHostEnvironment env, IBiomeRepository repository) : App
             return Forbid();
         }
 
-        var imageName = Input.ImageUrl == null ? null : await SaveImage(Input.ImageUrl);
+        var imageName = Input.ImageUrl == null ? null : await imageResolver.SaveImage(Input.ImageUrl, env);
 
         var createRequest = new CreateBiomeRequest
         {

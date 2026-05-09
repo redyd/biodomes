@@ -2,13 +2,14 @@ using BioDomes.Domains.Repository;
 using BioDomes.Web.Extensions;
 using BioDomes.Web.Mapper;
 using BioDomes.Web.PageModels;
+using BioDomes.Web.Services;
 using BioDomes.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Equipments;
 
-public class EquipmentPage(IEquipmentRepository repo, IWebHostEnvironment env, IEquipmentViewMapper mapper)
-    : AppPageModel(env)
+public class EquipmentPage(IEquipmentRepository repo, IEquipmentViewMapper mapper, IImagePathResolver imageResolver)
+    : AppPageModel
 {
     public List<EquipmentView> Equipments { get; set; } = [];
     public bool IsUserConnected { get; set; }
@@ -24,7 +25,7 @@ public class EquipmentPage(IEquipmentRepository repo, IWebHostEnvironment env, I
             equipmentsResult.Value!, 
             User.IsAdmin(),
             User.GetUserId(),
-            image => UseImageWithDefault(image, "tool.png"));
+            image => imageResolver.UseImageWithDefault(image, "tool.png"));
         
         return Page();
     }

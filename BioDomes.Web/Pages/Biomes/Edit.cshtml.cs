@@ -6,11 +6,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BioDomes.Domains.Core;
 using BioDomes.Web.InputModel;
+using BioDomes.Web.Services;
 
 namespace BioDomes.Web.Pages.Biomes;
 
 [Authorize]
-public class EditPage(IBiomeRepository repository, IWebHostEnvironment env) : AppPageModel(env)
+public class EditPage(IBiomeRepository repository, IWebHostEnvironment env, IImagePathResolver imageResolver) : AppPageModel
 {
     [BindProperty(SupportsGet = true)] public int Id { get; set; }
     [BindProperty] public UpdateBiomeInputModel Input { get; set; } = new();
@@ -31,7 +32,7 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env) : Ap
 
         var biome = result.Value!;
         BiomeName = biome.Name;
-        CurrentImageUrl = UseImageWithDefault(biome.ImageUrl, "dome.png");
+        CurrentImageUrl = imageResolver.UseImageWithDefault(biome.ImageUrl, "dome.png");
 
         Input = new UpdateBiomeInputModel
         {
@@ -62,7 +63,7 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env) : Ap
             var deleted = deleteResult.Value;
             if (deleted?.ImageUrl != null)
             {
-                DeleteImage(deleted.ImageUrl);
+                imageResolver.DeleteImage(deleted.ImageUrl, env);
             }
 
             SuccessNotification("Biome supprimé.");
@@ -74,7 +75,7 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env) : Ap
             var biomeForImage = await repository.FindAsync(Id, userId, IsAdmin);
             if (!biomeForImage.Failed)
             {
-                CurrentImageUrl = UseImageWithDefault(biomeForImage.Value!.ImageUrl, "dome.png");
+                CurrentImageUrl = imageResolver.UseImageWithDefault(biomeForImage.Value!.ImageUrl, "dome.png");
             }
 
             return Page();
@@ -88,13 +89,13 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env) : Ap
             
             if (!biomeForImage.Failed)
             {
-                CurrentImageUrl = UseImageWithDefault(biomeForImage.Value!.ImageUrl, "dome.png");
+                CurrentImageUrl = imageResolver.UseImageWithDefault(biomeForImage.Value!.ImageUrl, "dome.png");
             }
 
             return Page();
         }
 
-        var imageName = Input.Image is not null ? await SaveImage(Input.Image) : null;
+        var imageName = Input.Image is not null ? await imageResolver.SaveImage(Input.Image, env) : null;
 
         var request = new UpdateBiomeRequest
         {

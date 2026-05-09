@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.FoodChain;
 
-public class Index(IWebHostEnvironment env, IFoodChainRepository repo) : AppPageModel(env)
+public class Index(IFoodChainRepository repo) : AppPageModel
 {
     public FoodChainGraph Graph { get; set; } = null!;
 

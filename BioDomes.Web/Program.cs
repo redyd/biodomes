@@ -7,6 +7,7 @@ using BioDomes.Web.Constraints;
 using BioDomes.Web.Mapper;
 using BioDomes.Web.Middlewares;
 using BioDomes.Web.Middlewares.extensions;
+using BioDomes.Web.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Identity;
@@ -22,6 +23,9 @@ builder.Services.Configure<RouteOptions>(options =>
 
 builder.Services.AddScoped<ReverseProxyLinksMiddleware>();
 builder.Services.AddWebOptimizer(pipeline => { pipeline.AddCssBundle("/css/bundle.css", "css/**/*.css"); });
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IImagePathResolver, ImagePathResolver>();
 
 // repositories
 builder.Services.AddDbContext<BiodomeContext>(options

@@ -2,13 +2,14 @@
 using BioDomes.Web.Extensions;
 using BioDomes.Web.Mapper;
 using BioDomes.Web.PageModels;
+using BioDomes.Web.Services;
 using BioDomes.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Species;
 
-public class SpeciesModel(ISpeciesRepository repo, IWebHostEnvironment env, ISpecieViewMapper specieMapper)
-    : AppPageModel(env)
+public class SpeciesModel(ISpeciesRepository repo, IImagePathResolver imageResolver, ISpecieViewMapper specieMapper)
+    : AppPageModel
 {
     public List<SpecieView> SpeciesList { get; set; } = [];
     public bool IsUserConnected { get; set; }
@@ -27,7 +28,7 @@ public class SpeciesModel(ISpeciesRepository repo, IWebHostEnvironment env, ISpe
             species,
             User.IsAdmin(),
             User.GetUserId(),
-            image => UseImageWithDefault(image, "specie.png"));
+            image => imageResolver.UseImageWithDefault(image, "specie.png"));
 
         return Page();
     }

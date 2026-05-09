@@ -4,14 +4,15 @@ using BioDomes.Domains.Requests;
 using BioDomes.Web.Extensions;
 using BioDomes.Web.InputModel;
 using BioDomes.Web.PageModels;
+using BioDomes.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioDomes.Web.Pages.Equipments;
 
 [Authorize]
-public class Edit(IWebHostEnvironment env, ILogger<Edit> logger, IEquipmentRepository repository)
-    : AppPageModel(env)
+public class Edit(IWebHostEnvironment env, IImagePathResolver imageResolver, ILogger<Edit> logger, IEquipmentRepository repository)
+    : AppPageModel
 {
     [BindProperty] public UpdateEquipmentInputModel Input { get; set; } = new();
     
@@ -44,7 +45,7 @@ public class Edit(IWebHostEnvironment env, ILogger<Edit> logger, IEquipmentRepos
         }
 
         IsAdmin = User.IsAdmin();
-        ImageSource = UseImageWithDefault(equipment.ImageId, "tool.png");
+        ImageSource = imageResolver.UseImageWithDefault(equipment.ImageId, "tool.png");
         Resources = resourcesResult.Value!;
 
         Input = new UpdateEquipmentInputModel
@@ -108,8 +109,8 @@ public class Edit(IWebHostEnvironment env, ILogger<Edit> logger, IEquipmentRepos
 
         if (Input.Image is not null)
         {
-            var newImage = await SaveImage(Input.Image);
-            DeleteImage(equipment.ImageId);
+            var newImage = await imageResolver.SaveImage(Input.Image, env);
+            imageResolver.DeleteImage(equipment.ImageId, env);
             request.Image = newImage;
         }
 
@@ -129,7 +130,7 @@ public class Edit(IWebHostEnvironment env, ILogger<Edit> logger, IEquipmentRepos
 
         var deleted = deletedResult.Value!;
 
-        DeleteImage(equipment.ImageId);
+        imageResolver.DeleteImage(equipment.ImageId, env);
         SuccessNotification($"L'équipement {deleted.Name} a été supprimé");
 
         return RedirectToPage("/Equipments/Index");
