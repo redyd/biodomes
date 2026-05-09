@@ -18,7 +18,7 @@ public class BiomePage(
     IBiomeAnalyzer analyzer)
     : AppPageModel
 {
-    public Dictionary<BiomeView<Biome>, BiomeStats> BiomesStats { get; set; } = [];
+    public Dictionary<BiomeView<ComplexBiome>, BiomeStats> BiomesStats { get; set; } = [];
     public bool IsUserConnected { get; set; }
     public string BiomesJson { get; set; } = "[]";
 
@@ -40,20 +40,19 @@ public class BiomePage(
             ))
             .ToDictionary(x => x.view, x => x.stats);
 
-        var complexResult = await repository.GetAllComplexAsync(User.GetUserId(), User.IsAdmin());
-        if (complexResult.Failed) return Page();
-        var items = complexResult.Value!.Select(b => new
+        var items = BiomesStats.Keys.Select(b => new
         {
-            id = b.Id,
-            name = b.Name,
-            temperature = b.Temperature,
-            humidity = b.Humidity,
-            isPublic = b.IsPublic,
-            state = b.State.ToString(),
-            species = b.Species.Select(s => s.Model.Name).ToList(),
-            equipments = b.Equipments.Select(e => e.Model.Name).ToList(),
-            allSpeciesFed = BiomesStats.FirstOrDefault(kvp => kvp.Key.Model.Id == b.Id).Value?.AllSpeciesFed ?? false,
+            id = b.Model.Id,
+            name = b.Model.Name,
+            temperature = b.Model.Temperature,
+            humidity = b.Model.Humidity,
+            isPublic = b.Model.IsPublic,
+            state = b.Model.State.ToString(),
+            species = b.Model.Species.Select(s => s.Model.Name).ToList(),
+            equipments = b.Model.Equipments.Select(e => e.Model.Name).ToList(),
+            allSpeciesFed = BiomesStats.FirstOrDefault(kvp => kvp.Key.Model.Id == b.Model.Id).Value?.AllSpeciesFed ?? false,
         }).ToList();
+        
         BiomesJson = JsonSerializer.Serialize(items);
 
         return Page();

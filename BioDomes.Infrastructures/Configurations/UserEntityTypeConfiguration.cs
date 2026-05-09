@@ -32,7 +32,7 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<UserEntity>
             SecurityStamp = Guid.NewGuid().ToString(),
         };
 
-        var user = new UserEntity
+        var user1 = new UserEntity
         {
             Id = "user-2",
             UserName = "john",
@@ -45,6 +45,19 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<UserEntity>
             SecurityStamp = Guid.NewGuid().ToString(),
         };
 
-        builder.HasData(admin, user);
+        var user2 = new UserEntity
+        {
+            Id = "user-3",
+            UserName = "bob",
+            NormalizedUserName = "BOB",
+            Email = "bob@biodomes.com",
+            NormalizedEmail = "BOB@BIODOMES.COM",
+            EmailConfirmed = true,
+            Birthdate = new DateOnly(1995, 6, 15),
+            SearchOrganism = "Marie Thérèse",
+            SecurityStamp = Guid.NewGuid().ToString(),
+        };
+
+        builder.HasData(admin, user1, user2);
     }
 }

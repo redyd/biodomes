@@ -4,5 +4,5 @@ services:
       dockerfile: Dockerfile
       context: .
     ports:
-      - 9200:80
+      - 5298:80
     container_name: biodome-web

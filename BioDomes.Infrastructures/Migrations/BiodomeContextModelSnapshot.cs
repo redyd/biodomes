@@ -1130,7 +1130,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "dd846e1f-d948-420b-af1f-4c36fb9ba85d",
+                            ConcurrencyStamp = "a20eb2db-a843-4670-86fe-91c51d6cd08f",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             ImageUrl = "1637ca51-6139-4ec4-aa5a-3e824212b0e3.jpg",
@@ -1139,7 +1139,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "8937fe83-549e-493f-a4b6-79f1ae4fdb94",
+                            SecurityStamp = "c9d510c5-3e82-4d70-bc69-b310f6fc10d9",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -1148,7 +1148,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "2c59a1a3-9e94-46c6-9824-4da3fef7a162",
+                            ConcurrencyStamp = "5e43f8ef-4abd-4e50-be4e-d4cab90c4724",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -1156,9 +1156,26 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "ad5877b3-25a8-4dbc-ba2e-4f6ea086f57d",
+                            SecurityStamp = "797a92f8-cf25-4f4e-bbbd-892e073f6daf",
                             TwoFactorEnabled = false,
                             UserName = "john"
+                        },
+                        new
+                        {
+                            Id = "user-3",
+                            AccessFailedCount = 0,
+                            Birthdate = new DateOnly(1995, 6, 15),
+                            ConcurrencyStamp = "37cdf7c8-d666-4186-bc5a-17ae022e7f79",
+                            Email = "bob@biodomes.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "BOB@BIODOMES.COM",
+                            NormalizedUserName = "BOB",
+                            PhoneNumberConfirmed = false,
+                            SearchOrganism = "Marie Thérèse",
+                            SecurityStamp = "0b0cb2d4-b0b5-4c43-b070-b8ede3ec81cc",
+                            TwoFactorEnabled = false,
+                            UserName = "bob"
                         });
                 });
 

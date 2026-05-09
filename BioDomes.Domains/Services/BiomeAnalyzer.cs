@@ -70,9 +70,9 @@ public class BiomeAnalyzer(
         return new BiomeAnalysis { Graph = graph, Stats = stats };
     }
 
-    public async Task<Dictionary<Biome, BiomeStats>> AnalyzeAllBiomes(string? userId, bool isAdmin)
+    public async Task<Dictionary<ComplexBiome, BiomeStats>> AnalyzeAllBiomes(string? userId, bool isAdmin)
     {
-        var biomesResult = await biomeRepo.GetAllAsync(userId, isAdmin);
+        var biomesResult = await biomeRepo.GetAllComplexAsync(userId, isAdmin);
         var allSpeciesResult = await speciesRepo.FindAllAsDictAsync(userId, isAdmin);
 
         if (biomesResult.Failed || biomesResult.Value is null
@@ -82,7 +82,7 @@ public class BiomeAnalyzer(
         }
 
         var allSpecies = allSpeciesResult.Value;
-        var result = new Dictionary<Biome, BiomeStats>();
+        var result = new Dictionary<ComplexBiome, BiomeStats>();
 
         foreach (var biome in biomesResult.Value)
         {
