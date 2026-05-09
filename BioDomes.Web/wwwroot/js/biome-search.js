@@ -8,8 +8,8 @@ const fuse = new Fuse(rawData, {
         {name: 'temperature', weight: 0.025},
         {name: 'humidity', weight: 0.025},
     ],
-    threshold: 0.3,
-    minMatchCharLength: 1,
+    threshold: 0.2,
+    minMatchCharLength: 2,
     includeScore: true,
 });
 

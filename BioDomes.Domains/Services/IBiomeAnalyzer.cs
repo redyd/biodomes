@@ -8,7 +8,7 @@ public interface IBiomeAnalyzer
         FoodChainGraph biomeGraph);
 
     Task<BiomeAnalysis> AnalyzeBiome(string? userId, bool isAdmin, int biomeId);
-    Task<Dictionary<Biome, BiomeStats>> AnalyzeAllBiomes(string? userId, bool isAdmin);
+    Task<Dictionary<ComplexBiome, BiomeStats>> AnalyzeAllBiomes(string? userId, bool isAdmin);
     Task<GlobalStatistic> GlobalAnalyze(string? userId, bool isAdmin);
 
     Task<Result> PerformAction(string actionId, string? userId, bool isAdmin);

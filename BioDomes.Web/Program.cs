@@ -87,11 +87,18 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    var client = await userManager.FindByEmailAsync("john@biodomes.com");
+    var client1 = await userManager.FindByEmailAsync("john@biodomes.com");
 
-    if (client != null)
+    if (client1 != null)
     {
-        await userManager.AddPasswordAsync(client, "Password1234!");
+        await userManager.AddPasswordAsync(client1, "Password1234!");
+    }
+    
+    var client2 = await userManager.FindByEmailAsync("bob@biodomes.com");
+
+    if (client2 != null)
+    {
+        await userManager.AddPasswordAsync(client2, "Password1234!");
     }
 }
 

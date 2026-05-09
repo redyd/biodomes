@@ -12,22 +12,49 @@ La suite du document sera à compléter par vos soins.
 
 ## Membres de l'équipe
 
-**TODO :** indiquez les membres de votre équipe (de deux à trois membres).
+- Mattéo GEORGES Q240062
+- Timëo SOEUR Q240078
 
-**TODO :** indiquez quel membre est responsable du déploiement. Nous testerons l'application web depuis son URL https://ue19.cg.helmo.be/matricule.
+Mattéo est responsable du déploiement, disponible https://ue19.cg.helmo.be/q240062.
 
 ## Construction de la solution
 
-**TODO :** expliquez les étapes nécessaires à la récupération de votre solution, à sa construction et à son exécution dans un environnement de développement (tel que l'ordinateur de votre responsable).
+### Via dotnet 8
+
+`dotnet run --project BioDomes.Web`
+
+### Via docker
+
+`docker compose up --build`
+
+L'application démarra sur le port `5298`.
 
 ## Fonctionnalités implémentées
 
-**TODO :** pour chaque US décrite dans l'énoncé, indiquez son état d'avancement (non-faite, débutée, partiellement achevée, totalement achevée). Quand une US est débutée ou partiellement achevée, indiquez en quelques mots ce qui manque selon vous.
+- US1: totalement achevée
+- US2: totalement achevée
+- US3: totalement achevée
+- US4: totalement achevée
+- US5: totalement achevée
+- US6: totalement achevée
+- US7: totalement achevée
+- US8: totalement achevée
+- US9: totalement achevée
+- US10: totalement achevée (la page d'accueil affiche les 3 meilleurs biômes en équilibre)
+- US11: totalement achevée
+- US12: totalement achevée
+- US13: totalement achevée
+- US14: partiellement achevée (pas de propositions d'équipements)
+- US15: totalement achevée
+- US16: totalement achevée
 
 ## Données de connexion
 
-**TODO :** indiquez au minimum trois comptes dont un compte d'administrateur.
+- [ADMIN] email: admin@biodomes.com | pwd: Password1234!
+- [USER] email: john@biodomes.com | pwd: Password1234!
+- [USER] email: bob@biodomes.com | pwd: Password1234!
 
 ## Éléments techniques notables
 
-**TODO :** indiquez les éléments techniques que vous jugez notables. Par exemple, l'utilisation d'un framework CSS autre que Bootstrap. Autre exemple, l'utilisation de bibliothèques JS pour l'affichage de graphiques.
+- Utilisation de Cytoscape.js, Chart.js et Hammer.js pour les graphiques.
+- Modélisation d'une chaine alimentaire globale utilisée pour créer des sous-chaine au sein des biomes.
