@@ -48,8 +48,6 @@ public class BiomePage(IWebHostEnvironment env, IBiomeRepository repository, IBi
                 }).ToList();
 
                 BiomesJson = JsonSerializer.Serialize(items);
-
-                BiomesJson = JsonSerializer.Serialize(items);
             }
         }
 
