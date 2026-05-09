@@ -12,7 +12,7 @@ public class FoodChainNode
     {
         SpecieId = specieId;
         Name = name;
-        Diet = diet;
+        Diet = diet;    
         Classification = classification;
         Count = count;
     }
