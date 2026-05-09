@@ -25,14 +25,12 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env, IIma
         var userId = User.GetUserId();
         if (userId is null) return Forbid();
 
-        IsAdmin = User.IsAdmin();
-
-        var result = await repository.FindAsync(Id, userId, IsAdmin);
+        var result = await repository.FindAsync(Id, userId, User.IsAdmin());
         if (result.Failed) return result.ToPageResult(this);
 
         var biome = result.Value!;
-        BiomeName = biome.Name;
-        CurrentImageUrl = imageResolver.UseImageWithDefault(biome.ImageUrl, "dome.png");
+
+        LoadPageData(biome);
 
         Input = new UpdateBiomeInputModel
         {
@@ -49,35 +47,42 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env, IIma
         var userId = User.GetUserId();
         if (userId is null) return Forbid();
 
-        IsAdmin = User.IsAdmin();
+        var biomeResult = await repository.FindAsync(Id, userId, User.IsAdmin());
+        if (biomeResult.Failed) return biomeResult.ToPageResult(this);
 
-        if (action == "delete")
+        var biome = biomeResult.Value!;
+
+        return action switch
         {
-            var deleteResult = await repository.DeleteAsync(Id, userId, IsAdmin);
-            if (deleteResult.Failed)
-            {
-                ErrorNotification("Erreur lors de la suppression du biome.");
-                return deleteResult.ToPageResult(this);
-            }
+            "delete" => await PerformDelete(userId, biome),
+            "save" => await PerformUpdate(userId, biome),
+            _ => Page()
+        };
+    }
 
-            var deleted = deleteResult.Value;
-            if (deleted?.ImageUrl != null)
-            {
-                imageResolver.DeleteImage(deleted.ImageUrl, env);
-            }
-
-            SuccessNotification("Biome supprimé.");
-            return RedirectToPage("/Biomes/Index");
+    private async Task<IActionResult> PerformDelete(string userId, Biome biome)
+    {
+        var result = await repository.DeleteAsync(Id, userId, User.IsAdmin());
+        if (result.Failed)
+        {
+            ErrorNotification("Erreur lors de la suppression du biome.");
+            return result.ToPageResult(this);
         }
 
+        if (biome.ImageUrl != null)
+        {
+            imageResolver.DeleteImage(biome.ImageUrl, env);
+        }
+
+        SuccessNotification($"Biome '{biome.Name}' supprimé.");
+        return RedirectToPage("/Biomes/Index");
+    }
+
+    private async Task<IActionResult> PerformUpdate(string userId, Biome biome)
+    {
         if (!ModelState.IsValid)
         {
-            var biomeForImage = await repository.FindAsync(Id, userId, IsAdmin);
-            if (!biomeForImage.Failed)
-            {
-                CurrentImageUrl = imageResolver.UseImageWithDefault(biomeForImage.Value!.ImageUrl, "dome.png");
-            }
-
+            LoadPageData(biome);
             return Page();
         }
 
@@ -85,17 +90,13 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env, IIma
         if (!rule.IsValid)
         {
             ErrorNotification($"Humidité max pour {Input.Temperature}° : {rule.MaxHumidity:F2} g/m³.");
-            var biomeForImage = await repository.FindAsync(Id, userId, IsAdmin);
-            
-            if (!biomeForImage.Failed)
-            {
-                CurrentImageUrl = imageResolver.UseImageWithDefault(biomeForImage.Value!.ImageUrl, "dome.png");
-            }
-
+            LoadPageData(biome);
             return Page();
         }
 
-        var imageName = Input.Image is not null ? await imageResolver.SaveImage(Input.Image, env) : null;
+        var imageName = Input.Image is not null
+            ? await imageResolver.SaveImage(Input.Image, env)
+            : null;
 
         var request = new UpdateBiomeRequest
         {
@@ -104,24 +105,33 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env, IIma
             Temperature = Input.Temperature,
             Humidity = Input.AbsoluteHumidity,
             ImageUrl = imageName,
-            IsPublic = IsAdmin ? Input.IsPublic : null,
+            IsPublic = User.IsAdmin() ? Input.IsPublic : null,
         };
 
-        var result = await repository.UpdateAsync(request, userId, IsAdmin);
+        var result = await repository.UpdateAsync(request, userId, User.IsAdmin());
 
         if (result.Status == ResultStatus.Conflict)
         {
             ErrorNotification($"Un biome nommé '{Input.Name}' existe déjà.");
+            LoadPageData(biome);
             return Page();
         }
 
         if (result.Failed)
         {
             ErrorNotification("Erreur lors de la modification du biome.");
+            LoadPageData(biome);
             return Page();
         }
 
         SuccessNotification($"Biome '{Input.Name}' modifié avec succès.");
         return RedirectToPage("/Biomes/Index");
+    }
+
+    private void LoadPageData(Biome biome)
+    {
+        IsAdmin = User.IsAdmin();
+        BiomeName = biome.Name;
+        CurrentImageUrl = imageResolver.UseImageWithDefault(biome.ImageUrl, "dome.png");
     }
 }

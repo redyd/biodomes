@@ -50,7 +50,6 @@ public class EditModel(
 
         IsAdmin = User.IsAdmin();
         Specie = specie;
-
         ImageUrl = imageResolver.UseImageWithDefault(specie.ImageUrl, "specie.png");
 
         Input = new SpeciesInputModel

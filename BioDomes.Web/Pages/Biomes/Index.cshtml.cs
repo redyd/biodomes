@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using System.Text.Json;
 using BioDomes.Domains.Core;
 using BioDomes.Domains.Repository;
@@ -32,7 +31,7 @@ public class BiomePage(IBiomeRepository repository, IBiomeViewMapper mapper, IIm
             b => imageResolver.UseImageWithDefault(b, "dome.png"));
 
         if (!IsUserConnected) return Page();
-        
+
         var complexResult = await repository.GetAllComplexAsync(User.GetUserId(), User.IsAdmin());
         if (complexResult.Failed) return Page();
         var items = complexResult.Value!.Select(b => new
@@ -47,7 +46,7 @@ public class BiomePage(IBiomeRepository repository, IBiomeViewMapper mapper, IIm
             equipments = b.Equipments.Select(e => e.Model.Name).ToList(),
         }).ToList();
         BiomesJson = JsonSerializer.Serialize(items);
-        
+
         return Page();
     }
 }

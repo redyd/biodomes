@@ -23,6 +23,7 @@ public class AddPage(IWebHostEnvironment env, IImagePathResolver imageResolver, 
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid) return Page();
+        
         var temp = Input.Temperature;
         var humidity = Input.AbsoluteHumidity;
         var rule = new HumidityRule(temp, humidity);
@@ -53,11 +54,17 @@ public class AddPage(IWebHostEnvironment env, IImagePathResolver imageResolver, 
         };
 
         var result = await repository.CreateBiomeAsync(createRequest, userId);
+
+        if (result.Status == ResultStatus.Conflict)
+        {
+            ErrorNotification("Un biome de ce nom existe déjà");
+            return Page();
+        }
         
         if (result.Failed)
         {
             ErrorNotification("Erreur dans la création du biome");
-            return Page();
+            return result.ToPageResult(this);
         }
 
         var value = result.Value!;

@@ -1130,7 +1130,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "4369c6d3-e51f-4b84-bb37-ad481dad36f7",
+                            ConcurrencyStamp = "576d64ca-a86e-4780-b8bd-9f39f25c0584",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -1138,7 +1138,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "8e247e76-c804-4ebc-a4bb-5a8728a959a2",
+                            SecurityStamp = "1959f50f-025b-4068-a4b8-f4dce8615d70",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -1147,7 +1147,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "577a70db-2826-4d84-97bd-4b17dbd88079",
+                            ConcurrencyStamp = "6128ca1d-7a94-4134-a84d-ac5bd3b318bc",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -1155,7 +1155,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "3f009e7c-0a2c-4730-93e4-ca4c15630a34",
+                            SecurityStamp = "45493735-7b92-4eff-87eb-578750f3cfe8",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         });
