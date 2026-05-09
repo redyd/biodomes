@@ -36,6 +36,11 @@ builder.Services.AddDefaultIdentity<UserEntity>(options => { options.SignIn.Requ
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<BiodomeContext>();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/login";
+});
+
 builder.Services.AddScoped<IBiomeManagementRepository, BiomeManagementRepository>();
 builder.Services.AddScoped<IBiomeStatRepository, BiomeStatRepository>();
 builder.Services.AddScoped<ISpeciesRepository, SpeciesRepository>();
