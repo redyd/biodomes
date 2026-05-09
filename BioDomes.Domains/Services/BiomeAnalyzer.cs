@@ -70,6 +70,34 @@ public class BiomeAnalyzer(
         return new BiomeAnalysis { Graph = graph, Stats = stats };
     }
 
+    public async Task<Dictionary<Biome, BiomeStats>> AnalyzeAllBiomes(string? userId, bool isAdmin)
+    {
+        var biomesResult = await biomeRepo.GetAllAsync(userId, isAdmin);
+        var allSpeciesResult = await speciesRepo.FindAllAsDictAsync(userId, isAdmin);
+
+        if (biomesResult.Failed || biomesResult.Value is null
+                                || allSpeciesResult.Failed || allSpeciesResult.Value is null)
+        {
+            return [];
+        }
+
+        var allSpecies = allSpeciesResult.Value;
+        var result = new Dictionary<Biome, BiomeStats>();
+
+        foreach (var biome in biomesResult.Value)
+        {
+            var graphResult = await foodChainRepo.GetFullGraphForBiomeAsync(biome.Id, userId, isAdmin);
+
+            var stats = graphResult.Failed || graphResult.Value is null
+                ? new BiomeStats { BiomeId = biome.Id, TotalsSpecies = 0, AllSpeciesFed = true }
+                : BiomeFoodChainStabilityAnalyzer.Analyze(graphResult.Value, allSpecies, biome.Id);
+
+            result[biome] = stats;
+        }
+
+        return result;
+    }
+
     public async Task<GlobalStatistic> GlobalAnalyze(string? userId, bool isAdmin)
     {
         var allResult = await biomeRepo.GetAllComplexAsync(userId, isAdmin);

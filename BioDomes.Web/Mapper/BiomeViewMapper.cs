@@ -1,4 +1,5 @@
 using BioDomes.Domains.Core;
+using BioDomes.Domains.Services;
 using BioDomes.Web.ViewModels;
 
 namespace BioDomes.Web.Mapper;
@@ -17,7 +18,7 @@ public class BiomeViewMapper : IBiomeViewMapper
             IsPublic = true,
             MaxHumidity = rule.MaxHumidity,
             HumidityPercent = rule.HumidityPercent,
-            Model = b
+            Model = b,
         };
     }
 
@@ -33,12 +34,16 @@ public class BiomeViewMapper : IBiomeViewMapper
 
     public BiomeView<Biome> MapSingle(Biome biome, bool isAdmin, string? userId, Func<string?, string> resolveImage)
     {
+        var rule = new HumidityRule(biome.Temperature, biome.Humidity);
+        
         return new BiomeView<Biome>
         {
             ImageUrl = resolveImage(biome.ImageUrl),
             CanEdit = userId is not null && (isAdmin || biome.CreatedBy == userId),
             IsPublic = true,
-            Model = biome
+            Model = biome,
+            HumidityPercent =  rule.HumidityPercent,
+            MaxHumidity =  rule.MaxHumidity,
         };
     }
 }

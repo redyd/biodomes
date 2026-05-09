@@ -22,35 +22,16 @@ public static class BiomeFoodChainStabilityAnalyzer
             .Select(e => e.PredatorId)
             .ToHashSet();
 
+        var predatorsUnderfed = ComputeUnderfedPredators(graph, allSpecies);
+
         foreach (var node in graph.Nodes)
         {
             if (!node.Classification.RequireFood) continue;
+
             if (!predatorIdsWithPrey.Contains(node.SpecieId))
                 starved.Add(node);
-        }
-
-        var underfedIds = new HashSet<int>();
-
-        // predators ids where preys mass is not enough
-        var predatorsUnderfed = ComputeUnderfedPredators(graph, allSpecies);
-
-        foreach (var node in TopologicalSort(graph))
-        {
-            if (!node.Classification.RequireFood) continue;
-
-            // case 1
-            var directlyUnderfed = predatorsUnderfed.Contains(node.SpecieId);
-
-            // case 2
-            var preyIsCompromised = graph.Edges
-                .Where(e => e.PredatorId == node.SpecieId)
-                .Select(e => e.PreyId)
-                .Any(underfedIds.Contains);
-
-            if (!directlyUnderfed && !preyIsCompromised) continue;
-
-            underfedIds.Add(node.SpecieId);
-            underfed.Add(node);
+            else if (predatorsUnderfed.Contains(node.SpecieId))
+                underfed.Add(node);
         }
 
         return new BiomeStats
@@ -105,50 +86,6 @@ public static class BiomeFoodChainStabilityAnalyzer
         }
 
         return underfedPredators;
-    }
-
-    /// <summary>
-    /// Tri topologique de Kahn - retourne les nœuds du graphe
-    /// des proies vers les prédateurs (sources = proies pures, sans prédateur).
-    /// Les cycles éventuels sont ignorés et les nœuds restants sont ajoutés en fin.
-    /// </summary>
-    private static List<FoodChainNode> TopologicalSort(FoodChainGraph graph)
-    {
-        // GroupBy au lieu de ToDictionary → survit aux SpecieId dupliqués
-        var nodeById = graph.Nodes
-            .GroupBy(n => n.SpecieId)
-            .ToDictionary(g => g.Key, g => g.First());
-
-        var inDegree = nodeById.Keys.ToDictionary(id => id, _ => 0);
-
-        foreach (var edge in graph.Edges)
-        {
-            if (inDegree.ContainsKey(edge.PredatorId))
-                inDegree[edge.PredatorId]++;
-        }
-
-        var queue = new Queue<FoodChainNode>(
-            nodeById.Values.Where(n => inDegree[n.SpecieId] == 0));
-        var sorted = new List<FoodChainNode>();
-
-        while (queue.Count > 0)
-        {
-            var node = queue.Dequeue();
-            sorted.Add(node);
-
-            foreach (var edge in graph.Edges.Where(e => e.PreyId == node.SpecieId))
-            {
-                if (!inDegree.ContainsKey(edge.PredatorId)) continue;
-                inDegree[edge.PredatorId]--;
-                if (inDegree[edge.PredatorId] == 0)
-                    queue.Enqueue(nodeById[edge.PredatorId]);
-            }
-        }
-
-        var visited = sorted.Select(n => n.SpecieId).ToHashSet();
-        sorted.AddRange(nodeById.Values.Where(n => !visited.Contains(n.SpecieId)));
-
-        return sorted;
     }
 
     /// <summary>
