@@ -1,6 +1,5 @@
 using System.Text.Json;
 using BioDomes.Domains.Core;
-using BioDomes.Domains.Repository;
 using BioDomes.Domains.Services;
 using BioDomes.Web.Extensions;
 using BioDomes.Web.Mapper;
@@ -12,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace BioDomes.Web.Pages.Biomes;
 
 public class BiomePage(
-    IBiomeRepository repository,
     IBiomeViewMapper mapper,
     IImagePathResolver imageResolver,
     IBiomeAnalyzer analyzer)
@@ -25,9 +23,6 @@ public class BiomePage(
     public async Task<IActionResult> OnGetAsync()
     {
         IsUserConnected = User.Identity?.IsAuthenticated ?? false;
-
-        var biomesResult = await repository.GetAllAsync(User.GetUserId(), User.IsAdmin());
-        if (biomesResult.Failed) return biomesResult.ToPageResult(this);
 
         BiomesStats = (await analyzer.AnalyzeAllBiomes(User.GetUserId(), User.IsAdmin()))
             .Select(kvp => (
