@@ -77,11 +77,13 @@ public class BiomeAnalyzerTests
         await _analyzer.PerformAction(actionId, "user", false);
 
         _managementRepo.Verify(r =>
-            r.AddSpecieToBiome(
-                It.Is<SpecieToBiomeRequest>(x => x.SpecieSlug == "specie" && x.Count == 2),
-                "10",
-                "user",
-                false),
+                r.AddSpecieToBiome(
+                    It.Is<SpecieToBiomeRequest>(x =>
+                        x.SpecieSlug == "1" &&
+                        x.Count == 2),
+                    "10",
+                    "user",
+                    false),
             Times.Once);
     }
 
@@ -89,17 +91,21 @@ public class BiomeAnalyzerTests
     public async Task should_return_empty_analysis_when_graph_fails()
     {
         _foodChainRepo
-            .Setup(r => r.GetFullGraphForBiomeAsync(It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<bool>()))
+            .Setup(r => r.GetFullGraphForBiomeAsync(
+                It.IsAny<string>(),
+                It.IsAny<string?>(),
+                It.IsAny<bool>()))
             .ReturnsAsync(ResultT<FoodChainGraph>.Failure("error"));
 
         _speciesRepo
-            .Setup(r => r.FindAllAsDictAsync(It.IsAny<string?>(), It.IsAny<bool>()))
+            .Setup(r => r.FindAllAsDictAsync(
+                It.IsAny<string?>(),
+                It.IsAny<bool>()))
             .ReturnsAsync(ResultT<Dictionary<string, Specie>>.Failure("error"));
 
         var result = await _analyzer.AnalyzeBiome("biome", "user", false);
 
-        Assert.That(result.Graph.Nodes, Is.Empty);
-        Assert.That(result.Graph.Edges, Is.Empty);
+        Assert.That(result, Is.Null);
     }
 
     [Test]

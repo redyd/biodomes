@@ -18,8 +18,8 @@ public class GlobalStatisticTests
             CreatedBy = "test",
             Diet = new Diet("1", "Carnivore"),
             Classification = new Classification(
-                "1",
-                "Mammal",
+                id.ToString(),
+                $"Classification-{id}",
                 new List<Diet>(),
                 true
             )
