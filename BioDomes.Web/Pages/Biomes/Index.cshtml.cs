@@ -16,6 +16,9 @@ public class BiomePage(
     IBiomeAnalyzer analyzer)
     : AppPageModel
 {
+    
+    public List<KeyValuePair<BiomeView<ComplexBiome>, BiomeStats>> BalancedBiomes { get; set; } = [];
+    public List<KeyValuePair<BiomeView<ComplexBiome>, BiomeStats>> OtherBiomes { get; set; } = [];
     public Dictionary<BiomeView<ComplexBiome>, BiomeStats> BiomesStats { get; set; } = [];
     public bool IsUserConnected { get; set; }
     public string BiomesJson { get; set; } = "[]";
@@ -35,6 +38,14 @@ public class BiomePage(
             ))
             .ToDictionary(x => x.view, x => x.stats);
 
+        BalancedBiomes = BiomesStats
+            .Where(kvp => kvp.Value.AllSpeciesFed && kvp.Value.ProblemCount == 0)
+            .ToList();
+
+        OtherBiomes = BiomesStats
+            .Where(kvp => !kvp.Value.AllSpeciesFed || kvp.Value.ProblemCount > 0)
+            .ToList();
+        
         var items = BiomesStats.Keys.Select(b => new
         {
             slug = b.Model.Slug,

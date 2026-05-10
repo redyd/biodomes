@@ -4,9 +4,6 @@
 @{
     Layout = "Shared/_Layout";
     ViewData["Title"] = "Biomes";
-
-    var balancedBiomes = Model.BiomesStats.Where(kvp => kvp.Value is { AllSpeciesFed: true, ProblemCount: 0 }).ToList();
-    var otherBiomes = Model.BiomesStats.Where(kvp => !kvp.Value.AllSpeciesFed).ToList();
 }
 
 <div class="container">
@@ -20,49 +17,54 @@
             }
         </div>
 
-        <div class="search-bar-wrap">
-            <span class="search-icon">⌕</span>
-            <input id="biome-search" class="search-input" type="text"
-                   placeholder="Rechercher par nom, espèce, équipement, température..." autocomplete="off"/>
-        </div>
-        <p id="search-count" style="display:none" class="search-results-count"></p>
+        @if (Model.IsUserConnected)
+        {
+            <div class="search-bar-wrap">
+                <span class="search-icon">⌕</span>
+                <input id="biome-search" class="search-input" type="text"
+                       placeholder="Rechercher par nom, espèce, équipement, température..." autocomplete="off"/>
+            </div>
+            <p id="search-count" style="display:none" class="search-results-count"></p>
 
-        @if (balancedBiomes.Any())
+        }
+        
+        @if (Model.BalancedBiomes.Any())
         {
             <div class="card-body">
                 <h2 class="card-name">Biomes en équilibre</h2>
+
                 <div class="biomes-list">
-                    @foreach (var biome in balancedBiomes)
+                    @foreach (var biome in Model.BalancedBiomes)
                     {
-                        <partial name="Shared/_BiomeRow" model="biome.Key"/>
+                        <partial name="Shared/_BiomeRow" model="biome.Key" />
                     }
                 </div>
             </div>
         }
 
-        <div class="card-body">
-            @if (balancedBiomes.Any())
-            {
-                <h2 class="card-name">Autres biomes</h2>
-            }
-            else
-            {
-                <h2 class="card-name">Tous les biomes</h2>
-            }
-            <div class="biomes-list">
-                @if (otherBiomes.Any())
-                {
-                    @foreach (var biome in otherBiomes)
+        @if (Model.OtherBiomes.Any())
+        {
+            <div class="card-body">
+
+                <h2 class="card-name">
+                    @(Model.BalancedBiomes.Any() ? "Autres biomes" : "Tous les biomes")
+                </h2>
+
+                <div class="biomes-list">
+                    @foreach (var biome in Model.OtherBiomes)
                     {
-                        <partial name="Shared/_BiomeRow" model="biome.Key"/>
+                        <partial name="Shared/_BiomeRow" model="biome.Key" />
                     }
-                }
-                else
-                {
-                    <p class="biomes-empty">Aucun biome disponible.</p>
-                }
+                </div>
             </div>
-        </div>
+        }
+        else
+        {
+            <div class="card-body">
+                <h2 class="card-name">Tous les biomes</h2>
+                <p class="biomes-empty">Aucun biome disponible.</p>
+            </div>
+        }
     </div>
 </div>
 
