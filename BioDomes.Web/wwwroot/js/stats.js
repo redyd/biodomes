@@ -73,13 +73,12 @@ function renderSpecies(data){
         type:'bar',
         data:{labels:lb,datasets:[{data:ct,backgroundColor:lb.map((_,i)=>P[i%P.length]),borderRadius:4,borderSkipped:false}]},
         options:{...base(),
-            onClick:(e,els)=>{
-                if(!els.length)return;
-                const b=data[els[0].index];
-                modal(b.name,[
-                    {key:'Espèces',val:b.speciesCount},{key:'Équipements',val:b.equipmentCount},
-                    ...Object.entries(b.speciesByDiet||{}).map(([k,v])=>({key:k,val:v+' espèce(s)'}))
-                ]);
+            onClick: (e, els) => {
+                if (!els.length) return;
+                const b = data[els[0].index];
+                const lines = Object.entries(b.speciesByName ?? {})
+                    .map(([name, count]) => ({ key: name, val: count + ' individu(s)' }));
+                modal(b.name, lines.length ? lines : [{ key: 'Aucune espèce', val: '—' }]);
             },
             scales:{x:ax(),y:{...ax(),beginAtZero:true,ticks:{...ax().ticks,stepSize:1}}}}
     });

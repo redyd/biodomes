@@ -187,10 +187,10 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
             {
                 return ResultT<Biome>.Conflict("A biome with this name already exist.");
             }
-            
+
             var entity = await context
                 .Biomes
-                .FirstOrDefaultAsync(b => b.Slug == slug);
+                .FirstOrDefaultAsync(b => b.Slug == toUpdate.PreviousSlug);
 
             if (entity is null)
             {
