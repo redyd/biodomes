@@ -159,7 +159,7 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
                 .Include(s => s.DietEntity)
                 .Include(s => s.ClassificationEntity)
                 .ThenInclude(ce => ce.EatenByDiets)
-                .FirstAsync(s => s.Slug == toUpdate.PreviousSlug);
+                .FirstAsync(s => s.Slug == slug);
 
             return ResultT<Specie>.Ok(SpecieMapper.MapSpecie(specie));
         }

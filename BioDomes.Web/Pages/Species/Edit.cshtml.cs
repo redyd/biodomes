@@ -56,8 +56,8 @@ public class EditModel(
         Input = new SpeciesInputModel
         {
             Name = specie.Name,
-            ClassificationSlug = specie.Classification.Label,
-            DietSlug = specie.Diet.Label,
+            ClassificationSlug = specie.Classification.Slug,
+            DietSlug = specie.Diet.Slug,
             Height = specie.Height,
             Weight = specie.Weight,
             Public = specie.IsPublic
@@ -111,6 +111,7 @@ public class EditModel(
     {
         if (!ModelState.IsValid)
         {
+            IsAdmin = User.IsAdmin();
             var loaded = await LoadSelectLists();
             if (loaded is not null) return loaded;
             ImageUrl = imageResolver.UseImageWithDefault(specie.ImageUrl, "specie.png");
@@ -149,6 +150,7 @@ public class EditModel(
         {
             ErrorNotification("Une espèce avec ce nom existe déjà");
             
+            IsAdmin = User.IsAdmin();
             var loaded = await LoadSelectLists();
             if (loaded is not null) return loaded;
             ImageUrl = imageResolver.UseImageWithDefault(specie.ImageUrl, "specie.png");

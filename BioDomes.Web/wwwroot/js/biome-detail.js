@@ -64,12 +64,12 @@ function openRemoveEquipmentDialog(btn) {
 
     const elements = [
         ...nodes.map(n => {
-            const isStarved = stats.StarvedSpecies.some(s => s.SpecieId === n.SpecieId);
-            const isUnderfed = stats.UnderfedSpecies.some(s => s.SpecieId === n.SpecieId);
+            const isStarved = stats.StarvedSpecies.some(s => s.SpecieSlug === n.SpecieSlug);
+            const isUnderfed = stats.UnderfedSpecies.some(s => s.SpecieSlug === n.SpecieSlug);
 
             return {
                 data: {
-                    id: n.SpecieId,
+                    id: n.SpecieSlug,
                     label: `${n.Name}\n${n.Count}`,
                     count: n.Count,
                     hungerStatus: isStarved ? 'starved' : (isUnderfed ? 'underfed' : 'normal')
@@ -78,8 +78,8 @@ function openRemoveEquipmentDialog(btn) {
         }),
         ...edges.map(e => ({
             data: {
-                source: e.PredatorId,
-                target: e.PreyId
+                source: e.PredatorSlug,
+                target: e.PreySlug
             }
         }))
     ];

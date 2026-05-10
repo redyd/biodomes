@@ -21,8 +21,9 @@
                 <p>Créé par "@Model.Creator"</p>
                 @if (Model.Biome.CanEdit)
                 {
-                    <a class="btn-save" asp-page="/Biomes/Edit" asp-route-slug="@Model.Biome.Model.Slug">Modifier les
-                        informations</a>
+                    <a class="btn-save" asp-page="/Biomes/Edit" asp-route-slug="@Model.Biome.Model.Slug">
+                        Modifier les informations
+                    </a>
                 }
             </div>
             <img class="img-header" src="@Model.Biome.ImageUrl" alt="@Model.Biome.Model.Name"/>
