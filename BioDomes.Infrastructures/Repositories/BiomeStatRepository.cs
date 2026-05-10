@@ -59,8 +59,7 @@ public class BiomeStatRepository(BiodomeContext context, ILogger<IBiomeStatRepos
         }
     }
 
-    public async Task<ResultT<List<BiomeHistory>>> GetHistoryAsync(string biomeSlug, string? userId, bool isAdmin,
-        int days)
+    public async Task<ResultT<List<BiomeHistory>>> GetHistoryAsync(string? biomeSlug, string? userId, bool isAdmin, int days)
     {
         try
         {
@@ -72,8 +71,11 @@ public class BiomeStatRepository(BiodomeContext context, ILogger<IBiomeStatRepos
             {
                 query = query.Where(b => userId != null && b.UserId == userId);
             }
-
-            query = query.Where(b => b.Slug == biomeSlug);
+            
+            if (biomeSlug is not null)
+            {
+                query = query.Where(b => b.Slug == biomeSlug);
+            }
 
             var biomes = await query.ToListAsync();
 
@@ -134,7 +136,7 @@ public class BiomeStatRepository(BiodomeContext context, ILogger<IBiomeStatRepos
 
                 return new BiomeHistory
                 {
-                    BiomeId = b.Id,
+                    BiomeSlug = b.Slug,
                     BiomeName = b.Name,
                     SpeciesOverTime = speciesOverTime,
                     ByDietOverTime = byDiet,

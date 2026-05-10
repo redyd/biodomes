@@ -22,7 +22,7 @@ public class StatsModel(IBiomeStatRepository repo) : PageModel
         return new JsonResult(statsResults.Value!);
     }
     
-    public async Task<IActionResult> OnGetHistoryDataAsync(string biomeSlug, int days = 30)
+    public async Task<IActionResult> OnGetHistoryDataAsync(string? biomeSlug, int days = 30)
     {
         var userId  = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         var isAdmin = User.IsInRole("Admin");
