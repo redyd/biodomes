@@ -1,4 +1,4 @@
-const dataById = Object.fromEntries(rawData.map(b => [b.id, b]));
+const dataById = Object.fromEntries(rawData.map(b => [b.slug, b]));
 
 const fuse = new Fuse(rawData, {
     keys: [
@@ -28,18 +28,18 @@ input.addEventListener('input', () => {
 
     if (!q) return;
 
-    const matchedIds = new Set(fuse.search(q).map(r => r.item.id));
+    const matchedSlugs = new Set(fuse.search(q).map(r => r.item.slug));
 
     document.querySelectorAll('.biome-row-wrap').forEach(row => {
-        const id = parseInt(row.dataset.id);
-        if (!id) return;
+        const slug = row.dataset.slug;
+        if (!slug) return;
 
-        if (!matchedIds.has(id)) {
+        if (!matchedSlugs.has(slug)) {
             row.style.display = 'none';
             return;
         }
 
-        const b = dataById[id];
+        const b = dataById[slug];
         if (!b) return;
 
         const species = (b.species || []).map(s => `<span class="search-tag species">${s}</span>`).join('');
@@ -59,5 +59,5 @@ input.addEventListener('input', () => {
     });
 
     count.style.display = 'block';
-    count.textContent = `${matchedIds.size} résultat(s) pour "${q}"`;
+    count.textContent = `${matchedSlugs.size} résultat(s) pour "${q}"`;
 });
