@@ -34,6 +34,25 @@ public class SpecieAttributesRepositoryTests
         _context.Dispose();
     }
 
+    private SpecieClassification CreateClassification(string slug)
+    {
+        return new SpecieClassification
+        {
+            Slug = slug,
+            Label = slug,
+            RequireFood = true
+        };
+    }
+
+    private SpecieDiet CreateDiet(string slug)
+    {
+        return new SpecieDiet
+        {
+            Slug = slug,
+            Label = slug
+        };
+    }
+
     private void Seed()
     {
         _context.SpecieClassifications.AddRange(
@@ -49,30 +68,14 @@ public class SpecieAttributesRepositoryTests
         _context.SaveChanges();
     }
 
-    private SpecieClassification CreateClassification(string label)
-    {
-        return new SpecieClassification
-        {
-            Label = label,
-            RequireFood = true
-        };
-    }
-
-    private SpecieDiet CreateDiet(string label)
-    {
-        return new SpecieDiet
-        {
-            Label = label
-        };
-    }
-
     [Test]
     public async Task should_return_all_classifications()
     {
         var result = await _repository.GetClassifications();
 
         Assert.That(result.Status, Is.EqualTo(ResultStatus.Success));
-        Assert.That(result.Value, Is.Not.Empty);
+        Assert.That(result.Value, Is.Not.Null);
+        Assert.That(result.Value!.Count, Is.EqualTo(2));
         Assert.That(result.Value.Any(c => c.Label == "mammal"), Is.True);
     }
 
@@ -82,7 +85,8 @@ public class SpecieAttributesRepositoryTests
         var result = await _repository.GetDiets();
 
         Assert.That(result.Status, Is.EqualTo(ResultStatus.Success));
-        Assert.That(result.Value, Is.Not.Empty);
+        Assert.That(result.Value, Is.Not.Null);
+        Assert.That(result.Value!.Count, Is.EqualTo(2));
         Assert.That(result.Value.Any(d => d.Label == "herbivore"), Is.True);
     }
 
@@ -90,23 +94,25 @@ public class SpecieAttributesRepositoryTests
     public async Task should_return_empty_classifications_when_none_exist()
     {
         _context.SpecieClassifications.RemoveRange(_context.SpecieClassifications);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
         var result = await _repository.GetClassifications();
 
         Assert.That(result.Status, Is.EqualTo(ResultStatus.Success));
-        Assert.That(result.Value, Is.Empty);
+        Assert.That(result.Value, Is.Not.Null);
+        Assert.That(result.Value!.Count, Is.EqualTo(0));
     }
 
     [Test]
     public async Task should_return_empty_diets_when_none_exist()
     {
         _context.SpecieDiets.RemoveRange(_context.SpecieDiets);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
         var result = await _repository.GetDiets();
 
         Assert.That(result.Status, Is.EqualTo(ResultStatus.Success));
-        Assert.That(result.Value, Is.Empty);
+        Assert.That(result.Value, Is.Not.Null);
+        Assert.That(result.Value!.Count, Is.EqualTo(0));
     }
 }
