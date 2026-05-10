@@ -2,11 +2,20 @@
 @model BioDomes.Web.Pages.Errors.NotFoundModel
 
 @{
+    Layout = "Shared/_LayoutMinimal";
     ViewData["Title"] = "Introuvable";
 }
 
-<div class="main-container">
-    <h1>404 — Page introuvable</h1>
-    <p>La ressource demandée n'existe pas.</p>
-    <a asp-page="/Index" class="btn-save">Retour à l'accueil</a>
+<div class="error-page">
+    <div class="error-card error-card--404">
+        <div class="error-top">
+            <div class="error-code">404</div>
+            <div class="error-label">Page introuvable</div>
+        </div>
+        <div class="error-body">
+            <p class="error-title">Cette page n'existe pas</p>
+            <p class="error-desc">La ressource demandée n'existe pas.</p>
+            <a class="btn-save" asp-page="/Index">Retour à l'accueil</a>
+        </div>
+    </div>
 </div>

@@ -1714,3 +1714,102 @@ dialog::backdrop {
 
 .search-tag.species   { border-color: rgba(0, 210, 180, 0.3); color: #00d2b4; }
 .search-tag.equipment { border-color: rgba(240, 168, 48, 0.3); color: #f0a830; }
+
+.error-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.error-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--panel);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+}
+
+.error-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    opacity: 0.5;
+}
+
+.error-card--404::before {
+    background: linear-gradient(90deg, transparent, var(--teal), transparent);
+}
+
+.error-card--403::before {
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+}
+
+.error-top {
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.error-code {
+    font-family: var(--sans), serif;
+    font-size: 5rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+.error-card--404 .error-code { color: var(--teal); }
+.error-card--403 .error-code { color: var(--red); }
+
+.error-label {
+    font-family: var(--mono), serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 0.4rem;
+}
+
+.error-body {
+    padding: 2rem;
+    text-align: center;
+}
+
+.error-title {
+    font-family: var(--sans), serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 0.5rem;
+}
+
+.error-desc {
+    font-family: var(--mono), serif;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+.error-card--404 .btn-save {
+    background: var(--teal-dim);
+    color: var(--teal);
+    border-color: var(--border-bright);
+}
+
+.error-card--403 .btn-save {
+    background: var(--red-dim);
+    color: var(--red);
+    border-color: var(--border-red);
+}
+
+.error-card--403 .btn-save:hover {
+    background: rgba(255, 77, 79, 0.22);
+    box-shadow: 0 0 20px rgba(255, 77, 79, 0.1);
+}
