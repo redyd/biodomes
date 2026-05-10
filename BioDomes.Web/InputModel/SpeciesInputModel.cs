@@ -23,5 +23,7 @@ public class SpeciesInputModel
 
     public bool Public { get; set; }
     
+    [AllowedExtensions([".jpg", ".jpeg", ".png", ".gif"],
+        ErrorMessage = "Le fichier doit être une image (jpg, jpeg, png, gif).")]
     public IFormFile? Image { get; set; }
 }

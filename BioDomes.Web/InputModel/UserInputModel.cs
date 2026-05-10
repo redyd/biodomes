@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using BioDomes.Web.Validators;
 
 namespace BioDomes.Web.InputModel;
 
@@ -19,5 +20,7 @@ public class UserInputModel
     [DataType(DataType.Password), Compare("NewPassword")]
     public string? ConfirmPassword { get; set; }
     
+    [AllowedExtensions([".jpg", ".jpeg", ".png", ".gif"],
+        ErrorMessage = "Le fichier doit être une image (jpg, jpeg, png, gif).")]
     public IFormFile? ImageUpload { get; set; }
 }

@@ -1,3 +1,4 @@
+using System.Threading.RateLimiting;
 using BioDomes.Domains.Repository;
 using BioDomes.Domains.Services;
 using BioDomes.Infrastructures;
@@ -11,6 +12,7 @@ using BioDomes.Web.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +56,22 @@ builder.Services.AddScoped<IBiomeAnalyzer, BiomeAnalyzer>();
 builder.Services.AddScoped<IBiomeViewMapper, BiomeViewMapper>();
 builder.Services.AddScoped<IEquipmentViewMapper, EquipmentViewMapper>();
 builder.Services.AddScoped<ISpecieViewMapper, SpecieViewMapper>();
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 60,
+                Window = TimeSpan.FromMinutes(1)
+            }
+        )
+    );
+
+    options.RejectionStatusCode = 429;
+});
 
 var app = builder.Build();
 
@@ -125,6 +143,8 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseRouting();
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

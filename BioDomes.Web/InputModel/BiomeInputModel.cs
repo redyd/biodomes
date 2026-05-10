@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using BioDomes.Web.Validators;
 
 namespace BioDomes.Web.InputModel;
 
@@ -13,6 +14,8 @@ public class BiomeInputModel
     [Required(ErrorMessage = "L'humidité absolue est requise.")]
     [Range(0, double.MaxValue, ErrorMessage = "L'humidité doit être positive.")]
     public double AbsoluteHumidity { get; set; }
-        
+    
+    [AllowedExtensions([".jpg", ".jpeg", ".png", ".gif"],
+        ErrorMessage = "Le fichier doit être une image (jpg, jpeg, png, gif).")]
     public IFormFile? ImageUrl { get; set; }
 }
