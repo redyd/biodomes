@@ -9,9 +9,9 @@ public class BiomeTests
     {
         return new Biome
         {
-            Id = 1,
-            CreatedBy = "tester",
             Name = "TestBiome",
+            Slug = "testbiome",
+            CreatedBy = "tester",
             Temperature = temperature,
             Humidity = 50,
             ImageUrl = null,

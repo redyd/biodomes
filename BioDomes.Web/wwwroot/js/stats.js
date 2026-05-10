@@ -143,7 +143,7 @@ function histLine(canvasId,legendId,historyData,field){
 }
 
 function renderHistory(h){
-    ['cHistory','cDietHistory','cClassHistory'].forEach(slug=>{C[slug]?.destroy();});
+    ['cHistory','cDietHistory','cClassHistory'].forEach(id=>{C[id]?.destroy();});
     $('history-empty').style.display=h.length?'none':'block';
     if(!h.length)return;
     const dates=[...new Set(h.flatMap(b=>b.speciesOverTime.map(p=>p.date)))].sort();

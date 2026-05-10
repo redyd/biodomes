@@ -1,10 +1,9 @@
-﻿using BioDomes.Domains.Extensions;
-
+﻿
 namespace BioDomes.Domains.Core;
 
 public class Specie
 {
-    public string Slug => Name.ToKebabCase();
+    public required string Slug { get; init; }
     public required string Name { get; init; }
     public required int Height { get; init; }
     public required int Weight { get; init; }

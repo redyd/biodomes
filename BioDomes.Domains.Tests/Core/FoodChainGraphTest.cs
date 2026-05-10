@@ -1,206 +1,275 @@
 ﻿using BioDomes.Domains.Core;
+using BioDomes.Domains.Extensions;
 
 namespace BioDomes.Domains.Tests.Core;
 
 [TestFixture]
 public class FoodChainGraphTests
 {
-    private FoodChainNode CreateNode(
-        int specieId,
-        Diet diet,
-        Classification classification,
-        int count = 1)
+    // ─── Diets ───────────────────────────────────────────────────────────────
+    private static readonly Diet Carnivore   = new("carnivore",   "Carnivore");
+    private static readonly Diet Herbivore   = new("herbivore",   "Herbivore");
+    private static readonly Diet Omnivore    = new("omnivore",    "Omnivore");
+ 
+    // ─── Classifications ─────────────────────────────────────────────────────
+    // Carnivores eat herbivores and omnivores
+    private static readonly Classification PredatorClass = new(
+        "predator", "Predator",
+        eatenByDiets: [Carnivore, Omnivore],
+        requireFood: true
+    );
+ 
+    // Herbivores eat plants (no diet listed here eats them for simplicity,
+    // but carnivores prey on them → represented via PredatorClass.EatenByDiets)
+    private static readonly Classification HerbivoreClass = new(
+        "herbivore-class", "Herbivore Class",
+        eatenByDiets: [Carnivore, Omnivore],
+        requireFood: true
+    );
+ 
+    // Plants are eaten by herbivores and omnivores
+    private static readonly Classification PlantClass = new(
+        "plant", "Plant",
+        eatenByDiets: [Herbivore, Omnivore],
+        requireFood: false
+    );
+ 
+    // ─── Species helpers ─────────────────────────────────────────────────────
+    private static Specie MakeSpecie(string name, Diet diet, Classification classification) => new()
     {
-        return new FoodChainNode(
-            specieId,
-            $"Specie {specieId}",
-            diet,
-            classification,
-            count
-        );
-    }
-
-    private FoodChainEdge CreateEdge(int predatorId, int preyId)
-    {
-        return new FoodChainEdge(predatorId, preyId);
-    }
-
+        Name = name,
+        Height = 100,
+        Weight = 50,
+        ImageUrl = null,
+        IsPublic = true,
+        CreatedBy = "test",
+        Diet = diet,
+        Classification = classification,
+        Slug = name.ToKebabCase(),
+    };
+ 
+    // Wolf  → carnivore, predator class  (slug: "wolf")
+    // Deer  → herbivore, herbivore class (slug: "deer")
+    // Grass → herbivore, plant class     (slug: "grass")
+    private static readonly Specie Wolf  = MakeSpecie("Wolf",  Carnivore, PredatorClass);
+    private static readonly Specie Deer  = MakeSpecie("Deer",  Herbivore, HerbivoreClass);
+    private static readonly Specie Grass = MakeSpecie("Grass", Herbivore, PlantClass);
+ 
+    private static FoodChainNode NodeOf(Specie s) => new(s, 1);
+ 
+    // =========================================================================
+    // CountRelations
+    // =========================================================================
+ 
     [Test]
-    public void should_return_species_without_prey()
+    public void CountRelations_EmptyGraph_ReturnsEmptyDictionary()
     {
-        var diet = new Diet(1, "Carnivore");
-
-        var classification = new Classification(
-            1,
-            "Mammal",
-            new List<Diet>(),
-            true
-        );
-
-        var node1 = CreateNode(1, diet, classification);
-        var node2 = CreateNode(2, diet, classification);
-        var node3 = CreateNode(3, diet, classification);
-
-        var graph = new FoodChainGraph(
-            new List<FoodChainNode> { node1, node2, node3 },
-            new List<FoodChainEdge>
-            {
-                CreateEdge(1, 2)
-            }
-        );
-
-        var result = graph.NoPreySpecies();
-
-        Assert.That(result.Count, Is.EqualTo(2));
-        Assert.That(result.Contains(node2));
-        Assert.That(result.Contains(node3));
-    }
-
-    [Test]
-    public void should_count_all_relations_for_each_species()
-    {
-        var diet = new Diet(1, "Carnivore");
-
-        var classification = new Classification(
-            1,
-            "Mammal",
-            new List<Diet>(),
-            true
-        );
-
-        var node1 = CreateNode(1, diet, classification);
-        var node2 = CreateNode(2, diet, classification);
-        var node3 = CreateNode(3, diet, classification);
-
-        var graph = new FoodChainGraph(
-            new List<FoodChainNode> { node1, node2, node3 },
-            new List<FoodChainEdge>
-            {
-                CreateEdge(1, 2),
-                CreateEdge(1, 3)
-            }
-        );
-
+        var graph = new FoodChainGraph([], []);
+ 
         var result = graph.CountRelations();
-
-        Assert.That(result[1], Is.EqualTo(2));
-        Assert.That(result[2], Is.EqualTo(1));
-        Assert.That(result[3], Is.EqualTo(1));
-    }
-
-    [Test]
-    public void should_count_prey_relations_for_each_species()
-    {
-        var diet = new Diet(1, "Carnivore");
-
-        var classification = new Classification(
-            1,
-            "Mammal",
-            new List<Diet>(),
-            true
-        );
-
-        var node1 = CreateNode(1, diet, classification);
-        var node2 = CreateNode(2, diet, classification);
-        var node3 = CreateNode(3, diet, classification);
-
-        var graph = new FoodChainGraph(
-            new List<FoodChainNode> { node1, node2, node3 },
-            new List<FoodChainEdge>
-            {
-                CreateEdge(1, 2),
-                CreateEdge(1, 3)
-            }
-        );
-
-        var result = graph.CountPreyRelations();
-
-        Assert.That(result[1], Is.EqualTo(2));
-        Assert.That(result[2], Is.EqualTo(0));
-        Assert.That(result[3], Is.EqualTo(0));
-    }
-
-    [Test]
-    public void should_return_prey_of_predator()
-    {
-        var diet = new Diet(1, "Carnivore");
-
-        var classification = new Classification(
-            1,
-            "Mammal",
-            new List<Diet>(),
-            true
-        );
-
-        var node1 = CreateNode(1, diet, classification);
-        var node2 = CreateNode(2, diet, classification);
-        var node3 = CreateNode(3, diet, classification);
-
-        var graph = new FoodChainGraph(
-            new List<FoodChainNode> { node1, node2, node3 },
-            new List<FoodChainEdge>
-            {
-                CreateEdge(1, 2),
-                CreateEdge(1, 3)
-            }
-        );
-
-        var result = graph.PreyOf(1);
-
-        Assert.That(result.Count, Is.EqualTo(2));
-        Assert.That(result.Contains(node2));
-        Assert.That(result.Contains(node3));
-    }
-
-    [Test]
-    public void should_return_empty_list_when_predator_does_not_exist()
-    {
-        var graph = new FoodChainGraph(
-            new List<FoodChainNode>(),
-            new List<FoodChainEdge>()
-        );
-
-        var result = graph.AvailablePreyFor(999);
-
+ 
         Assert.That(result, Is.Empty);
     }
-
+ 
     [Test]
-    public void should_return_available_prey_for_predator()
+    public void CountRelations_NodeWithNoEdges_ReturnsZero()
     {
-        var carnivore = new Diet(1, "Carnivore");
-        var herbivore = new Diet(2, "Herbivore");
-
-        var predatorClassification = new Classification(
-            1,
-            "Predator",
-            new List<Diet>(),
-            true
-        );
-
-        var preyClassification = new Classification(
-            2,
-            "Prey",
-            new List<Diet> { carnivore },
-            true
-        );
-
-        var predator = CreateNode(1, carnivore, predatorClassification);
-
-        var prey1 = CreateNode(2, herbivore, preyClassification);
-        var prey2 = CreateNode(3, herbivore, preyClassification);
-
-        var graph = new FoodChainGraph(
-            new List<FoodChainNode> { predator, prey1, prey2 },
-            new List<FoodChainEdge>
-            {
-                CreateEdge(1, 2)
-            }
-        );
-
-        var result = graph.AvailablePreyFor(1);
-
-        Assert.That(result.Count, Is.EqualTo(1));
-        Assert.That(result.Contains(prey2));
+        var nodes = new[] { NodeOf(Wolf) };
+        var graph = new FoodChainGraph(nodes, []);
+ 
+        var result = graph.CountRelations();
+ 
+        Assert.That(result[Wolf], Is.EqualTo(0));
+    }
+ 
+    [Test]
+    public void CountRelations_SingleEdge_CountsOneForBothEndpoints()
+    {
+        // Wolf → Deer
+        var nodes = new[] { NodeOf(Wolf), NodeOf(Deer) };
+        var edges = new[] { new FoodChainEdge(Wolf.Slug, Deer.Slug) };
+        var graph = new FoodChainGraph(nodes, edges);
+ 
+        var result = graph.CountRelations();
+ 
+        Assert.That(result[Wolf], Is.EqualTo(1));
+        Assert.That(result[Deer], Is.EqualTo(1));
+    }
+ 
+    [Test]
+    public void CountRelations_MultipleEdges_CountsAllAppearances()
+    {
+        // Wolf → Deer, Wolf → Grass
+        var nodes = new[] { NodeOf(Wolf), NodeOf(Deer), NodeOf(Grass) };
+        var edges = new[]
+        {
+            new FoodChainEdge(Wolf.Slug, Deer.Slug),
+            new FoodChainEdge(Wolf.Slug, Grass.Slug),
+        };
+        var graph = new FoodChainGraph(nodes, edges);
+ 
+        var result = graph.CountRelations();
+ 
+        Assert.That(result[Wolf],  Is.EqualTo(2)); // appears as predator twice
+        Assert.That(result[Deer],  Is.EqualTo(1));
+        Assert.That(result[Grass], Is.EqualTo(1));
+    }
+ 
+    [Test]
+    public void CountRelations_ContainsAllNodes_EvenWithZeroEdges()
+    {
+        var nodes = new[] { NodeOf(Wolf), NodeOf(Deer), NodeOf(Grass) };
+        var graph = new FoodChainGraph(nodes, []);
+ 
+        var result = graph.CountRelations();
+ 
+        Assert.That(result.Keys, Has.Count.EqualTo(3));
+    }
+ 
+    // =========================================================================
+    // PreyOf
+    // =========================================================================
+ 
+    [Test]
+    public void PreyOf_UnknownPredator_ReturnsEmptyList()
+    {
+        var nodes = new[] { NodeOf(Wolf), NodeOf(Deer) };
+        var edges = new[] { new FoodChainEdge(Wolf.Slug, Deer.Slug) };
+        var graph = new FoodChainGraph(nodes, edges);
+ 
+        var result = graph.PreyOf("unknown-slug");
+ 
+        Assert.That(result, Is.Empty);
+    }
+ 
+    [Test]
+    public void PreyOf_PredatorWithNoPrey_ReturnsEmptyList()
+    {
+        var nodes = new[] { NodeOf(Wolf), NodeOf(Deer) };
+        var graph = new FoodChainGraph(nodes, []);
+ 
+        var result = graph.PreyOf(Wolf.Slug);
+ 
+        Assert.That(result, Is.Empty);
+    }
+ 
+    [Test]
+    public void PreyOf_ReturnsSinglePrey()
+    {
+        var nodes = new[] { NodeOf(Wolf), NodeOf(Deer) };
+        var edges = new[] { new FoodChainEdge(Wolf.Slug, Deer.Slug) };
+        var graph = new FoodChainGraph(nodes, edges);
+ 
+        var result = graph.PreyOf(Wolf.Slug);
+ 
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].Specie, Is.EqualTo(Deer));
+    }
+ 
+    [Test]
+    public void PreyOf_ReturnsMultiplePrey()
+    {
+        var nodes = new[] { NodeOf(Wolf), NodeOf(Deer), NodeOf(Grass) };
+        var edges = new[]
+        {
+            new FoodChainEdge(Wolf.Slug, Deer.Slug),
+            new FoodChainEdge(Wolf.Slug, Grass.Slug),
+        };
+        var graph = new FoodChainGraph(nodes, edges);
+ 
+        var result = graph.PreyOf(Wolf.Slug);
+ 
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result.Select(n => n.Specie), Does.Contain(Deer));
+        Assert.That(result.Select(n => n.Specie), Does.Contain(Grass));
+    }
+ 
+    [Test]
+    public void PreyOf_DoesNotReturnPredatorItself()
+    {
+        var nodes = new[] { NodeOf(Wolf), NodeOf(Deer) };
+        var edges = new[] { new FoodChainEdge(Wolf.Slug, Deer.Slug) };
+        var graph = new FoodChainGraph(nodes, edges);
+ 
+        var result = graph.PreyOf(Wolf.Slug);
+ 
+        Assert.That(result.Select(n => n.Specie), Does.Not.Contain(Wolf));
+    }
+ 
+    // =========================================================================
+    // AvailablePreyFor
+    // =========================================================================
+ 
+    [Test]
+    public void AvailablePreyFor_UnknownPredator_ReturnsEmptyList()
+    {
+        var nodes = new[] { NodeOf(Wolf), NodeOf(Deer) };
+        var graph = new FoodChainGraph(nodes, []);
+ 
+        var result = graph.AvailablePreyFor("unknown-slug");
+ 
+        Assert.That(result, Is.Empty);
+    }
+ 
+    [Test]
+    public void AvailablePreyFor_ExcludesPredatorItself()
+    {
+        // Wolf is carnivore; PredatorClass has no eatenByDiets that match Wolf's
+        // diet, so Wolf cannot eat itself — but we verify the slug exclusion rule.
+        var nodes = new[] { NodeOf(Wolf) };
+        var graph = new FoodChainGraph(nodes, []);
+ 
+        var result = graph.AvailablePreyFor(Wolf.Slug);
+ 
+        Assert.That(result.Select(n => n.Specie), Does.Not.Contain(Wolf));
+    }
+ 
+    [Test]
+    public void AvailablePreyFor_ExcludesAlreadyConnectedPrey()
+    {
+        // Wolf already eats Deer → Deer must not appear as available
+        var nodes = new[] { NodeOf(Wolf), NodeOf(Deer), NodeOf(Grass) };
+        var edges = new[] { new FoodChainEdge(Wolf.Slug, Deer.Slug) };
+        var graph = new FoodChainGraph(nodes, edges);
+ 
+        var result = graph.AvailablePreyFor(Wolf.Slug);
+ 
+        Assert.That(result.Select(n => n.Specie), Does.Not.Contain(Deer));
+    }
+ 
+    [Test]
+    public void AvailablePreyFor_ReturnsCompatibleUnconnectedPrey()
+    {
+        // Wolf is carnivore. HerbivoreClass.EatenByDiets contains Carnivore
+        // → Deer (herbivore class) should be available.
+        var nodes = new[] { NodeOf(Wolf), NodeOf(Deer) };
+        var graph = new FoodChainGraph(nodes, []);
+ 
+        var result = graph.AvailablePreyFor(Wolf.Slug);
+ 
+        Assert.That(result.Select(n => n.Specie), Does.Contain(Deer));
+    }
+ 
+    [Test]
+    public void AvailablePreyFor_ExcludesIncompatibleClassification()
+    {
+        // PlantClass.EatenByDiets = [Herbivore, Omnivore] — does NOT include Carnivore.
+        // Wolf is carnivore → Grass (plant class) should NOT be available.
+        var nodes = new[] { NodeOf(Wolf), NodeOf(Grass) };
+        var graph = new FoodChainGraph(nodes, []);
+ 
+        var result = graph.AvailablePreyFor(Wolf.Slug);
+ 
+        Assert.That(result.Select(n => n.Specie), Does.Not.Contain(Grass));
+    }
+ 
+    [Test]
+    public void AvailablePreyFor_EmptyGraph_ReturnsEmptyList()
+    {
+        var graph = new FoodChainGraph([], []);
+ 
+        var result = graph.AvailablePreyFor("any-slug");
+ 
+        Assert.That(result, Is.Empty);
     }
 }

@@ -10,25 +10,37 @@ public class BiomeFoodChainStabilityAnalyzerTests
     {
         return new Specie
         {
-            Id = id,
+            Slug = $"s{id}",
             Name = $"S{id}",
             Height = 1,
             Weight = weight,
             ImageUrl = null,
             IsPublic = true,
             CreatedBy = "test",
-            Diet = new Diet(1, "Carnivore"),
-            Classification = new Classification(1, "A", new List<Diet>(), true)
+            Diet = new Diet("1", "Carnivore"),
+            Classification = new Classification("1", "A", new List<Diet>(), true)
         };
     }
 
     private FoodChainNode CreateNode(int id, int count = 1)
     {
         return new FoodChainNode(
-            id,
-            $"N{id}",
-            new Diet(1, "Carnivore"),
-            new Classification(1, "A", new List<Diet>(), true),
+            new Specie
+            {
+                Slug = $"{id}",
+                Name = $"{id}",
+                Height = 67,
+                Weight = 67,
+                Classification = new Classification("1",
+                    "A",
+                    new List<Diet>(),
+                    true),
+                Diet = new Diet("1",
+                    "Carnivore"),
+                CreatedBy = "test",
+                IsPublic = true,
+                ImageUrl = null
+            },
             count
         );
     }
@@ -44,8 +56,8 @@ public class BiomeFoodChainStabilityAnalyzerTests
             },
             new List<FoodChainEdge>
             {
-                new FoodChainEdge(1, 2),
-                new FoodChainEdge(2, 1) 
+                new FoodChainEdge("1", "2"),
+                new FoodChainEdge("2", "1")
             }
         );
 
