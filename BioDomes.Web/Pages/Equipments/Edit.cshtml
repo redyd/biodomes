@@ -1,4 +1,4 @@
-@page "/equipments/edit/{id:int}"
+@page "/equipments/edit/{slug:kebab}"
 @model BioDomes.Web.Pages.Equipments.Edit
 @{
     Layout = "Shared/_Layout";
@@ -22,27 +22,27 @@
                 </div>
 
                 <div class="field-group">
-                    <label class="field-label" asp-for="Input.ProducedResourceId">Production</label>
-                    <select class="field-input" asp-for="Input.ProducedResourceId">
+                    <label class="field-label" asp-for="Input.ProducedResourceSlug">Production</label>
+                    <select class="field-input" asp-for="Input.ProducedResourceSlug">
                         <option value="">-- Choisir --</option>
                         @foreach (var classification in Model.Productions)
                         {
                             <option value="@classification.Value">@classification.Text</option>
                         }
                     </select>
-                    <span asp-validation-for="Input.ProducedResourceId" class="field-error"></span>
+                    <span asp-validation-for="Input.ProducedResourceSlug" class="field-error"></span>
                 </div>
 
                 <div class="field-group">
-                    <label class="field-label" asp-for="Input.ConsumedResourceId">Consomation</label>
-                    <select class="field-input" asp-for="Input.ConsumedResourceId">
+                    <label class="field-label" asp-for="Input.ConsumedResourceSlug">Consomation</label>
+                    <select class="field-input" asp-for="Input.ConsumedResourceSlug">
                         <option value="">-- Choisir --</option>
                         @foreach (var classification in Model.Consomations)
                         {
                             <option value="@classification.Value">@classification.Text</option>
                         }
                     </select>
-                    <span asp-validation-for="Input.ConsumedResourceId" class="field-error"></span>
+                    <span asp-validation-for="Input.ConsumedResourceSlug" class="field-error"></span>
                 </div>
                 
                 <div class="field-group">

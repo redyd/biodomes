@@ -532,7 +532,14 @@ namespace BioDomes.Infrastructures.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
 
                     b.ToTable("equipment_resources", "dbo");
 
@@ -540,62 +547,74 @@ namespace BioDomes.Infrastructures.Migrations
                         new
                         {
                             Id = 1,
-                            Label = "Lumière"
+                            Label = "Lumière",
+                            Slug = "lumiere"
                         },
                         new
                         {
                             Id = 2,
-                            Label = "Eau"
+                            Label = "Eau",
+                            Slug = "eau"
                         },
                         new
                         {
                             Id = 3,
-                            Label = "Azote"
+                            Label = "Azote",
+                            Slug = "azote"
                         },
                         new
                         {
                             Id = 4,
-                            Label = "Hydrogène"
+                            Label = "Hydrogène",
+                            Slug = "hydrogene"
                         },
                         new
                         {
                             Id = 5,
-                            Label = "Oxygène"
+                            Label = "Oxygène",
+                            Slug = "oxygene"
                         },
                         new
                         {
                             Id = 6,
-                            Label = "CO2"
+                            Label = "CO2",
+                            Slug = "co2"
                         },
                         new
                         {
                             Id = 7,
-                            Label = "Phosphore"
+                            Label = "Phosphore",
+                            Slug = "phosphore"
                         },
                         new
                         {
                             Id = 8,
-                            Label = "Potassium"
+                            Label = "Potassium",
+                            Slug = "potassium"
                         },
                         new
                         {
                             Id = 9,
-                            Label = "Calcium"
+                            Label = "Calcium",
+                            Slug = "calcium"
                         },
                         new
                         {
                             Id = 10,
-                            Label = "Magnésium"
+                            Label = "Magnésium",
+                            Slug = "magnesium"
                         },
                         new
                         {
                             Id = 11,
-                            Label = "Énergie"
+                            Label = "Énergie",
+                            Slug = "energie"
                         },
                         new
                         {
                             Id = 12,
-                            Label = "Matière organique"
+                            Label = "Matière organique",
+                            Slug = "matiere-organique"
                         });
                 });
 
@@ -1195,7 +1214,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "8c409f09-5e3c-47d9-9066-d2158e72aa05",
+                            ConcurrencyStamp = "3f1551d6-ff3f-4754-9f57-2efe8ca0edf9",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             ImageUrl = "1637ca51-6139-4ec4-aa5a-3e824212b0e3.jpg",
@@ -1204,7 +1223,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "e0466feb-a308-4b78-be46-2d75db6202d5",
+                            SecurityStamp = "3c883524-a9f6-4398-b2fc-e20dd7d4da0f",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -1213,7 +1232,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "8a700a51-9772-4931-a4e1-701021463768",
+                            ConcurrencyStamp = "28686c89-e70e-48b7-9ad2-0c3ccdd95e3a",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -1221,7 +1240,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "7d9b6530-79f9-4bd1-b248-4f84529d4963",
+                            SecurityStamp = "9aff6ae9-ff34-405b-8d28-899e561e50e6",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         },
@@ -1230,7 +1249,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-3",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "a8e6abc7-eb59-4450-a29a-2fd43dbeac06",
+                            ConcurrencyStamp = "cf6df051-7d66-4313-a460-e0cae0a3bfe9",
                             Email = "bob@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -1238,7 +1257,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "BOB",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "18322c0c-17f9-4725-96d0-582263bb78a1",
+                            SecurityStamp = "f3674868-b7bb-4cba-82b2-b1be62a682a5",
                             TwoFactorEnabled = false,
                             UserName = "bob"
                         });

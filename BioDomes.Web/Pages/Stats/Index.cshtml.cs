@@ -22,12 +22,12 @@ public class StatsModel(IBiomeStatRepository repo) : PageModel
         return new JsonResult(statsResults.Value!);
     }
     
-    public async Task<IActionResult> OnGetHistoryDataAsync(int? biomeId, int days = 30)
+    public async Task<IActionResult> OnGetHistoryDataAsync(string biomeSlug, int days = 30)
     {
         var userId  = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         var isAdmin = User.IsInRole("Admin");
 
-        var historyResults = await repo.GetHistoryAsync(userId, isAdmin, biomeId, days);
+        var historyResults = await repo.GetHistoryAsync(biomeSlug, userId, isAdmin, days);
         if (historyResults.Failed) return historyResults.ToPageResult(this);
         
         return new JsonResult(historyResults.Value!);

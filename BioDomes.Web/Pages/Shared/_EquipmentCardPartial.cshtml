@@ -10,7 +10,7 @@
         <div class="card-info"><span class="card-label">Consomme :</span> @Model.Consumed</div>
         @if (Model.CanEdit)
         {
-            <a asp-page="/Equipments/Edit" asp-route-id="@Model.Id">Éditer</a>
+            <a asp-page="/Equipments/Edit" asp-route-id="@Model.Slug">Éditer</a>
         }
     </div>
 </div>

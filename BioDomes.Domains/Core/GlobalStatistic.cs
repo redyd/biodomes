@@ -3,8 +3,6 @@ namespace BioDomes.Domains.Core;
 public class GlobalStatistic
 {
     public required List<ComplexBiome> All { get; init; }
-    public int BiomesCount => All.Count;
-
     public List<ComplexBiome> GetBalancedBiome(int count)
     {
         return All

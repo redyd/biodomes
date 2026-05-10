@@ -19,7 +19,7 @@ public static class SpecieMapper
         };
 
     public static Classification MapClassification(SpecieClassification classification)
-        => new(classification.Label, classification.EatenByDiets.Select(MapDiet).ToList(), classification.RequireFood);
+        => new(classification.Slug, classification.Label, classification.EatenByDiets.Select(MapDiet).ToList(), classification.RequireFood);
 
-    public static Diet MapDiet(SpecieDiet diet) => new(diet.Label);
+    public static Diet MapDiet(SpecieDiet diet) => new(diet.Slug, diet.Label);
 }

@@ -2,6 +2,6 @@ namespace BioDomes.Domains.Core;
 
 public class EquipmentResource
 {
-    public required int Id { get; set; }
-    public required string Label { get; set; }
+    public required string Slug { get; init; }
+    public required string Label { get; init; }
 }

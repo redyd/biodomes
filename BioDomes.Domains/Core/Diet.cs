@@ -1,10 +1,8 @@
-using BioDomes.Domains.Extensions;
-
 namespace BioDomes.Domains.Core;
 
-public class Diet(string label)
+public class Diet(string slug, string label)
 {
-    public string Slug => Label.ToKebabCase();
+    public string Slug { get; } = slug;
     public string Label { get; } = label;
 
     public static bool operator ==(Diet a, Diet b) => a.Equals(b);

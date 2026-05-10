@@ -9,7 +9,7 @@ public static class EquipmentMapper
         => new()
         {
             CreatedBy = entity.UserId,
-            Id = entity.Id,
+            Slug = entity.Slug,
             Name = entity.Name,
             Consumed = MapResource(entity.ConsumedResourceEntity),
             Produced = MapResource(entity.ProducedResourceEntity),
@@ -20,7 +20,7 @@ public static class EquipmentMapper
     private static EquipmentResource MapResource(EquipmentResourceEntity entity)
         => new()
         {
-            Id = entity.Id,
+            Slug = entity.Slug,
             Label = entity.Label,
         };
 }

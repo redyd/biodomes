@@ -55,8 +55,8 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
         {
             Name = Input.Name,
             Image = imageId,
-            ConsumedResourceId = (int)Input.ConsumedResourceId!,
-            ProducedResourceId = (int)Input.ProducedResourceId!,
+            ConsumedResourceSlug = Input.ConsumedResourceSlug,
+            ProducedResourceSlug = Input.ProducedResourceSlug,
             UserId = userId
         };
 
@@ -88,8 +88,8 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
         var resourcesResult = await repository.GetResourcesAsync();
         if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
         
-        Productions = new SelectList(resourcesResult.Value!, "Id", "Label", Input.ProducedResourceId);
-        Consomations = new SelectList(resourcesResult.Value!, "Id", "Label", Input.ConsumedResourceId);
+        Productions = new SelectList(resourcesResult.Value!, "Id", "Label", Input.ProducedResourceSlug);
+        Consomations = new SelectList(resourcesResult.Value!, "Id", "Label", Input.ConsumedResourceSlug);
         return null;
     }
 }

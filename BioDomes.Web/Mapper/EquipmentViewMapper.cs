@@ -9,7 +9,7 @@ public class EquipmentViewMapper : IEquipmentViewMapper
     {
         return new EquipmentView
         {
-            Id = equipment.Id,
+            Slug = equipment.Slug,
             Name = equipment.Name,
             Consumed = equipment.Consumed.Label,
             Image = resolveImage(equipment.ImageId),

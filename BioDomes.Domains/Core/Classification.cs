@@ -1,10 +1,8 @@
-using BioDomes.Domains.Extensions;
-
 namespace BioDomes.Domains.Core;
 
-public class Classification(string label, List<Diet> eatenByDiets, bool requireFood)
+public class Classification(string slug, string label, List<Diet> eatenByDiets, bool requireFood)
 {
-    public string Slug => Label.ToKebabCase();
+    public string Slug { get; } = slug;
     public string Label { get; } = label;
     public List<Diet> EatenByDiets { get; } = eatenByDiets;
     public bool RequireFood { get; } = requireFood;

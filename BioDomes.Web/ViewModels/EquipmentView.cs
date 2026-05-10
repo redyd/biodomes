@@ -2,10 +2,10 @@ namespace BioDomes.Web.ViewModels;
 
 public class EquipmentView
 {
-    public required int Id { get; set; }
-    public required string Name { get; set; }
-    public required string Image { get; set; }
-    public required string Produced { get; set; }
-    public required string Consumed { get; set; }
-    public required bool CanEdit { get; set; }
+    public required string Slug { get; init; }
+    public required string Name { get; init; }
+    public required string Image { get; init; }
+    public required string Produced { get; init; }
+    public required string Consumed { get; init; }
+    public required bool CanEdit { get; init; }
 }
