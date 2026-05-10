@@ -23,7 +23,7 @@ public class Index(IFoodChainRepository repo) : AppPageModel
 
     public async Task<IActionResult> OnPostAddRelation([FromBody] NodeActionDto action)
     {
-        var result = await repo.AddRelation(action.PredatorId, action.PreyId);
+        var result = await repo.AddRelation(action.PredatorSlug, action.PreySlug);
         if (result.Failed) return result.ToPageResult(this);
 
         return Page();
@@ -31,7 +31,7 @@ public class Index(IFoodChainRepository repo) : AppPageModel
 
     public async Task<IActionResult> OnPostRemoveRelation([FromBody] NodeActionDto action)
     {
-        var result = await repo.DeleteRelation(action.PredatorId, action.PreyId);
+        var result = await repo.DeleteRelation(action.PredatorSlug, action.PreySlug);
         if (result.Failed) return result.ToPageResult(this);
         
         return Page();

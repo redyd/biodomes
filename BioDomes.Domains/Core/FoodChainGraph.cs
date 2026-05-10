@@ -6,21 +6,6 @@ public class FoodChainGraph(IReadOnlyList<FoodChainNode> nodes, IReadOnlyList<Fo
     public IReadOnlyList<FoodChainEdge> Edges { get; } = edges;
 
     /// <summary>
-    /// Récupère les espèces sans proies
-    /// </summary>
-    /// <returns></returns>
-    public IReadOnlyList<FoodChainNode> NoPreySpecies()
-    {
-        var predatorSlugs = Edges
-            .Select(e => e.PredatorSlug)
-            .ToHashSet();
-
-        return Nodes
-            .Where(n => !predatorSlugs.Contains(n.Specie.Slug))
-            .ToList();
-    }
-
-    /// <summary>
     /// Retourne le nombre de fois qu'un id d'une espèce se retrouve dans les liens (specieId - count)
     /// </summary>
     /// <returns></returns>
@@ -36,23 +21,7 @@ public class FoodChainGraph(IReadOnlyList<FoodChainNode> nodes, IReadOnlyList<Fo
 
         return dict;
     }
-
-    /// <summary>
-    /// Détermine le nombre de proies qu'une espèce a
-    /// </summary>
-    /// <returns></returns>
-    public Dictionary<Specie, int> CountPreyRelations()
-    {
-        var dict = new Dictionary<Specie, int>();
-
-        foreach (var node in Nodes)
-        {
-            dict[node.Specie] = Edges.Count(edge => edge.PredatorSlug == node.Specie.Slug);
-        }
-
-        return dict;
-    }
-
+    
     public IReadOnlyList<FoodChainNode> PreyOf(string predatorSlug)
     {
         var preyIds = Edges

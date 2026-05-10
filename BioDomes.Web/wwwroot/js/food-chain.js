@@ -19,8 +19,8 @@ function onSpecieSelect(data) {
 
     document.querySelector('#diet-badge').style.display = 'inline-block';
 
-    renderAvailablePrey(data.available, data.id);
-    renderExistingPrey(data.preys, data.id);
+    renderAvailablePrey(data.available, data.slug);
+    renderExistingPrey(data.preys, data.slug);
 }
 
 function renderExistingPrey(preys, rootSpecie) {
@@ -39,11 +39,11 @@ function renderExistingPrey(preys, rootSpecie) {
         li.className = "li-info-card";
         li.innerHTML = `
             <div class="d-flex flex-column">
-                <span>${p.name}</span>
-                <span class="li-card-meta">${p.classification.label}</span>
+                <span>${p.specie.name}</span>
+                <span class="li-card-meta">${p.specie.classification.label}</span>
             </div>
             <button class="btn-action btn-remove" title="Supprimer le lien" 
-                    onclick="handleAction('${rootSpecie}', '${p.specieId}', 'remove')">×</button>
+                    onclick="handleAction('${rootSpecie}', '${p.specie.slug}', 'remove')">×</button>
         `;
         existing.appendChild(li);
     }
@@ -65,11 +65,11 @@ function renderAvailablePrey(preys, rootSpecie) {
         li.className = "li-info-card";
         li.innerHTML = `
             <div class="d-flex flex-column">
-                <span>${p.name}</span>
-                <span class="li-card-meta">${p.classification.label}</span>
+                <span>${p.specie.name}</span>
+                <span class="li-card-meta">${p.specie.classification.label}</span>
             </div>
             <button class="btn-action btn-add" title="Ajouter le lien" 
-                    onclick="handleAction('${rootSpecie}', '${p.specieId}', 'add')">+</button>
+                    onclick="handleAction('${rootSpecie}', '${p.specie.slug}', 'add')">+</button>
         `;
         available.appendChild(li);
     }
@@ -84,13 +84,9 @@ function handleAction(predator, prey, action) {
             'Content-Type': 'application/json',
             'RequestVerificationToken': getAntiForgeryToken()
         },
-        body: JSON.stringify({ predatorId: parseInt(predator), preyId: parseInt(prey) })
+        body: JSON.stringify({ predatorSlug: predator, preySlug: prey })
     })
-        .then(res => {
-            if (res.ok) {
-                location.reload();
-            }
-        })
+        .then(res => { if (res.ok) location.reload(); })
         .catch(err => console.error("Erreur d'action:", err));
 }
 
@@ -109,14 +105,14 @@ function handleAction(predator, prey, action) {
     const elements = [
         ...nodes.map(n => ({
             data: {
-                id: n.SpecieId,
-                label: `${n.Name}\n${n.Diet.Label}`
+                id: n.Specie.Slug,
+                label: `${n.Specie.Name}\n${n.Specie.Diet.Label}`
             }
         })),
         ...edges.map(e => ({
             data: {
-                source: e.PredatorId,
-                target: e.PreyId
+                source: e.PredatorSlug,
+                target: e.PreySlug
             }
         }))
     ];
@@ -168,25 +164,6 @@ function handleAction(predator, prey, action) {
             },
 
             {
-                selector: 'node:hover',
-                style: {
-                    'border-color': 'rgba(0, 210, 180, 0.8)',
-                    'border-width': 2,
-                    'background-color': '#0f2229'
-                }
-            },
-
-            {
-                selector: 'edge:hover',
-                style: {
-                    'line-color': '#00d2b4',
-                    'target-arrow-color': '#00d2b4',
-                    'width': 3,
-                    'opacity': 1
-                }
-            },
-
-            {
                 selector: ':selected',
                 style: {
                     'border-color': '#00d2b4',
@@ -215,13 +192,11 @@ function handleAction(predator, prey, action) {
                     'Content-Type': 'application/json',
                     'RequestVerificationToken': getAntiForgeryToken()
                 },
-                body: JSON.stringify({ specieId: parseInt(node.id()) })
+                body: JSON.stringify({ specieSlug: node.id() })
             })
                 .then(res => res.json())
-                .then(data => {
-                    console.log(JSON.stringify(data));
-                    onSpecieSelect(data);
-                })
+                .then(data => onSpecieSelect(data))
+                .catch(err => console.error("Erreur d'action:", err));
         });
     }
 

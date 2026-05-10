@@ -105,15 +105,15 @@ public class FoodChainRepository(BiodomeContext context, ILogger<FoodChainReposi
         }
     }
 
-    public async Task<Result> AddRelation(int predatorId, int preyId)
+    public async Task<Result> AddRelation(string predatorSlug, string preySlug)
     {
         try
         {
             var predator = await context.Species
-                .FirstOrDefaultAsync(s => s.Id == predatorId);
+                .FirstOrDefaultAsync(s => s.Slug == predatorSlug);
 
             var prey = await context.Species
-                .FirstOrDefaultAsync(s => s.Id == preyId);
+                .FirstOrDefaultAsync(s => s.Slug == preySlug);
 
             if (predator == null || prey == null)
             {
@@ -146,12 +146,14 @@ public class FoodChainRepository(BiodomeContext context, ILogger<FoodChainReposi
         }
     }
 
-    public async Task<Result> DeleteRelation(int predatorId, int preyId)
+    public async Task<Result> DeleteRelation(string predatorSlug, string preySlug)
     {
         try
         {
             var relation = await context.SpecieFoodChains
-                .FirstOrDefaultAsync(r => r.Predator.Id == predatorId && r.Prey.Id == preyId);
+                .Include(sfc => sfc.Predator)
+                .Include(sfc => sfc.Prey)
+                .FirstOrDefaultAsync(r => r.Predator.Slug == predatorSlug && r.Prey.Slug == preySlug);
 
             if (relation is null)
             {

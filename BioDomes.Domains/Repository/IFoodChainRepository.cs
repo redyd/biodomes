@@ -7,6 +7,6 @@ public interface IFoodChainRepository
     Task<ResultT<FoodChainGraph>> GetFullGraphForBiomeAsync(string biomeSlug, string? userId, bool isAdmin);
     Task<ResultT<FoodChainGraph>> GetFullGraphAsync(string? userId, bool isAdmin);
 
-    Task<Result> DeleteRelation(int predatorId, int preyId);
-    Task<Result> AddRelation(int predatorId, int preyId);
+    Task<Result> DeleteRelation(string predatorSlug, string preySlug);
+    Task<Result> AddRelation(string predatorSlug, string preySlug);
 }
