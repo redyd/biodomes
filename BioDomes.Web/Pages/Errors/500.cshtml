@@ -2,11 +2,20 @@
 @model BioDomes.Web.Pages.Errors.ServerErrorModel
 
 @{
+    Layout = "Shared/_LayoutMinimal";
     ViewData["Title"] = "Cassé";
 }
 
-<div class="main-container">
-    <h1>500 — Erreur serveur</h1>
-    <p>Une erreur inattendue s'est produite.</p>
-    <a asp-page="/Index" class="btn-save">Retour à l'accueil</a>
+<div class="error-page">
+    <div class="error-card error-card--403">
+        <div class="error-top">
+            <div class="error-code">500</div>
+            <div class="error-label">Erreur serveur</div>
+        </div>
+        <div class="error-body">
+            <p class="error-title">Accès non autorisé</p>
+            <p class="error-desc">Une erreur inattendue s'est produite.</p>
+            <a class="btn-save" asp-page="/Index">Retour à l'accueil</a>
+        </div>
+    </div>
 </div>

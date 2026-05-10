@@ -2,11 +2,20 @@
 @model BioDomes.Web.Pages.Errors.ForbidenModel
 
 @{
+    Layout = "Shared/_LayoutMinimal";
     ViewData["Title"] = "Interdit";
 }
 
-<div class="main-container">
-    <h1>403 — Accès refusé</h1>
-    <p>Vous n'avez pas les droits pour accéder à cette ressource.</p>
-    <a asp-page="/Index" class="btn-save">Retour à l'accueil</a>
+<div class="error-page">
+    <div class="error-card error-card--403">
+        <div class="error-top">
+            <div class="error-code">403</div>
+            <div class="error-label">Accès refusé</div>
+        </div>
+        <div class="error-body">
+            <p class="error-title">Accès non autorisé</p>
+            <p class="error-desc">Vous n'avez pas les droits pour accéder à cette ressource.</p>
+            <a class="btn-save" asp-page="/Index">Retour à l'accueil</a>
+        </div>
+    </div>
 </div>
