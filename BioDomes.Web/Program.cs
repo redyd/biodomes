@@ -5,14 +5,13 @@ using BioDomes.Infrastructures;
 using BioDomes.Infrastructures.Models;
 using BioDomes.Infrastructures.Repositories;
 using BioDomes.Web.Constraints;
+using BioDomes.Web.Extensions;
 using BioDomes.Web.Mapper;
 using BioDomes.Web.Middlewares;
-using BioDomes.Web.Middlewares.extensions;
 using BioDomes.Web.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 

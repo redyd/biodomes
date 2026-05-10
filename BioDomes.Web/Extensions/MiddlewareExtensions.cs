@@ -1,9 +1,11 @@
-﻿namespace BioDomes.Web.Middlewares.extensions;
+﻿using BioDomes.Web.Middlewares;
+
+namespace BioDomes.Web.Extensions;
 
 public static class MiddlewareExtensions
 {
-    public static IApplicationBuilder UseReverseProxyMiddleware(this IApplicationBuilder app)
+    public static void UseReverseProxyMiddleware(this IApplicationBuilder app)
     {
-        return app.UseMiddleware<ReverseProxyLinksMiddleware>();
+        app.UseMiddleware<ReverseProxyLinksMiddleware>();
     }
 }
