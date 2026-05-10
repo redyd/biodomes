@@ -37,7 +37,7 @@
                         <button
                             class="btn-action btn-remove"
                             title="Supprimer des @chainNode.Specie.Name"
-                            data-specie-id="@chainNode.Specie"
+                            data-specie-slug="@chainNode.Specie.Slug"
                             data-specie-name="@chainNode.Specie.Name"
                             data-specie-count="@chainNode.Count"
                             onclick="openRemoveSpecieDialog(this)">
@@ -92,7 +92,7 @@
                         <button
                             class="btn-action btn-remove"
                             title="Supprimer des @equipment.Model.Name"
-                            data-equipment-id="@equipment.Model.Slug"
+                            data-equipment-slug="@equipment.Model.Slug"
                             data-equipment-name="@equipment.Model.Name"
                             data-equipment-count="@equipment.TrackedInsertionsById.Count"
                             onclick="openRemoveEquipmentDialog(this)">

@@ -105,7 +105,7 @@ public class Detail(
         }
 
         SuccessNotification("Equipement retirée avec succès");
-        return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { Slug }, fragment: "title-section");
+        return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { slug = Slug }, fragment: "title-section");
     }
 
     // POST SPECIES
@@ -166,7 +166,7 @@ public class Detail(
     }
 
     // ACTIONS
-    public async Task<IActionResult> OnPostExecuteActionAsync(string actionId, int biomeId)
+    public async Task<IActionResult> OnPostExecuteActionAsync(string actionId)
     {
         var result = await analyzer.PerformAction(actionId, User.GetUserId(), User.IsAdmin());
 
@@ -177,7 +177,7 @@ public class Detail(
         }
 
         SuccessNotification("Action correctement effectuée");
-        return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { id = biomeId },
+        return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { Slug },
             fragment: "title-section");
     }
 
