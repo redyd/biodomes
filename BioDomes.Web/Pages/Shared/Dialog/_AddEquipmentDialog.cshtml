@@ -14,7 +14,7 @@
                     @foreach (var equipment in Model.AllEquipments)
                     {
                         <label class="suggestion-card">
-                            <input type="radio" asp-for="EquipmentInput.EquipmentId" value="@equipment.Id" hidden/>
+                            <input type="radio" asp-for="EquipmentInput.EquipmentSlug" value="@equipment.Slug" hidden/>
                             <img class="suggestion-card-img"
                                  src="@equipment.Image"
                                  alt="@equipment.Name"/>
@@ -22,7 +22,7 @@
                         </label>
                     }
                 </div>
-                <span asp-validation-for="EquipmentInput.EquipmentId" class="field-error"></span>
+                <span asp-validation-for="EquipmentInput.EquipmentSlug" class="field-error"></span>
             </div>
 
             <div class="field-group">

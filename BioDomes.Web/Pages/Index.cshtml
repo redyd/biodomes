@@ -20,7 +20,7 @@
     <div class="hero-stats">
         @foreach (var dome in Model.RankedBiomes)
         {
-            <a asp-page="/Biomes/Detail" asp-route-id="@dome.Model.Id">
+            <a asp-page="/Biomes/Detail" asp-route-slug="@dome.Model.Slug">
                 <div class="hero-stat">
                     <div>
                         <img src="@dome.ImageUrl" alt="@dome.Model.Name" class="card-image"/>

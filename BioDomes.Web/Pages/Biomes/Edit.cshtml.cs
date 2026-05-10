@@ -13,7 +13,7 @@ namespace BioDomes.Web.Pages.Biomes;
 [Authorize]
 public class EditPage(IBiomeRepository repository, IWebHostEnvironment env, IImagePathResolver imageResolver) : AppPageModel
 {
-    [BindProperty(SupportsGet = true)] public int Id { get; set; }
+    [BindProperty(SupportsGet = true)] public string Slug { get; set; } = null!;
     [BindProperty] public UpdateBiomeInputModel Input { get; set; } = new();
 
     public string CurrentImageUrl { get; set; } = null!;
@@ -25,7 +25,7 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env, IIma
         var userId = User.GetUserId();
         if (userId is null) return Forbid();
 
-        var result = await repository.FindAsync(Id, userId, User.IsAdmin());
+        var result = await repository.FindAsync(Slug, userId, User.IsAdmin());
         if (result.Failed) return result.ToPageResult(this);
 
         var biome = result.Value!;
@@ -47,7 +47,7 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env, IIma
         var userId = User.GetUserId();
         if (userId is null) return Forbid();
 
-        var biomeResult = await repository.FindAsync(Id, userId, User.IsAdmin());
+        var biomeResult = await repository.FindAsync(Slug, userId, User.IsAdmin());
         if (biomeResult.Failed) return biomeResult.ToPageResult(this);
 
         var biome = biomeResult.Value!;
@@ -62,7 +62,8 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env, IIma
 
     private async Task<IActionResult> PerformDelete(string userId, Biome biome)
     {
-        var result = await repository.DeleteAsync(Id, userId, User.IsAdmin());
+        var result = await repository.DeleteAsync(Slug, userId, User.IsAdmin());
+        
         if (result.Failed)
         {
             ErrorNotification("Erreur lors de la suppression du biome.");
@@ -100,7 +101,7 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env, IIma
 
         var request = new UpdateBiomeRequest
         {
-            Id = Id,
+            PreviousSlug = Slug,
             Name = Input.Name,
             Temperature = Input.Temperature,
             Humidity = Input.AbsoluteHumidity,

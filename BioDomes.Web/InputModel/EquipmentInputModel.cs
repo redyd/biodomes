@@ -7,15 +7,13 @@ public class EquipmentInputModel
 {
     [Required(ErrorMessage = "Le nom est requis.")]
     [MaxLength(75, ErrorMessage = "Le nom ne peut pas dépasser 75 caractères.")]
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; } = null!;
 
     [Required(ErrorMessage = "La ressource produite est requise.")]
-    [Range(1, int.MaxValue, ErrorMessage = "La ressource produite doit être un ID valide.")]
-    public int? ProducedResourceId { get; set; }
+    public string ProducedResourceSlug { get; set; } = null!;
 
     [Required(ErrorMessage = "La ressource consommée est requise.")]
-    [Range(1, int.MaxValue, ErrorMessage = "La ressource consommée doit être un ID valide.")]
-    public int? ConsumedResourceId { get; set; }
+    public string ConsumedResourceSlug { get; set; } = null!;
 
     [Required(ErrorMessage = "Une image est requise.")]
     [DataType(DataType.Upload)]

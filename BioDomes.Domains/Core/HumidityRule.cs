@@ -1,20 +1,11 @@
 namespace BioDomes.Domains.Core;
 
-public class HumidityRule
+public class HumidityRule(double temperature, double humidity)
 {
-    private readonly double _temp;
-    private readonly double _hum;
-
-    public HumidityRule(double temperature, double humidity)
-    {
-        _temp = temperature;
-        _hum = humidity;
-    }
-
-    public bool IsValid => _hum <= MaxHumidity;
+    public bool IsValid => humidity <= MaxHumidity;
 
     public double MaxHumidity =>
-        216.7 * 6.112 * Math.Exp(17.67 * _temp / (_temp + 243.5)) / (_temp + 273.15);
+        216.7 * 6.112 * Math.Exp(17.67 * temperature / (temperature + 243.5)) / (temperature + 273.15);
 
-    public double HumidityPercent => Math.Min(MaxHumidity > 0 ? _hum / MaxHumidity * 100 : 0, 100);
+    public double HumidityPercent => Math.Min(MaxHumidity > 0 ? humidity / MaxHumidity * 100 : 0, 100);
 }

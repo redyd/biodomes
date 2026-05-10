@@ -19,7 +19,7 @@ removeSuggestionsBtns.forEach(btn => {
 });
 
 function openRemoveSpecieDialog(btn) {
-    const id = btn.dataset.specieId;
+    const id = btn.dataset.specieSlug;
     const name = btn.dataset.specieName;
     const count = btn.dataset.specieCount;
 
@@ -34,7 +34,7 @@ function openRemoveSpecieDialog(btn) {
 }
 
 function openRemoveEquipmentDialog(btn) {
-    const id = btn.dataset.equipmentId;
+    const id = btn.dataset.equipmentSlug;
     const name = btn.dataset.equipmentName;
     const count = btn.dataset.equipmentCount;
 
@@ -64,13 +64,13 @@ function openRemoveEquipmentDialog(btn) {
 
     const elements = [
         ...nodes.map(n => {
-            const isStarved = stats.StarvedSpecies.some(s => s.SpecieId === n.SpecieId);
-            const isUnderfed = stats.UnderfedSpecies.some(s => s.SpecieId === n.SpecieId);
+            const isStarved = stats.StarvedSpecies.some(s => s.Specie.Slug === n.Specie.Slug);
+            const isUnderfed = stats.UnderfedSpecies.some(s => s.Specie.Slug === n.Specie.Slug);
 
             return {
                 data: {
-                    id: n.SpecieId,
-                    label: `${n.Name}\n${n.Count}`,
+                    id: n.Specie.Slug,
+                    label: `${n.Specie.Name}\n${n.Count}`,
                     count: n.Count,
                     hungerStatus: isStarved ? 'starved' : (isUnderfed ? 'underfed' : 'normal')
                 }
@@ -78,8 +78,8 @@ function openRemoveEquipmentDialog(btn) {
         }),
         ...edges.map(e => ({
             data: {
-                source: e.PredatorId,
-                target: e.PreyId
+                source: e.PredatorSlug,
+                target: e.PreySlug
             }
         }))
     ];

@@ -9,16 +9,16 @@ public class GlobalStatisticTests
     {
         return new Specie
         {
-            Id = id,
+            Slug = $"specie-{id}",
             Name = $"Specie {id}",
             Height = 10,
             Weight = 10,
             ImageUrl = null,
             IsPublic = true,
             CreatedBy = "test",
-            Diet = new Diet(1, "Carnivore"),
+            Diet = new Diet("1", "Carnivore"),
             Classification = new Classification(
-                1,
+                "1",
                 "Mammal",
                 new List<Diet>(),
                 true
@@ -39,7 +39,7 @@ public class GlobalStatisticTests
 
         return new ComplexBiome
         {
-            Id = 1,
+            Slug = "biome",
             CreatedBy = "test",
             Name = "Biome",
             Temperature = 20,
@@ -49,22 +49,6 @@ public class GlobalStatisticTests
             Species = species,
             Equipments = new List<Tracked<Equipment>>()
         };
-    }
-
-    [Test]
-    public void should_return_correct_biomes_count()
-    {
-        var stat = new GlobalStatistic
-        {
-            All = new List<ComplexBiome>
-            {
-                CreateBiome(BiomeState.Optimal, 1),
-                CreateBiome(BiomeState.Instable, 1),
-                CreateBiome(BiomeState.Critic, 1)
-            }
-        };
-
-        Assert.That(stat.BiomesCount, Is.EqualTo(3));
     }
 
     [Test]

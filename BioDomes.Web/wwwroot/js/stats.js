@@ -41,7 +41,7 @@ document.addEventListener('click',e=>{
         $('detail-modal').classList.remove('open');
 });
 
-const filtered=()=>{const v=$('biomeSelector').value;return v==='all'?D:D.filter(b=>b.id==v);};
+const filtered=()=>{const v=$('biomeSelector').value;return v==='all'?D:D.filter(b=>b.slug===v);};
 
 function legend(id,labels,colors){
     const el=$(id);if(!el)return;
@@ -123,7 +123,7 @@ function renderTrophic(data){
 
 async function loadHistory(){
     const v=$('biomeSelector').value,p=new URLSearchParams({days});
-    if(v!=='all')p.append('biomeId',v);
+    if(v!=='all')p.append('biomeSlug',v);
     try{const r=await fetch(`?handler=HistoryData&${p}`);if(r.ok)renderHistory(await r.json());}
     catch(e){console.error(e);}
 }
@@ -186,7 +186,7 @@ async function loadData(){
         D=await r.json();
         const sel=$('biomeSelector');
         sel.innerHTML='<option value="all">Tous mes biomes</option>';
-        D.forEach(b=>{const o=el('option',{value:b.id},b.name);sel.appendChild(o);});
+        D.forEach(b=>{const o=el('option',{value:b.slug},b.name);sel.appendChild(o);});
         renderAll();
     }catch(e){console.error(e);}
 }

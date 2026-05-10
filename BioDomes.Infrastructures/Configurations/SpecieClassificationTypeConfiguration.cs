@@ -11,6 +11,12 @@ public class SpecieClassificationTypeConfiguration : IEntityTypeConfiguration<Sp
         builder.ToTable("specie_classifications");
         builder.HasKey(sc => sc.Id);
 
+        builder.Property(sc => sc.Slug)
+            .IsRequired();
+
+        builder.HasIndex(sc => sc.Slug)
+            .IsUnique();
+
         builder.Property(sc => sc.Label)
             .IsRequired()
             .HasMaxLength(50);
@@ -37,32 +43,32 @@ public class SpecieClassificationTypeConfiguration : IEntityTypeConfiguration<Sp
     {
         builder.HasData(
             // --- VERTÉBRÉS (RequireFood = true) ---
-            new SpecieClassification { Id = 1, Label = "Mammifère", RequireFood = true },
-            new SpecieClassification { Id = 2, Label = "Oiseau", RequireFood = true },
-            new SpecieClassification { Id = 3, Label = "Poisson", RequireFood = true },
-            new SpecieClassification { Id = 4, Label = "Reptile", RequireFood = true },
-            new SpecieClassification { Id = 5, Label = "Amphibien", RequireFood = true },
+            new SpecieClassification { Id = 1, Label = "Mammifère", Slug = "mammifere", RequireFood = true },
+            new SpecieClassification { Id = 2, Label = "Oiseau", Slug = "oiseau", RequireFood = true },
+            new SpecieClassification { Id = 3, Label = "Poisson", Slug = "poisson", RequireFood = true },
+            new SpecieClassification { Id = 4, Label = "Reptile", Slug = "reptile", RequireFood = true },
+            new SpecieClassification { Id = 5, Label = "Amphibien", Slug = "amphibien", RequireFood = true },
 
             // --- INVERTÉBRÉS (RequireFood = true) ---
-            new SpecieClassification { Id = 6, Label = "Crustacé", RequireFood = true },
-            new SpecieClassification { Id = 7, Label = "Arachnides", RequireFood = true },
-            new SpecieClassification { Id = 8, Label = "Insecte", RequireFood = true },
-            new SpecieClassification { Id = 9, Label = "Myriapode", RequireFood = true },
-            new SpecieClassification { Id = 10, Label = "Mollusque", RequireFood = true },
-            new SpecieClassification { Id = 11, Label = "Echinoderme", RequireFood = true },
-            new SpecieClassification { Id = 12, Label = "Anélide", RequireFood = true },
-            new SpecieClassification { Id = 13, Label = "Cnidaire", RequireFood = true },
-            new SpecieClassification { Id = 14, Label = "Plathelminthe", RequireFood = true },
-            new SpecieClassification { Id = 15, Label = "Porifère", RequireFood = true },
+            new SpecieClassification { Id = 6, Label = "Crustacé", Slug = "crustace", RequireFood = true },
+            new SpecieClassification { Id = 7, Label = "Arachnides", Slug = "arachnides", RequireFood = true },
+            new SpecieClassification { Id = 8, Label = "Insecte", Slug = "insecte", RequireFood = true },
+            new SpecieClassification { Id = 9, Label = "Myriapode", Slug = "myriapode", RequireFood = true },
+            new SpecieClassification { Id = 10, Label = "Mollusque", Slug = "mollusque", RequireFood = true },
+            new SpecieClassification { Id = 11, Label = "Echinoderme", Slug = "echinoderme", RequireFood = true },
+            new SpecieClassification { Id = 12, Label = "Anélide", Slug = "anelide", RequireFood = true },
+            new SpecieClassification { Id = 13, Label = "Cnidaire", Slug = "cnidaire", RequireFood = true },
+            new SpecieClassification { Id = 14, Label = "Plathelminthe", Slug = "plathelminthe", RequireFood = true },
+            new SpecieClassification { Id = 15, Label = "Porifère", Slug = "porifere", RequireFood = true },
 
             // --- PRODUCTEURS PRIMAIRES (RequireFood = false — autotrophes) ---
-            new SpecieClassification { Id = 16, Label = "Plante", RequireFood = false },
-            new SpecieClassification { Id = 17, Label = "Mousse", RequireFood = false },
-            new SpecieClassification { Id = 18, Label = "Algue", RequireFood = false },
+            new SpecieClassification { Id = 16, Label = "Plante", Slug = "plante", RequireFood = false },
+            new SpecieClassification { Id = 17, Label = "Mousse", Slug = "mousse", RequireFood = false },
+            new SpecieClassification { Id = 18, Label = "Algue", Slug = "algue", RequireFood = false },
 
             // --- DÉCOMPOSEURS (RequireFood = false — se nourrissent de matière morte non-vivante) ---
-            new SpecieClassification { Id = 19, Label = "Lichen", RequireFood = false },
-            new SpecieClassification { Id = 20, Label = "Champignon", RequireFood = false }
+            new SpecieClassification { Id = 19, Label = "Lichen", Slug = "lichen", RequireFood = false },
+            new SpecieClassification { Id = 20, Label = "Champignon", Slug = "champignon", RequireFood = false }
         );
     }
 

@@ -1,90 +1,54 @@
 namespace BioDomes.Domains.Core;
 
-public class FoodChainGraph
+public class FoodChainGraph(IReadOnlyList<FoodChainNode> nodes, IReadOnlyList<FoodChainEdge> edges)
 {
-    public IReadOnlyList<FoodChainNode> Nodes { get; }
-    public IReadOnlyList<FoodChainEdge> Edges { get; }
-
-    public FoodChainGraph(IReadOnlyList<FoodChainNode> nodes, IReadOnlyList<FoodChainEdge> edges)
-    {
-        Nodes = nodes;
-        Edges = edges;
-    }
-    
-    /// <summary>
-    /// Récupère les espèces sans proies
-    /// </summary>
-    /// <returns></returns>
-    public IReadOnlyList<FoodChainNode> NoPreySpecies()
-    {
-        var predatorIds = Edges
-            .Select(e => e.PredatorId)
-            .ToHashSet();
-
-        return Nodes
-            .Where(n => !predatorIds.Contains(n.SpecieId))
-            .ToList();
-    }
+    public IReadOnlyList<FoodChainNode> Nodes { get; } = nodes;
+    public IReadOnlyList<FoodChainEdge> Edges { get; } = edges;
 
     /// <summary>
     /// Retourne le nombre de fois qu'un id d'une espèce se retrouve dans les liens (specieId - count)
     /// </summary>
     /// <returns></returns>
-    public Dictionary<int, int> CountRelations()
+    public Dictionary<Specie, int> CountRelations()
     {
-        var dict = new Dictionary<int, int>();
+        var dict = new Dictionary<Specie, int>();
 
         foreach (var node in Nodes)
         {
-            dict[node.SpecieId] = Edges.Count(edge => edge.PreyId == node.SpecieId || edge.PredatorId == node.SpecieId);
+            dict[node.Specie] = Edges
+                .Count(edge => edge.PreySlug == node.Specie.Slug || edge.PredatorSlug == node.Specie.Slug);
         }
 
         return dict;
     }
-
-    /// <summary>
-    /// Détermine le nombre de proies qu'une espèce a
-    /// </summary>
-    /// <returns></returns>
-    public Dictionary<int, int> CountPreyRelations()
-    {
-        var dict = new Dictionary<int, int>();
-
-        foreach (var node in Nodes)
-        {
-            dict[node.SpecieId] = Edges.Count(edge => edge.PredatorId == node.SpecieId);
-        }
-
-        return dict;
-    }
-
-    public IReadOnlyList<FoodChainNode> PreyOf(int predatorId)
+    
+    public IReadOnlyList<FoodChainNode> PreyOf(string predatorSlug)
     {
         var preyIds = Edges
-            .Where(e => e.PredatorId == predatorId)
-            .Select(e => e.PreyId)
+            .Where(e => e.PredatorSlug == predatorSlug)
+            .Select(e => e.PreySlug)
             .ToHashSet();
 
         return Nodes
-            .Where(n => preyIds.Contains(n.SpecieId))
+            .Where(n => preyIds.Contains(n.Specie.Slug))
             .ToList();
     }
 
-    public IReadOnlyList<FoodChainNode> AvailablePreyFor(int predatorId)
+    public IReadOnlyList<FoodChainNode> AvailablePreyFor(string predatorSlug)
     {
-        var target = Nodes.FirstOrDefault(n => n.SpecieId == predatorId);
+        var target = Nodes.FirstOrDefault(n => n.Specie.Slug == predatorSlug);
         if (target == null) return new List<FoodChainNode>();
 
         var alreadyConnectedPreys = Edges
-            .Where(e => e.PredatorId == predatorId)
-            .Select(e => e.PreyId)
+            .Where(e => e.PredatorSlug == predatorSlug)
+            .Select(e => e.PreySlug)
             .ToHashSet();
 
         return Nodes
             .Where(n =>
-                n.SpecieId != predatorId &&
-                !alreadyConnectedPreys.Contains(n.SpecieId) &&
-                n.Classification.EatenByDiets.Any(t => t.Id == target.Diet.Id)
+                n.Specie.Slug != predatorSlug &&
+                !alreadyConnectedPreys.Contains(n.Specie.Slug) &&
+                n.Specie.Classification.EatenByDiets.Any(t => t.Slug == target.Specie.Diet.Slug)
             )
             .ToList();
     }

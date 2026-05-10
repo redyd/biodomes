@@ -23,7 +23,7 @@ public class Index(IFoodChainRepository repo) : AppPageModel
 
     public async Task<IActionResult> OnPostAddRelation([FromBody] NodeActionDto action)
     {
-        var result = await repo.AddRelation(action.PredatorId, action.PreyId);
+        var result = await repo.AddRelation(action.PredatorSlug, action.PreySlug);
         if (result.Failed) return result.ToPageResult(this);
 
         return Page();
@@ -31,7 +31,7 @@ public class Index(IFoodChainRepository repo) : AppPageModel
 
     public async Task<IActionResult> OnPostRemoveRelation([FromBody] NodeActionDto action)
     {
-        var result = await repo.DeleteRelation(action.PredatorId, action.PreyId);
+        var result = await repo.DeleteRelation(action.PredatorSlug, action.PreySlug);
         if (result.Failed) return result.ToPageResult(this);
         
         return Page();
@@ -43,15 +43,15 @@ public class Index(IFoodChainRepository repo) : AppPageModel
         if (result.Failed) return result.ToPageResult(this);
 
         var graph = result.Value!;
-        var specie = graph.Nodes.First(x => x.SpecieId == node.SpecieId);
-        var preys = graph.PreyOf(node.SpecieId);
-        var available = graph.AvailablePreyFor(node.SpecieId);
+        var chainNode = graph.Nodes.First(x => x.Specie.Slug == node.SpecieSlug);
+        var preys = graph.PreyOf(node.SpecieSlug);
+        var available = graph.AvailablePreyFor(node.SpecieSlug);
 
         return new JsonResult(new NodeClickedDetailDto
         {
-            Id = specie.SpecieId,
-            Name = specie.Name,
-            Classification = specie.Classification,
+            Slug = chainNode.Specie.Slug,
+            Name = chainNode.Specie.Name,
+            Classification = chainNode.Specie.Classification,
             Preys = preys,
             Available = available
         });

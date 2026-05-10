@@ -11,13 +11,15 @@ namespace BioDomes.Infrastructures.Repositories;
 public class BiomeManagementRepository(BiodomeContext context, ILogger<IBiomeManagementRepository> logger)
     : IBiomeManagementRepository
 {
-    public async Task<Result> AddSpecieToBiome(SpecieToBiomeRequest request, int biomeId, string? userId, bool isAdmin)
+    public async Task<Result> AddSpecieToBiome(SpecieToBiomeRequest request, string biomeSlug, string? userId,
+        bool isAdmin)
     {
         try
         {
-            var biome = await context.Biomes.FirstOrDefaultAsync(b => b.Id == biomeId);
-
-            if (biome is null)
+            var biome = await context.Biomes.FirstOrDefaultAsync(b => b.Slug == biomeSlug);
+            var specie = await context.Species.FirstOrDefaultAsync(s => s.Slug == request.SpecieSlug);
+            
+            if (biome is null || specie is null)
             {
                 return Result.NotFound("Biome is not found");
             }
@@ -32,8 +34,8 @@ public class BiomeManagementRepository(BiodomeContext context, ILogger<IBiomeMan
             {
                 allToAdd.Add(new BiomeSpecieEntity
                 {
-                    BiomeId = biomeId,
-                    SpecieId = request.SpecieId,
+                    BiomeId = biome.Id,
+                    SpecieId = specie.Id
                 });
             }
 
@@ -57,9 +59,10 @@ public class BiomeManagementRepository(BiodomeContext context, ILogger<IBiomeMan
         }
     }
 
-    public async Task<Result> RemoveSpecieToBiome(SpecieToBiomeRequest request, int biomeId, string? userId, bool isAdmin)
+    public async Task<Result> RemoveSpecieToBiome(SpecieToBiomeRequest request, string biomeSlug, string? userId,
+        bool isAdmin)
     {
-        var biome = await context.Biomes.FirstOrDefaultAsync(b => b.Id == biomeId);
+        var biome = await context.Biomes.FirstOrDefaultAsync(b => b.Slug == biomeSlug);
 
         if (biome is null)
         {
@@ -72,7 +75,9 @@ public class BiomeManagementRepository(BiodomeContext context, ILogger<IBiomeMan
         }
 
         var existing = await context.BiomeSpecies
-            .Where(bs => bs.BiomeId == biomeId && bs.SpecieId == request.SpecieId)
+            .Include(bs => bs.Specie)
+            .Include(bs => bs.Biome)
+            .Where(bs => bs.Biome.Slug == biomeSlug && bs.Specie.Slug == request.SpecieSlug)
             .ToListAsync();
 
         var toRemove = existing.Take(request.Count).ToList();
@@ -83,13 +88,15 @@ public class BiomeManagementRepository(BiodomeContext context, ILogger<IBiomeMan
         return Result.Ok();
     }
 
-    public async Task<Result> AddEquipmentToBiome(EquipmentToBiomeRequest request, int biomeId, string? userId, bool isAdmin)
+    public async Task<Result> AddEquipmentToBiome(EquipmentToBiomeRequest request, string biomeSlug, string? userId,
+        bool isAdmin)
     {
         try
         {
-            var biome = await context.Biomes.FirstOrDefaultAsync(b => b.Id == biomeId);
+            var biome = await context.Biomes.FirstOrDefaultAsync(b => b.Slug == biomeSlug);
+            var equipment = await context.Equipments.FirstOrDefaultAsync(e => e.Slug == request.EquipmentSlug);
 
-            if (biome is null)
+            if (biome is null || equipment is null)
             {
                 return Result.NotFound("Biome is not found");
             }
@@ -104,8 +111,8 @@ public class BiomeManagementRepository(BiodomeContext context, ILogger<IBiomeMan
             {
                 allToAdd.Add(new BiomeEquipmentEntity
                 {
-                    BiomeId = biomeId,
-                    EquipmentId = request.EquipmentId,
+                    BiomeId = biome.Id,
+                    EquipmentId = equipment.Id
                 });
             }
 
@@ -129,9 +136,10 @@ public class BiomeManagementRepository(BiodomeContext context, ILogger<IBiomeMan
         }
     }
 
-    public async Task<Result> RemoveEquipmentToBiome(EquipmentToBiomeRequest request, int biomeId, string? userId, bool isAdmin)
+    public async Task<Result> RemoveEquipmentToBiome(EquipmentToBiomeRequest request, string biomeSlug, string? userId,
+        bool isAdmin)
     {
-        var biome = await context.Biomes.FirstOrDefaultAsync(b => b.Id == biomeId);
+        var biome = await context.Biomes.FirstOrDefaultAsync(b => b.Slug == biomeSlug);
 
         if (biome is null)
         {
@@ -144,7 +152,9 @@ public class BiomeManagementRepository(BiodomeContext context, ILogger<IBiomeMan
         }
 
         var existing = await context.BiomeEquipments
-            .Where(bs => bs.BiomeId == biomeId && bs.EquipmentId == request.EquipmentId)
+            .Include(be => be.Biome)
+            .Include(be => be.Equipment)
+            .Where(bs => bs.Biome.Slug == biomeSlug && bs.Equipment.Slug == request.EquipmentSlug)
             .ToListAsync();
 
         var toRemove = existing.Take(request.Count).ToList();

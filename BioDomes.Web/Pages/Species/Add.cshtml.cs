@@ -52,51 +52,46 @@ public class AddModel(
             return Forbid();
         }
 
-        try
+        var imageName = Input.Image == null ? null : await imageResolver.SaveImage(Input.Image, env);
+        var specie = new CreateSpecieRequest
         {
-            var imageName = Input.Image == null ? null : await imageResolver.SaveImage(Input.Image, env);
-            var specie = new CreateSpecieRequest
+            Name = Input.Name,
+            Image = imageName,
+            Height = Input.Height,
+            Weight = Input.Weight,
+            DietSlug = Input.DietSlug,
+            ClassificationSlug = Input.ClassificationSlug
+        };
+
+        var result = await speciesRepository.AddAsync(specie, userId);
+        if (result.Status == ResultStatus.Conflict)
+        {
+            ErrorNotification("Une espèce avec ce nom existe déjà");
+            if (imageName is not null)
             {
-                Name = Input.Name,
-                Image = imageName,
-                Height = Input.Height,
-                Weight = Input.Weight,
-                DietId = (int)Input.DietId!,
-                ClassificationId = (int)Input.ClassificationId!
-            };
-
-            var result = await speciesRepository.AddAsync(specie, userId);
-            if (result.Status == ResultStatus.Conflict)
-            {
-                ErrorNotification("Une espèce avec ce nom existe déjà");
-                if (imageName is not null)
-                {
-                    imageResolver.DeleteImage(imageName, env);
-                }
-
-                var loaded = await LoadSelectLists();
-                if (loaded is not null) return loaded;
-
-                return Page();
+                imageResolver.DeleteImage(imageName, env);
             }
 
-            if (result.Failed)
-            {
-                return result.ToPageResult(this);
-            }
-
-            SuccessNotification($"Espèce {Input.Name} correctement ajoutée.");
-            return RedirectToPage("/Species/Index");
-        }
-        catch (InvalidOperationException ex)
-        {
-            ModelState.AddModelError("Input.Name", ex.Message);
             var loaded = await LoadSelectLists();
             if (loaded is not null) return loaded;
+
             return Page();
         }
+
+        if (result.Failed)
+        {
+            if (imageName is not null)
+            {
+                imageResolver.DeleteImage(imageName, env);
+            }
+
+            return result.ToPageResult(this);
+        }
+
+        SuccessNotification($"Espèce {Input.Name} correctement ajoutée.");
+        return RedirectToPage("/Species/Index");
     }
-    
+
     private async Task<IActionResult?> LoadSelectLists()
     {
         var classifications = await attributesRepository.GetClassifications();
@@ -105,8 +100,8 @@ public class AddModel(
         if (classifications.Failed) return classifications.ToPageResult(this);
         if (diets.Failed) return diets.ToPageResult(this);
 
-        Classifications = new SelectList(classifications.Value!, "Id", "Label", Input.ClassificationId);
-        Diets = new SelectList(diets.Value!, "Id", "Label", Input?.DietId);
+        Classifications = new SelectList(classifications.Value!, "Slug", "Label", Input.ClassificationSlug);
+        Diets = new SelectList(diets.Value!, "Slug", "Label", Input.DietSlug);
 
         return null;
     }

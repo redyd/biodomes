@@ -2,8 +2,8 @@
 
 public class BiomeHistory
 {
-    public int BiomeId { get; set; }
-    public string BiomeName { get; set; } = string.Empty;
+    public required string BiomeSlug { get; set; }
+    public required string BiomeName { get; set; } = string.Empty;
     
     public List<HistoryPoint> SpeciesOverTime { get; set; } = new();
     

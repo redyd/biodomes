@@ -8,16 +8,21 @@ public static class StringExtensions
 {
     public static string ToKebabCase(this string value)
     {
-        if (string.IsNullOrEmpty(value)) return value;
+        if (string.IsNullOrWhiteSpace(value))
+            return value;
 
         var normalized = value.Normalize(NormalizationForm.FormD);
-    
+
         var withoutDiacritics = new string(
             normalized
                 .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
                 .ToArray()
         );
-    
-        return Regex.Replace(withoutDiacritics, @"[\s\p{P}]", "-").ToLower();
+
+        var kebab = Regex.Replace(withoutDiacritics, @"[^a-zA-Z0-9]+", "-");
+
+        kebab = kebab.Trim('-');
+
+        return kebab.ToLowerInvariant();
     }
 }

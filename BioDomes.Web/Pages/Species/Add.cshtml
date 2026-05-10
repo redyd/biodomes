@@ -23,23 +23,23 @@
                 </div>
 
                 <div class="field-group">
-                    <label class="field-label" asp-for="Input.ClassificationId">Classification</label>
+                    <label class="field-label" asp-for="Input.ClassificationSlug">Classification</label>
                     <select class="field-input"
-                            asp-for="Input.ClassificationId"
+                            asp-for="Input.ClassificationSlug"
                             asp-items="Model.Classifications">
                         <option value="">-- Choisir --</option>
                     </select>
-                    <span asp-validation-for="Input.ClassificationId" class="field-error"></span>
+                    <span asp-validation-for="Input.ClassificationSlug" class="field-error"></span>
                 </div>
 
                 <div class="field-group">
-                    <label class="field-label" asp-for="Input.DietId">Régime</label>
+                    <label class="field-label" asp-for="Input.DietSlug">Régime</label>
                     <select class="field-input"
-                            asp-for="Input.DietId"
+                            asp-for="Input.DietSlug"
                             asp-items="Model.Diets">
                         <option value="">-- Choisir --</option>
                     </select>
-                    <span asp-validation-for="Input.DietId" class="field-error"></span>
+                    <span asp-validation-for="Input.DietSlug" class="field-error"></span>
                 </div>
 
                 <div class="field-group">

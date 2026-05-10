@@ -1,4 +1,5 @@
 using BioDomes.Domains.Core;
+using BioDomes.Domains.Extensions;
 using BioDomes.Domains.Repository;
 using BioDomes.Domains.Requests;
 using BioDomes.Infrastructures.Errors;
@@ -44,13 +45,13 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
             var result = await context.EquipmentResources.ToListAsync();
             return ResultT<List<EquipmentResource>>.Ok(result.Select(r => new EquipmentResource
             {
-                Id = r.Id,
+                Slug = r.Slug,
                 Label = r.Label
             }).ToList());
         }
         catch (DbUpdateException e)
         {
-            logger.LogError("Database error: {ExMessage}", e.Message);            
+            logger.LogError("Database error: {ExMessage}", e.Message);
             return ResultT<List<EquipmentResource>>.Failure($"Database error: {e.Message}");
         }
     }
@@ -59,19 +60,34 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
     {
         try
         {
-            var exist = await context.Equipments.AnyAsync(e => e.Name.ToLower() == request.Name.ToLower());
+            var slug = request.Name.ToKebabCase();
+            var exist = await context.Equipments.AnyAsync(e => e.Slug == slug);
 
             if (exist)
             {
                 return ResultT<Equipment>.Conflict("An equipment with this name already exists.");
             }
 
+            var produced = await context
+                .EquipmentResources
+                .FirstOrDefaultAsync(e => e.Slug == request.ProducedResourceSlug);
+
+            var consumed = await context
+                .EquipmentResources
+                .FirstOrDefaultAsync(e => e.Slug == request.ConsumedResourceSlug);
+
+            if (produced is null || consumed is null)
+            {
+                return ResultT<Equipment>.NotFound("Equipment not found.");
+            }
+
             var entity = new EquipmentEntity
             {
+                Slug = slug,
                 Name = request.Name,
                 Image = request.Image,
-                ProducedResourceId = request.ProducedResourceId,
-                ConsumedResourceId = request.ConsumedResourceId,
+                ProducedResourceId = produced.Id,
+                ConsumedResourceId = consumed.Id,
                 UserId = userId
             };
 
@@ -99,21 +115,25 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
             return ResultT<Equipment>.Failure("Database error");
         }
     }
-    
-    public async Task<ResultT<Equipment>> DeleteAsync(int id, string? userId, bool isAdmin)
+
+    public async Task<ResultT<Equipment>> DeleteAsync(string slug, string userId, bool isAdmin)
     {
         try
         {
             var entity = await context.Equipments
                 .Include(e => e.ConsumedResourceEntity)
                 .Include(e => e.ProducedResourceEntity)
-                .FirstOrDefaultAsync(e => e.Id == id);
+                .FirstOrDefaultAsync(e => e.Slug == slug);
 
             if (entity is null)
-                return ResultT<Equipment>.NotFound($"Equipment {id} not found.");
+            {
+                return ResultT<Equipment>.NotFound($"Equipment {slug} not found.");
+            }
 
             if (!isAdmin && entity.UserId != userId)
+            {
                 return ResultT<Equipment>.Forbidden("Access denied.");
+            }
 
             var model = EquipmentMapper.MapEquipment(entity);
             context.Equipments.Remove(entity);
@@ -127,18 +147,18 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
         }
     }
 
-    public async Task<ResultT<Equipment>> FindAsync(int id, string? userId, bool isAdmin)
+    public async Task<ResultT<Equipment>> FindAsync(string slug, string userId, bool isAdmin)
     {
         try
         {
             var entity = await context.Equipments
                 .Include(e => e.ConsumedResourceEntity)
                 .Include(e => e.ProducedResourceEntity)
-                .FirstOrDefaultAsync(e => e.Id == id);
+                .FirstOrDefaultAsync(e => e.Slug == slug);
 
             if (entity is null)
             {
-                return ResultT<Equipment>.NotFound($"Equipment {id} not found.");
+                return ResultT<Equipment>.NotFound($"Equipment {slug} not found.");
             }
 
             if (!isAdmin && !entity.IsPublic && entity.UserId != userId)
@@ -159,21 +179,50 @@ public class EquipmentRepository(BiodomeContext context, ILogger<EquipmentReposi
     {
         try
         {
+            var slug = toUpdate.Name.ToKebabCase();
+            var exist = await context
+                .Equipments
+                .Where(e => e.Slug != toUpdate.PreviousSlug)
+                .AnyAsync(e => e.Slug == slug);
+
+            if (exist)
+            {
+                return ResultT<Equipment>.Conflict("An equipment with this name already exists.");
+            }
+
             var entity = await context.Equipments
                 .Include(e => e.ConsumedResourceEntity)
                 .Include(e => e.ProducedResourceEntity)
-                .FirstOrDefaultAsync(e => e.Id == toUpdate.Id);
+                .FirstOrDefaultAsync(e => e.Slug == toUpdate.PreviousSlug);
 
             if (entity is null)
-                return ResultT<Equipment>.NotFound($"Equipment {toUpdate.Id} not found.");
+            {
+                return ResultT<Equipment>.NotFound($"Equipment {toUpdate.PreviousSlug} not found.");
+            }
 
             if (!isAdmin && entity.UserId != userId)
+            {
                 return ResultT<Equipment>.Forbidden("Access denied.");
+            }
+            
+            var produced = await context
+                .EquipmentResources
+                .FirstOrDefaultAsync(e => e.Slug == toUpdate.ProducedResourceSlug);
 
+            var consumed = await context
+                .EquipmentResources
+                .FirstOrDefaultAsync(e => e.Slug == toUpdate.ConsumedResourceSlug);
+
+            if (produced is null || consumed is null)
+            {
+                return ResultT<Equipment>.NotFound("Equipment not found.");
+            }
+
+            entity.Slug = slug;
             entity.Name = toUpdate.Name;
             entity.Image = toUpdate.Image;
-            entity.ProducedResourceId = toUpdate.ProducedResourceId;
-            entity.ConsumedResourceId = toUpdate.ConsumedResourceId;
+            entity.ProducedResourceId = produced.Id;
+            entity.ConsumedResourceId = consumed.Id;
 
             if (isAdmin)
             {

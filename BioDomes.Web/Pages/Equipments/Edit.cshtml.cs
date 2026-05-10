@@ -15,10 +15,10 @@ namespace BioDomes.Web.Pages.Equipments;
 public class Edit(
     IWebHostEnvironment env,
     IImagePathResolver imageResolver,
-    ILogger<Edit> logger,
     IEquipmentRepository repository)
     : AppPageModel
 {
+    [BindProperty(SupportsGet = true)] public string Slug { get; set; } = null!;
     [BindProperty] public UpdateEquipmentInputModel Input { get; set; } = new();
 
     public SelectList Productions { get; set; } = null!;
@@ -26,12 +26,12 @@ public class Edit(
     public string ImageSource { get; set; } = null!;
     public bool IsAdmin { get; set; }
 
-    public async Task<IActionResult> OnGetAsync(int id)
+    public async Task<IActionResult> OnGetAsync()
     {
         var userId = User.GetUserId();
         if (userId == null) return Forbid();
 
-        var equipmentResult = await repository.FindAsync(id, userId, User.IsAdmin());
+        var equipmentResult = await repository.FindAsync(Slug, userId, User.IsAdmin());
         if (equipmentResult.Failed) return equipmentResult.ToPageResult(this);
 
         var equipment = equipmentResult.Value!;
@@ -44,31 +44,30 @@ public class Edit(
         Input = new UpdateEquipmentInputModel
         {
             Name = equipment.Name,
-            ConsumedResourceId = equipment.Consumed.Id,
-            ProducedResourceId = equipment.Produced.Id,
+            ConsumedResourceSlug = equipment.Consumed.Slug,
+            ProducedResourceSlug = equipment.Produced.Slug,
             Public = equipment.IsPublic
         };
 
         var loaded = await LoadSelectLists();
         if (loaded is not null) return loaded;
 
-        logger.LogInformation("Editing {Id}", id);
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync(int id, string action)
+    public async Task<IActionResult> OnPostAsync(string action)
     {
         var userId = User.GetUserId();
         if (userId == null) return Forbid();
 
-        var equipmentResult = await repository.FindAsync(id, userId, User.IsAdmin());
+        var equipmentResult = await repository.FindAsync(Slug, userId, User.IsAdmin());
         if (equipmentResult.Failed) return equipmentResult.ToPageResult(this);
 
         var equipment = equipmentResult.Value!;
 
         return action switch
         {
-            "delete" => await PerformDelete(id, userId, equipment),
+            "delete" => await PerformDelete(equipment, userId),
             "save" => await PerformUpdate(equipment, userId),
             _ => Page()
         };
@@ -88,10 +87,10 @@ public class Edit(
 
         var request = new UpdateEquipmentRequest
         {
-            Id = equipment.Id,
+            PreviousSlug = Slug,
             Name = Input.Name,
-            ConsumedResourceId = (int)Input.ConsumedResourceId!,
-            ProducedResourceId = (int)Input.ProducedResourceId!,
+            ConsumedResourceSlug = Input.ConsumedResourceSlug,
+            ProducedResourceSlug = Input.ProducedResourceSlug,
             Image = equipment.ImageId
         };
 
@@ -127,9 +126,9 @@ public class Edit(
         return RedirectToPage("/Equipments/Index");
     }
 
-    private async Task<IActionResult> PerformDelete(int id, string userId, Equipment equipment)
+    private async Task<IActionResult> PerformDelete(Equipment equipment, string userId)
     {
-        var deletedResult = await repository.DeleteAsync(id, userId, User.IsAdmin());
+        var deletedResult = await repository.DeleteAsync(Slug, userId, User.IsAdmin());
         if (deletedResult.Failed) return deletedResult.ToPageResult(this);
 
         imageResolver.DeleteImage(equipment.ImageId, env);
@@ -143,8 +142,8 @@ public class Edit(
         var resourcesResult = await repository.GetResourcesAsync();
         if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
 
-        Productions = new SelectList(resourcesResult.Value!, "Id", "Label", Input.ProducedResourceId);
-        Consomations = new SelectList(resourcesResult.Value!, "Id", "Label", Input.ConsumedResourceId);
+        Productions = new SelectList(resourcesResult.Value!, "Slug", "Label", Input.ProducedResourceSlug);
+        Consomations = new SelectList(resourcesResult.Value!, "Slug", "Label", Input.ConsumedResourceSlug);
         return null;
     }
 }

@@ -1,31 +1,17 @@
 namespace BioDomes.Domains.Core;
 
-public class Diet
+public class Diet(string slug, string label)
 {
-    public int Id { get; }
-    public string Label { get; }
-    
-    public static bool operator ==(Diet? a, Diet? b)
-    {
-        if (a is null && b is null) return true;
-        if (a is null || b is null) return false;
-        return a.Id == b.Id && a.Label == b.Label;
-    }
+    public string Slug { get; } = slug;
+    public string Label { get; } = label;
 
-    public static bool operator !=(Diet? a, Diet? b)
-    {
-        return !(a == b);
-    }
+    public static bool operator ==(Diet a, Diet b) => a.Equals(b);
 
-    public Diet(int id, string label)
-    {
-        Id = id;
-        Label = label;
-    }
-    
+    public static bool operator !=(Diet a, Diet b) => !(a == b);
+
     protected bool Equals(Diet other)
     {
-        return Id == other.Id && Label == other.Label;
+        return Label == other.Label;
     }
 
     public override bool Equals(object? obj)
@@ -38,7 +24,6 @@ public class Diet
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Id, Label);
+        return Label.GetHashCode();
     }
-
 }

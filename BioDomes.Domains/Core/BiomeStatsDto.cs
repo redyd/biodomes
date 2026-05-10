@@ -2,8 +2,8 @@
 
 public class BiomeStatsDto
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public required string Slug { get; set; }
+    public required string Name { get; set; } = string.Empty;
     public int SpeciesCount { get; set; }
     public int EquipmentCount { get; set; }
     public double Temperature { get; set; }

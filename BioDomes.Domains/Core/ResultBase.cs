@@ -1,14 +1,8 @@
 namespace BioDomes.Domains.Core;
 
-public abstract class ResultBase
+public abstract class ResultBase(ResultStatus status, string? error = null)
 {
-    public string? Error { get; }
-    public ResultStatus Status { get; }
+    public string? Error { get; } = error;
+    public ResultStatus Status { get; } = status;
     public bool Failed => Status != ResultStatus.Success;
-
-    protected ResultBase(ResultStatus status, string? error = null)
-    {
-        Status = status;
-        Error = error;
-    }
 }
