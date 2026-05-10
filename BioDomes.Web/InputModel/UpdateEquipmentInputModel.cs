@@ -10,11 +10,9 @@ public class UpdateEquipmentInputModel
     public string Name { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "La ressource produite est requise.")]
-    [Range(1, int.MaxValue, ErrorMessage = "La ressource produite doit être un ID valide.")]
     public string ProducedResourceSlug { get; set; } = null!;
 
     [Required(ErrorMessage = "La ressource consommée est requise.")]
-    [Range(1, int.MaxValue, ErrorMessage = "La ressource consommée doit être un ID valide.")]
     public string ConsumedResourceSlug { get; set; } = null!;
 
     public bool Public { get; set; }

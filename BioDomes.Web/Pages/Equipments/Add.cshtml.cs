@@ -66,6 +66,7 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
         {
             ErrorNotification("Un équipement de ce nom existe déjà.");
             
+            imageResolver.DeleteImage(imageId, env);
             var loaded = await LoadSelectLists();
             if (loaded is not null) return loaded;
             
@@ -74,6 +75,7 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
 
         if (result.Failed)
         {
+            imageResolver.DeleteImage(imageId, env);
             return result.ToPageResult(this);
         }
 
@@ -88,8 +90,8 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
         var resourcesResult = await repository.GetResourcesAsync();
         if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
         
-        Productions = new SelectList(resourcesResult.Value!, "Id", "Label", Input.ProducedResourceSlug);
-        Consomations = new SelectList(resourcesResult.Value!, "Id", "Label", Input.ConsumedResourceSlug);
+        Productions = new SelectList(resourcesResult.Value!, "Slug", "Label", Input.ProducedResourceSlug);
+        Consomations = new SelectList(resourcesResult.Value!, "Slug", "Label", Input.ConsumedResourceSlug);
         return null;
     }
 }

@@ -148,7 +148,7 @@ public class SpeciesRepository(BiodomeContext context, ILogger<SpeciesRepository
             entity.ClassificationId = classification.Id;
             entity.DietId = diet.Id;
 
-            if (toUpdate.ImageUrl is not null)
+            if (!string.IsNullOrEmpty(toUpdate.ImageUrl))
             {
                 entity.UploadedImageId = toUpdate.ImageUrl;
             }
