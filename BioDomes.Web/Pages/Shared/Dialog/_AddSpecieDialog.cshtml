@@ -18,7 +18,7 @@
                         @foreach (var specie in species.Value.Select(sp => sp.Involved))
                         {
                             <label class="suggestion-card">
-                                <input type="radio" asp-for="SpecieInput.SpecieId" value="@specie.Model.Id" hidden/>
+                                <input type="radio" asp-for="SpecieInput.SpecieSlug" value="@specie.Model.Slug" hidden/>
                                 <img class="suggestion-card-img"
                                      src="@specie.ImageUrl"
                                      alt="@specie.Model.Name"/>
@@ -27,7 +27,7 @@
                         }
                     </div>
                 }
-                <span asp-validation-for="SpecieInput.SpecieId" class="field-error"></span>
+                <span asp-validation-for="SpecieInput.SpecieSlug" class="field-error"></span>
             </div>
 
             <div class="field-group">

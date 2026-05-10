@@ -8,8 +8,8 @@ public class BiomeMapper
     public static Biome MapSimpleBiome(BiomeEntity entity)
         => new()
         {
+            Slug = entity.Slug,
             CreatedBy = entity.UserId,
-            Id = entity.Id,
             Name = entity.Name,
             Temperature = entity.Temperature,
             Humidity = entity.Humidity,
@@ -21,7 +21,7 @@ public class BiomeMapper
     {
         return new ComplexBiome
         {
-            Id = entity.Id,
+            Slug = entity.Slug,
             Name = entity.Name,
             Temperature = entity.Temperature,
             Humidity = entity.Humidity,

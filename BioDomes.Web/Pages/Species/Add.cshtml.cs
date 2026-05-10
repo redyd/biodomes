@@ -61,8 +61,8 @@ public class AddModel(
                 Image = imageName,
                 Height = Input.Height,
                 Weight = Input.Weight,
-                DietId = (int)Input.DietId!,
-                ClassificationId = (int)Input.ClassificationId!
+                DietSlug = Input.DietSlug,
+                ClassificationSlug = Input.ClassificationSlug
             };
 
             var result = await speciesRepository.AddAsync(specie, userId);
@@ -105,8 +105,8 @@ public class AddModel(
         if (classifications.Failed) return classifications.ToPageResult(this);
         if (diets.Failed) return diets.ToPageResult(this);
 
-        Classifications = new SelectList(classifications.Value!, "Id", "Label", Input.ClassificationId);
-        Diets = new SelectList(diets.Value!, "Id", "Label", Input?.DietId);
+        Classifications = new SelectList(classifications.Value!, "Slug", "Label", Input.ClassificationSlug);
+        Diets = new SelectList(diets.Value!, "Slug", "Label", Input.DietSlug);
 
         return null;
     }

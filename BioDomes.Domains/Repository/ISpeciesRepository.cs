@@ -6,7 +6,7 @@ namespace BioDomes.Domains.Repository;
 public interface ISpeciesRepository
 {
     Task<ResultT<List<Specie>>> FindAllAsync(string? userId, bool isAdmin);
-    Task<ResultT<Dictionary<int, Specie>>> FindAllAsDictAsync(string? userId, bool isAdmin);
+    Task<ResultT<Dictionary<string, Specie>>> FindAllAsDictAsync(string? userId, bool isAdmin);
 
     Task<ResultT<Specie>> FindBySlugAsync(string slug, string? userId, bool isAdmin);
 
@@ -14,5 +14,5 @@ public interface ISpeciesRepository
 
     Task<ResultT<Specie>> AddAsync(CreateSpecieRequest toAdd, string? userId);
 
-    Task<ResultT<Specie>> DeleteAsync(int specieId, string? userId, bool isAdmin);
+    Task<ResultT<Specie>> DeleteAsync(string specieSlug, string? userId, bool isAdmin);
 }

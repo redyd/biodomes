@@ -11,6 +11,8 @@ namespace BioDomes.Infrastructures.Repositories;
 public class FoodChainRepository(BiodomeContext context, ILogger<FoodChainRepository> logger) : IFoodChainRepository
 {
     private readonly IQueryable<SpecieEntity> _query = context.Species
+        .Include(s => s.BiomeSpecies)
+        .ThenInclude(bs => bs.Biome)
         .Include(s => s.DietEntity)
         .Include(s => s.ClassificationEntity)
         .ThenInclude(c => c.EatenByDiets)
@@ -26,20 +28,17 @@ public class FoodChainRepository(BiodomeContext context, ILogger<FoodChainReposi
                 .ToListAsync();
 
             var nodes = allSpecies
-                .Select(s => new FoodChainNode(
-                    specieId: s.Id,
-                    name: s.Name,
-                    diet: SpecieMapper.MapDiet(s.DietEntity),
-                    classification: SpecieMapper.MapClassification(s.ClassificationEntity),
-                    count: s.BiomeSpecies.Count
+                .Select(s => new FoodChainNode(specie: SpecieMapper.MapSpecie(s), count: s.BiomeSpecies.Count
                 ))
                 .ToList();
 
             var visibleIds = allSpecies.Select(s => s.Id).ToHashSet();
 
             var edges = await context.SpecieFoodChains
+                .Include(spc => spc.Predator)
+                .Include(spc => spc.Prey)
                 .Where(r => visibleIds.Contains(r.Predator.Id) && visibleIds.Contains(r.Prey.Id))
-                .Select(r => new FoodChainEdge(r.Predator.Id, r.Prey.Id))
+                .Select(r => new FoodChainEdge(r.Predator.Slug, r.Prey.Slug))
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -52,46 +51,48 @@ public class FoodChainRepository(BiodomeContext context, ILogger<FoodChainReposi
         }
     }
 
-    public async Task<ResultT<FoodChainGraph>> GetFullGraphForBiomeAsync(int biomeId, string? userId, bool isAdmin)
+    public async Task<ResultT<FoodChainGraph>> GetFullGraphForBiomeAsync(string biomeSlug, string? userId, bool isAdmin)
     {
         try
         {
             var biome = await context.Biomes
                 .AsNoTracking()
-                .FirstOrDefaultAsync(b => b.Id == biomeId);
+                .FirstOrDefaultAsync(b => b.Slug == biomeSlug);
 
             if (biome is null)
-                return ResultT<FoodChainGraph>.NotFound($"Biome {biomeId} not found");
+            {
+                return ResultT<FoodChainGraph>.NotFound($"Biome {biomeSlug} not found");
+            }
 
             if (!biome.IsPublic && biome.UserId != userId && !isAdmin)
+            {
                 return ResultT<FoodChainGraph>.Forbidden("Access denied.");
+            }
 
             var allSpecies = await _query
                 .Where(s =>
-                    s.BiomeSpecies.Any(b => b.BiomeId == biomeId) &&
+                    s.BiomeSpecies.Any(b => b.Biome.Slug == biomeSlug) &&
                     (s.IsPublic || s.UserId == userId || isAdmin))
                 .AsNoTracking()
                 .ToListAsync();
 
             var nodes = allSpecies
-                .Select(s => new FoodChainNode(
-                    specieId: s.Id,
-                    name: s.Name,
-                    diet: SpecieMapper.MapDiet(s.DietEntity),
-                    classification: SpecieMapper.MapClassification(s.ClassificationEntity),
-                    count: s.BiomeSpecies.Count(bs => bs.BiomeId == biomeId)
+                .Select(s => new FoodChainNode(SpecieMapper.MapSpecie(s),
+                    s.BiomeSpecies.Count(bs => bs.Biome.Slug == biomeSlug)
                 ))
                 .ToList();
 
             var visibleIds = allSpecies.Select(s => s.Id).ToHashSet();
 
             var edges = await context.SpecieFoodChains
+                .Include(sfc => sfc.Predator)
+                .Include(sfc => sfc.Prey)
                 .Where(r =>
-                    r.Predator.BiomeSpecies.Any(b => b.BiomeId == biomeId) &&
-                    r.Prey.BiomeSpecies.Any(b => b.BiomeId == biomeId) &&
+                    r.Predator.BiomeSpecies.Any(b => b.Biome.Slug == biomeSlug) &&
+                    r.Prey.BiomeSpecies.Any(b => b.Biome.Slug == biomeSlug) &&
                     visibleIds.Contains(r.Predator.Id) &&
                     visibleIds.Contains(r.Prey.Id))
-                .Select(r => new FoodChainEdge(r.Predator.Id, r.Prey.Id))
+                .Select(r => new FoodChainEdge(r.Predator.Slug, r.Prey.Slug))
                 .AsNoTracking()
                 .ToListAsync();
 

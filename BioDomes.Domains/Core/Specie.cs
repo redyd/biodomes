@@ -4,7 +4,6 @@ namespace BioDomes.Domains.Core;
 
 public class Specie
 {
-    public required int Id { get; init; }
     public string Slug => Name.ToKebabCase();
     public required string Name { get; set; }
     public required int Height { get; set; }

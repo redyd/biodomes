@@ -1,4 +1,4 @@
-@page "/biomes/{id:int}"
+@page "/biomes/{slug:kebab}"
 @using System.Text.Json
 @using BioDomes.Web.Extensions
 @model Detail
@@ -21,7 +21,7 @@
                 <p>Créé par "@Model.Creator"</p>
                 @if (Model.Biome.CanEdit)
                 {
-                    <a class="btn-save" asp-page="/Biomes/Edit" asp-route-id="@Model.Biome.Model.Id">Modifier les
+                    <a class="btn-save" asp-page="/Biomes/Edit" asp-route-slug="@Model.Biome.Model.Slug">Modifier les
                         informations</a>
                 }
             </div>

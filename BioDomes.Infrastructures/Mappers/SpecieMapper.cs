@@ -8,9 +8,8 @@ public static class SpecieMapper
     public static Specie MapSpecie(SpecieEntity specie)
         => new()
         {
-            Id = specie.Id,
-            CreatedBy = specie.UserId,
             Name = specie.Name,
+            CreatedBy = specie.UserId,
             Classification = MapClassification(specie.ClassificationEntity),
             Diet = MapDiet(specie.DietEntity),
             Height = specie.Height,
@@ -20,8 +19,7 @@ public static class SpecieMapper
         };
 
     public static Classification MapClassification(SpecieClassification classification)
-        => new(classification.Id, classification.Label, classification.EatenByDiets.Select(MapDiet).ToList(),
-            classification.RequireFood);
+        => new(classification.Label, classification.EatenByDiets.Select(MapDiet).ToList(), classification.RequireFood);
 
-    public static Diet MapDiet(SpecieDiet diet) => new(diet.Id, diet.Label);
+    public static Diet MapDiet(SpecieDiet diet) => new(diet.Label);
 }

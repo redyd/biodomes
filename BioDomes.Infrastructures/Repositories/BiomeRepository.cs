@@ -1,4 +1,5 @@
 ﻿using BioDomes.Domains.Core;
+using BioDomes.Domains.Extensions;
 using BioDomes.Domains.Repository;
 using BioDomes.Domains.Requests;
 using BioDomes.Infrastructures.Errors;
@@ -29,31 +30,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         .ThenInclude(ee => ee.Equipment)
         .ThenInclude(e => e.ConsumedResourceEntity)
         .Include(b => b.BiomeEquipments);
-
-    public async Task<ResultT<List<Biome>>> GetAllAsync(string? userId, bool isAdmin)
-    {
-        try
-        {
-            var query = context.Biomes
-                .AsQueryable();
-
-            if (!isAdmin)
-            {
-                query = query.Where(b =>
-                    b.IsPublic
-                    || (userId != null && b.UserId == userId));
-            }
-
-            var result = await query.ToListAsync();
-            return ResultT<List<Biome>>.Ok(result.Select(BiomeMapper.MapSimpleBiome).ToList());
-        }
-        catch (DbUpdateException e)
-        {
-            logger.LogError("Database error: {ExMessage}", e.Message);
-            return ResultT<List<Biome>>.Failure($"Database error: {e.Message}");
-        }
-    }
-
+    
     public async Task<ResultT<List<ComplexBiome>>> GetAllComplexAsync(string? userId, bool isAdmin)
     {
         try
@@ -78,12 +55,14 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         }
     }
 
-    public async Task<ResultT<string>> GetCreatorAsync(int biomeId)
+    public async Task<ResultT<string>> GetCreatorAsync(string slug)
     {
         try
         {
-            var biome = await context.Biomes.Include(b => b.User)
-                .FirstOrDefaultAsync(b => b.Id == biomeId);
+            var biome = await context
+                .Biomes
+                .Include(b => b.User)
+                .FirstOrDefaultAsync(b => b.Slug == slug);
 
             return biome?.User.UserName is null
                 ? ResultT<string>.NotFound("Biome not found")
@@ -96,16 +75,17 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         }
     }
 
-    public async Task<ResultT<Biome>> FindAsync(int id, string? userId, bool isAdmin)
+    public async Task<ResultT<Biome>> FindAsync(string slug, string? userId, bool isAdmin)
     {
         try
         {
-            var entity = await context.Biomes
-                .FirstOrDefaultAsync(b => b.Id == id);
+            var entity = await context
+                .Biomes
+                .FirstOrDefaultAsync(b => b.Slug == slug);
 
             if (entity is null)
             {
-                return ResultT<Biome>.NotFound($"Biome {id} not found");
+                return ResultT<Biome>.NotFound($"Biome {slug} not found");
             }
 
             if (entity.IsPublic || entity.UserId == userId || isAdmin)
@@ -122,16 +102,16 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         }
     }
 
-    public async Task<ResultT<ComplexBiome>> FindComplexAsync(int id, string? userId, bool isAdmin)
+    public async Task<ResultT<ComplexBiome>> FindComplexAsync(string slug, string? userId, bool isAdmin)
     {
         try
         {
             var entity = await _complexQuery
-                .FirstOrDefaultAsync(b => b.Id == id);
+                .FirstOrDefaultAsync(b => b.Slug == slug);
 
             if (entity is null)
             {
-                return ResultT<ComplexBiome>.NotFound($"Biome {id} not found");
+                return ResultT<ComplexBiome>.NotFound($"Biome {slug} not found");
             }
 
             if (entity.IsPublic || entity.UserId == userId || isAdmin)
@@ -152,7 +132,8 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
     {
         try
         {
-            var exist = await context.Biomes.AnyAsync(b => b.Name.ToLower() == createRequest.Name.ToLower());
+            var slug = createRequest.Name.ToKebabCase();
+            var exist = await context.Biomes.AnyAsync(b => b.Slug == slug);
 
             if (exist)
             {
@@ -161,6 +142,7 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
 
             var entity = new BiomeEntity
             {
+                Slug = slug,
                 Name = createRequest.Name,
                 Temperature = createRequest.Temperature,
                 Humidity = createRequest.Humidity,
@@ -195,36 +177,45 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
     {
         try
         {
-            var exist = await context.Biomes
-                .Where(b => b.Id != toUpdate.Id)
-                .AnyAsync(b => b.Name.ToLower() == toUpdate.Name.ToLower());
+            var slug = toUpdate.Name.ToKebabCase();
+            var exist = await context
+                .Biomes
+                .Where(b => b.Slug != toUpdate.PreviousSlug)
+                .AnyAsync(b => b.Slug == slug);
 
             if (exist)
             {
                 return ResultT<Biome>.Conflict("A biome with this name already exist.");
             }
             
-            var entity = await context.Biomes
-                .FirstOrDefaultAsync(b => b.Id == toUpdate.Id);
+            var entity = await context
+                .Biomes
+                .FirstOrDefaultAsync(b => b.Slug == slug);
 
             if (entity is null)
+            {
                 return ResultT<Biome>.NotFound("Biome not found");
-
+            }
 
             if (!isAdmin && !entity.IsPublic && entity.UserId != userId)
             {
                 return ResultT<Biome>.Forbidden("Access denied.");
             }
 
+            entity.Slug = slug;
             entity.Name = toUpdate.Name;
             entity.Temperature = toUpdate.Temperature;
             entity.Humidity = toUpdate.Humidity;
 
             if (toUpdate.ImageUrl is not null)
+            {
                 entity.ImageUrl = toUpdate.ImageUrl;
+            }
 
             if (isAdmin && toUpdate.IsPublic.HasValue)
+            {
                 entity.IsPublic = toUpdate.IsPublic.Value;
+            }
 
             await context.SaveChangesAsync();
             return ResultT<Biome>.Ok(BiomeMapper.MapSimpleBiome(entity));
@@ -244,18 +235,23 @@ public class BiomeRepository(BiodomeContext context, ILogger<IBiomeRepository> l
         }
     }
 
-    public async Task<ResultT<Biome>> DeleteAsync(int id, string userId, bool isAdmin)
+    public async Task<ResultT<Biome>> DeleteAsync(string slug, string userId, bool isAdmin)
     {
         try
         {
-            var entity = await context.Biomes
-                .FirstOrDefaultAsync(b => b.Id == id);
+            var entity = await context
+                .Biomes
+                .FirstOrDefaultAsync(b => b.Slug == slug);
 
             if (entity is null)
-                return ResultT<Biome>.NotFound($"Biome {id} not found.");
+            {
+                return ResultT<Biome>.NotFound($"Biome {slug} not found.");
+            }
 
             if (!isAdmin && entity.UserId != userId)
+            {
                 return ResultT<Biome>.Forbidden("Access denied.");
+            }
 
             var model = BiomeMapper.MapSimpleBiome(entity);
             context.Biomes.Remove(entity);

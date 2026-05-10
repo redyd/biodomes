@@ -1,7 +1,7 @@
 @using BioDomes.Web.Extensions
 @model BioDomes.Web.ViewModels.BiomeView<BioDomes.Domains.Core.ComplexBiome>
 
-<div class="biome-row-wrap" data-id="@Model.Model.Id">
+<div class="biome-row-wrap" data-slug="@Model.Model.Slug">
     <div class="biome-row">
         <div class="biome-row-image">
             @if (!string.IsNullOrEmpty(Model.ImageUrl))
@@ -15,7 +15,7 @@
             <span class="biome-state biome-state-badge biome-state-@Model.Model.State.GetDisplayName().ToLower()">@Model.Model.State</span>
         </div>
 
-        <a class="biome-row-body" asp-page="/Biomes/Detail" asp-route-id="@Model.Model.Id">
+        <a class="biome-row-body" asp-page="/Biomes/Detail" asp-route-slug="@Model.Model.Slug">
             <div class="biome-row-header">
                 <h2 class="biome-row-name">@Model.Model.Name</h2>
                 @if (Model.IsPublic)
@@ -37,7 +37,7 @@
 
         @if (Model.CanEdit)
         {
-            <a class="biome-row-actions biome-row-edit" asp-page="/Biomes/Edit" asp-route-id="@Model.Model.Id">Modifier →</a>
+            <a class="biome-row-actions biome-row-edit" asp-page="/Biomes/Edit" asp-route-slug="@Model.Model.Slug">Modifier →</a>
         }
     </div>
 </div>

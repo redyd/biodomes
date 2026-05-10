@@ -25,21 +25,21 @@
             }
         </div>
         <ul class="list-unstyled d-flex flex-column gap-2">
-            @foreach (var specie in Model.Analyze.Graph.Nodes)
+            @foreach (var chainNode in Model.Analyze.Graph.Nodes)
             {
                 <li class="li-info-card">
                     <div class="d-flex flex-column">
-                        <span>@specie.Name (@specie.Count)</span>
-                        <span class="li-card-meta">@specie.Classification.Label</span>
+                        <span>@chainNode.Specie.Name (@chainNode.Count)</span>
+                        <span class="li-card-meta">@chainNode.Specie.Classification.Label</span>
                     </div>
                     @if (Model.Biome.CanEdit)
                     {
                         <button
                             class="btn-action btn-remove"
-                            title="Supprimer des @specie.Name"
-                            data-specie-id="@specie.SpecieId"
-                            data-specie-name="@specie.Name"
-                            data-specie-count="@specie.Count"
+                            title="Supprimer des @chainNode.Specie.Name"
+                            data-specie-id="@chainNode.Specie"
+                            data-specie-name="@chainNode.Specie.Name"
+                            data-specie-count="@chainNode.Count"
                             onclick="openRemoveSpecieDialog(this)">
                             ×
                         </button>

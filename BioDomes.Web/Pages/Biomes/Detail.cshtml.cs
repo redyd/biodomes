@@ -23,6 +23,8 @@ public class Detail(
     ISpecieViewMapper specieMapper)
     : AppPageModel
 {
+    [BindProperty(SupportsGet = true)] public string Slug { get; set; } = null!;
+
     // BASICS
     public BiomeView<ComplexBiome> Biome { get; set; } = null!;
     public BiomeAnalysis Analyze { get; set; } = null!;
@@ -37,9 +39,9 @@ public class Detail(
     public bool ReopenAddSpecieDialog { get; set; }
     public bool ReopenAddEquipmentDialog { get; set; }
 
-    public async Task<IActionResult> OnGetAsync(int id)
+    public async Task<IActionResult> OnGetAsync()
     {
-        var loadResult = await LoadPageDataAsync(id);
+        var loadResult = await LoadPageDataAsync();
         if (loadResult is not null) return loadResult;
 
         SpecieInput = new BiomeSpecieInputModel();
@@ -49,22 +51,24 @@ public class Detail(
     }
 
     // POST EQUIPMENTS
-    public async Task<IActionResult> OnPostAddEquipmentAsync(int id)
+    public async Task<IActionResult> OnPostAddEquipmentAsync()
     {
         ModelState.Clear();
         if (!TryValidateModel(EquipmentInput, nameof(EquipmentInput)))
         {
-            var loadResult = await LoadPageDataAsync(id);
+            var loadResult = await LoadPageDataAsync();
             ReopenAddEquipmentDialog = true;
             if (loadResult != null) return loadResult;
             return Page();
         }
 
-        var result = await managementRepo.AddEquipmentToBiome(new EquipmentToBiomeRequest
+        var request = new EquipmentToBiomeRequest
         {
-            EquipmentId = (int)EquipmentInput.EquipmentId!,
+            EquipmentSlug = EquipmentInput.EquipmentSlug,
             Count = (int)EquipmentInput.Count!
-        }, id, User.GetUserId(), User.IsAdmin());
+        };
+
+        var result = await managementRepo.AddEquipmentToBiome(request, Slug, User.GetUserId(), User.IsAdmin());
 
         if (result.Failed)
         {
@@ -73,24 +77,27 @@ public class Detail(
 
         ReopenAddEquipmentDialog = false;
         SuccessNotification("Equipement ajouté avec succès");
-        return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { id }, fragment: "title-section");
+
+        return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { Slug }, fragment: "title-section");
     }
 
-    public async Task<IActionResult> OnPostRemoveEquipmentAsync(int id)
+    public async Task<IActionResult> OnPostRemoveEquipmentAsync()
     {
         ModelState.Clear();
         if (!TryValidateModel(EquipmentInput, nameof(EquipmentInput)))
         {
-            var loadResult = await LoadPageDataAsync(id);
+            var loadResult = await LoadPageDataAsync();
             if (loadResult != null) return loadResult;
             return Page();
         }
 
-        var result = await managementRepo.RemoveEquipmentToBiome(new EquipmentToBiomeRequest
+        var request = new EquipmentToBiomeRequest
         {
-            EquipmentId = (int)EquipmentInput.EquipmentId!,
+            EquipmentSlug = EquipmentInput.EquipmentSlug,
             Count = (int)EquipmentInput.Count!
-        }, id, User.GetUserId(), User.IsAdmin());
+        };
+
+        var result = await managementRepo.RemoveEquipmentToBiome(request, Slug, User.GetUserId(), User.IsAdmin());
 
         if (result.Failed)
         {
@@ -98,27 +105,28 @@ public class Detail(
         }
 
         SuccessNotification("Equipement retirée avec succès");
-        return RedirectToPage(pageName: null, pageHandler: null,
-            routeValues: new { id }, fragment: "title-section");
+        return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { Slug }, fragment: "title-section");
     }
 
     // POST SPECIES
-    public async Task<IActionResult> OnPostAddSpecieAsync(int id)
+    public async Task<IActionResult> OnPostAddSpecieAsync()
     {
         ModelState.Clear();
         if (!TryValidateModel(SpecieInput, nameof(SpecieInput)))
         {
-            var loadResult = await LoadPageDataAsync(id);
+            var loadResult = await LoadPageDataAsync();
             ReopenAddSpecieDialog = true;
             if (loadResult != null) return loadResult;
             return Page();
         }
 
-        var result = await managementRepo.AddSpecieToBiome(new SpecieToBiomeRequest
+        var request = new SpecieToBiomeRequest
         {
-            SpecieId = (int)SpecieInput.SpecieId!,
+            SpecieSlug = SpecieInput.SpecieSlug,
             Count = (int)SpecieInput.Count!
-        }, id, User.GetUserId(), User.IsAdmin());
+        };
+        
+        var result = await managementRepo.AddSpecieToBiome(request, Slug, User.GetUserId(), User.IsAdmin());
 
         if (result.Failed)
         {
@@ -127,24 +135,26 @@ public class Detail(
 
         ReopenAddSpecieDialog = false;
         SuccessNotification("Espèce ajoutée avec succès");
-        return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { id }, fragment: "title-section");
+        return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { Slug }, fragment: "title-section");
     }
 
-    public async Task<IActionResult> OnPostRemoveSpecieAsync(int id)
+    public async Task<IActionResult> OnPostRemoveSpecieAsync()
     {
         ModelState.Clear();
         if (!TryValidateModel(SpecieInput, nameof(SpecieInput)))
         {
-            var loadResult = await LoadPageDataAsync(id);
+            var loadResult = await LoadPageDataAsync();
             if (loadResult != null) return loadResult;
             return Page();
         }
 
-        var result = await managementRepo.RemoveSpecieToBiome(new SpecieToBiomeRequest
+        var request = new SpecieToBiomeRequest
         {
-            SpecieId = (int)SpecieInput.SpecieId!,
+            SpecieSlug = SpecieInput.SpecieSlug,
             Count = (int)SpecieInput.Count!
-        }, id, User.GetUserId(), User.IsAdmin());
+        };
+        
+        var result = await managementRepo.RemoveSpecieToBiome(request, Slug, User.GetUserId(), User.IsAdmin());
 
         if (result.Failed)
         {
@@ -152,8 +162,7 @@ public class Detail(
         }
 
         SuccessNotification("Espèce retirée avec succès");
-        return RedirectToPage(pageName: null, pageHandler: null,
-            routeValues: new { id }, fragment: "title-section");
+        return RedirectToPage(pageName: null, pageHandler: null, routeValues: new { Slug }, fragment: "title-section");
     }
 
     // ACTIONS
@@ -173,26 +182,33 @@ public class Detail(
     }
 
     // HELPER 
-    private async Task<IActionResult?> LoadPageDataAsync(int id)
+    private async Task<IActionResult?> LoadPageDataAsync()
     {
         var userId = User.GetUserId();
 
-        var biomeResult = await biomeRepo.FindComplexAsync(id, userId, User.IsAdmin());
+        var biomeResult = await biomeRepo.FindComplexAsync(Slug, userId, User.IsAdmin());
         if (biomeResult.Failed) return biomeResult.ToPageResult(this);
 
-        var creatorResult = await biomeRepo.GetCreatorAsync(biomeResult.Value!.Id);
+        var creatorResult = await biomeRepo.GetCreatorAsync(biomeResult.Value!.Slug);
         if (creatorResult.Failed) return creatorResult.ToPageResult(this);
 
         var equipmentsResults = await equipmentRepo.GetAllAsync(User.GetUserId(), User.IsAdmin());
         if (equipmentsResults.Failed) return equipmentsResults.ToPageResult(this);
+
+        var analyze = await analyzer.AnalyzeBiome(Slug, userId, User.IsAdmin());
+
+        if (analyze is null)
+        {
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
         
-        Analyze = await analyzer.AnalyzeBiome(userId, User.IsAdmin(), id);
+        Analyze = analyze;
         Creator = creatorResult.Value!;
-        
-        var species = await analyzer.RecommendationToAddForBiome(userId, User.IsAdmin(), id, Analyze.Graph);
-        
+
+        var species = await analyzer.RecommendationToAddForBiome(Slug, userId, User.IsAdmin(), Analyze.Graph);
+
         Biome = biomeMapper.MapSingle(
-            biomeResult.Value,
+            biomeResult.Value!,
             User.IsAdmin(),
             userId,
             image => imageResolver.UseImageWithDefault(image, "biome_bg.png"));
@@ -216,8 +232,8 @@ public class Detail(
                     Type = sp.Type,
                     Involved = specieMapper.MapSingle(
                         sp.Involved,
-                        User.IsAdmin(), 
-                        userId, 
+                        User.IsAdmin(),
+                        userId,
                         image => imageResolver.UseImageWithDefault(image, "specie.png"))
                 }).ToList());
 

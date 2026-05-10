@@ -1,13 +1,7 @@
 namespace BioDomes.Domains.Core;
 
-public class FoodChainEdge
+public class FoodChainEdge(string predatorSlug, string preySlug)
 {
-    public int PredatorId { get; init; }
-    public int PreyId { get; init; }
-
-    public FoodChainEdge(int predatorId, int preyId)
-    {
-        PredatorId = predatorId;
-        PreyId = preyId;
-    }
+    public string PredatorSlug { get; } = predatorSlug;
+    public string PreySlug { get; } = preySlug;
 }

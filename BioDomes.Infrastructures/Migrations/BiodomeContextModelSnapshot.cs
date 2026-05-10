@@ -45,6 +45,10 @@ namespace BioDomes.Infrastructures.Migrations
                         .HasMaxLength(75)
                         .HasColumnType("nvarchar(75)");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<double>("Temperature")
                         .HasColumnType("float");
 
@@ -53,6 +57,9 @@ namespace BioDomes.Infrastructures.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -65,6 +72,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Humidity = 16.0,
                             IsPublic = true,
                             Name = "Biotest Ultimate",
+                            Slug = "biotest-ultimate",
                             Temperature = 25.0,
                             UserId = "user-1"
                         });
@@ -396,6 +404,10 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<int>("ProducedResourceId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -408,6 +420,9 @@ namespace BioDomes.Infrastructures.Migrations
                         .IsUnique();
 
                     b.HasIndex("ProducedResourceId");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -422,6 +437,7 @@ namespace BioDomes.Infrastructures.Migrations
                             IsPublic = false,
                             Name = "Générateur de lumière artificielle",
                             ProducedResourceId = 1,
+                            Slug = "generateur-de-lumiere-artificielle",
                             UserId = "user-1"
                         },
                         new
@@ -432,6 +448,7 @@ namespace BioDomes.Infrastructures.Migrations
                             IsPublic = true,
                             Name = "Condenseur atmosphérique",
                             ProducedResourceId = 2,
+                            Slug = "condenseur-atmospherique",
                             UserId = "user-1"
                         },
                         new
@@ -442,6 +459,7 @@ namespace BioDomes.Infrastructures.Migrations
                             IsPublic = false,
                             Name = "Extracteur de CO2",
                             ProducedResourceId = 6,
+                            Slug = "extracteur-de-co2",
                             UserId = "user-1"
                         },
                         new
@@ -452,6 +470,7 @@ namespace BioDomes.Infrastructures.Migrations
                             IsPublic = true,
                             Name = "Module de photosynthèse",
                             ProducedResourceId = 5,
+                            Slug = "module-de-photosynthese",
                             UserId = "user-1"
                         },
                         new
@@ -462,6 +481,7 @@ namespace BioDomes.Infrastructures.Migrations
                             IsPublic = false,
                             Name = "Synthétiseur d'engrais",
                             ProducedResourceId = 7,
+                            Slug = "synthetiseur-d-engrais",
                             UserId = "user-2"
                         },
                         new
@@ -472,6 +492,7 @@ namespace BioDomes.Infrastructures.Migrations
                             IsPublic = true,
                             Name = "Recycleur de biomasse",
                             ProducedResourceId = 3,
+                            Slug = "recycleur-de-biomasse",
                             UserId = "user-2"
                         },
                         new
@@ -482,6 +503,7 @@ namespace BioDomes.Infrastructures.Migrations
                             IsPublic = false,
                             Name = "Filtre minéral",
                             ProducedResourceId = 9,
+                            Slug = "filtre-mineral",
                             UserId = "user-2"
                         },
                         new
@@ -492,6 +514,7 @@ namespace BioDomes.Infrastructures.Migrations
                             IsPublic = true,
                             Name = "Extracteur d'électrolytes",
                             ProducedResourceId = 10,
+                            Slug = "extracteur-d-electrolytes",
                             UserId = "user-2"
                         });
                 });
@@ -592,7 +615,14 @@ namespace BioDomes.Infrastructures.Migrations
                     b.Property<bool>("RequireFood")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
 
                     b.ToTable("specie_classifications", "dbo");
 
@@ -601,121 +631,141 @@ namespace BioDomes.Infrastructures.Migrations
                         {
                             Id = 1,
                             Label = "Mammifère",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "mammifere"
                         },
                         new
                         {
                             Id = 2,
                             Label = "Oiseau",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "oiseau"
                         },
                         new
                         {
                             Id = 3,
                             Label = "Poisson",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "poisson"
                         },
                         new
                         {
                             Id = 4,
                             Label = "Reptile",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "reptile"
                         },
                         new
                         {
                             Id = 5,
                             Label = "Amphibien",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "amphibien"
                         },
                         new
                         {
                             Id = 6,
                             Label = "Crustacé",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "crustace"
                         },
                         new
                         {
                             Id = 7,
                             Label = "Arachnides",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "arachnides"
                         },
                         new
                         {
                             Id = 8,
                             Label = "Insecte",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "insecte"
                         },
                         new
                         {
                             Id = 9,
                             Label = "Myriapode",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "myriapode"
                         },
                         new
                         {
                             Id = 10,
                             Label = "Mollusque",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "mollusque"
                         },
                         new
                         {
                             Id = 11,
                             Label = "Echinoderme",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "echinoderme"
                         },
                         new
                         {
                             Id = 12,
                             Label = "Anélide",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "anelide"
                         },
                         new
                         {
                             Id = 13,
                             Label = "Cnidaire",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "cnidaire"
                         },
                         new
                         {
                             Id = 14,
                             Label = "Plathelminthe",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "plathelminthe"
                         },
                         new
                         {
                             Id = 15,
                             Label = "Porifère",
-                            RequireFood = true
+                            RequireFood = true,
+                            Slug = "porifere"
                         },
                         new
                         {
                             Id = 16,
                             Label = "Plante",
-                            RequireFood = false
+                            RequireFood = false,
+                            Slug = "plante"
                         },
                         new
                         {
                             Id = 17,
                             Label = "Mousse",
-                            RequireFood = false
+                            RequireFood = false,
+                            Slug = "mousse"
                         },
                         new
                         {
                             Id = 18,
                             Label = "Algue",
-                            RequireFood = false
+                            RequireFood = false,
+                            Slug = "algue"
                         },
                         new
                         {
                             Id = 19,
                             Label = "Lichen",
-                            RequireFood = false
+                            RequireFood = false,
+                            Slug = "lichen"
                         },
                         new
                         {
                             Id = 20,
                             Label = "Champignon",
-                            RequireFood = false
+                            RequireFood = false,
+                            Slug = "champignon"
                         });
                 });
 
@@ -732,7 +782,14 @@ namespace BioDomes.Infrastructures.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
 
                     b.ToTable("specie_diets", "dbo");
 
@@ -740,42 +797,50 @@ namespace BioDomes.Infrastructures.Migrations
                         new
                         {
                             Id = 1,
-                            Label = "Carnivore"
+                            Label = "Carnivore",
+                            Slug = "carnivore"
                         },
                         new
                         {
                             Id = 2,
-                            Label = "Herbivore"
+                            Label = "Herbivore",
+                            Slug = "herbivore"
                         },
                         new
                         {
                             Id = 3,
-                            Label = "Omnivore"
+                            Label = "Omnivore",
+                            Slug = "omnivore"
                         },
                         new
                         {
                             Id = 4,
-                            Label = "Coprophages"
+                            Label = "Coprophages",
+                            Slug = "coprophages"
                         },
                         new
                         {
                             Id = 5,
-                            Label = "Limivores"
+                            Label = "Limivores",
+                            Slug = "limivores"
                         },
                         new
                         {
                             Id = 6,
-                            Label = "Détritivores"
+                            Label = "Détritivores",
+                            Slug = "detritivores"
                         },
                         new
                         {
                             Id = 7,
-                            Label = "Autotrophie (Photosynthèse)"
+                            Label = "Autotrophie (Photosynthèse)",
+                            Slug = "autotrophie-photosynthese"
                         },
                         new
                         {
                             Id = 8,
-                            Label = "Hétérotrophie"
+                            Label = "Hétérotrophie",
+                            Slug = "heterotrophie"
                         });
                 });
 
@@ -1130,7 +1195,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-1",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1990, 1, 1),
-                            ConcurrencyStamp = "a20eb2db-a843-4670-86fe-91c51d6cd08f",
+                            ConcurrencyStamp = "8c409f09-5e3c-47d9-9066-d2158e72aa05",
                             Email = "admin@biodomes.com",
                             EmailConfirmed = true,
                             ImageUrl = "1637ca51-6139-4ec4-aa5a-3e824212b0e3.jpg",
@@ -1139,7 +1204,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "ADMIN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Saint Paul",
-                            SecurityStamp = "c9d510c5-3e82-4d70-bc69-b310f6fc10d9",
+                            SecurityStamp = "e0466feb-a308-4b78-be46-2d75db6202d5",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -1148,7 +1213,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-2",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "5e43f8ef-4abd-4e50-be4e-d4cab90c4724",
+                            ConcurrencyStamp = "8a700a51-9772-4931-a4e1-701021463768",
                             Email = "john@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -1156,7 +1221,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "JOHN",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "797a92f8-cf25-4f4e-bbbd-892e073f6daf",
+                            SecurityStamp = "7d9b6530-79f9-4bd1-b248-4f84529d4963",
                             TwoFactorEnabled = false,
                             UserName = "john"
                         },
@@ -1165,7 +1230,7 @@ namespace BioDomes.Infrastructures.Migrations
                             Id = "user-3",
                             AccessFailedCount = 0,
                             Birthdate = new DateOnly(1995, 6, 15),
-                            ConcurrencyStamp = "37cdf7c8-d666-4186-bc5a-17ae022e7f79",
+                            ConcurrencyStamp = "a8e6abc7-eb59-4450-a29a-2fd43dbeac06",
                             Email = "bob@biodomes.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -1173,7 +1238,7 @@ namespace BioDomes.Infrastructures.Migrations
                             NormalizedUserName = "BOB",
                             PhoneNumberConfirmed = false,
                             SearchOrganism = "Marie Thérèse",
-                            SecurityStamp = "0b0cb2d4-b0b5-4c43-b070-b8ede3ec81cc",
+                            SecurityStamp = "18322c0c-17f9-4725-96d0-582263bb78a1",
                             TwoFactorEnabled = false,
                             UserName = "bob"
                         });

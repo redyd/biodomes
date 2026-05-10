@@ -37,7 +37,7 @@ public class BiomePage(
 
         var items = BiomesStats.Keys.Select(b => new
         {
-            id = b.Model.Id,
+            slug = b.Model.Slug,
             name = b.Model.Name,
             temperature = b.Model.Temperature,
             humidity = b.Model.Humidity,
@@ -45,7 +45,7 @@ public class BiomePage(
             state = b.Model.State.ToString(),
             species = b.Model.Species.Select(s => s.Model.Name).ToList(),
             equipments = b.Model.Equipments.Select(e => e.Model.Name).ToList(),
-            allSpeciesFed = BiomesStats.FirstOrDefault(kvp => kvp.Key.Model.Id == b.Model.Id).Value?.AllSpeciesFed ?? false,
+            allSpeciesFed = BiomesStats.FirstOrDefault(kvp => kvp.Key.Model == b.Model).Value?.AllSpeciesFed ?? false,
         }).ToList();
         
         BiomesJson = JsonSerializer.Serialize(items);

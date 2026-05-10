@@ -103,7 +103,7 @@
                             <div class="d-inline-flex">
                                 <form method="post" asp-page-handler="ExecuteAction">
                                     <input type="hidden" name="actionId" value="@rec.ActionId"/>
-                                    <input type="hidden" name="biomeId" value="@Model.Biome.Model.Id"/>
+                                    <input type="hidden" name="biomeSlug" value="@Model.Biome.Model.Slug"/>
                                     <button type="submit" class="btn-action btn-add p-1">✓</button>
                                 </form>
 

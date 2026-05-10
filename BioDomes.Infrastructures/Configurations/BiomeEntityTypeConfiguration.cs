@@ -11,6 +11,9 @@ public class BiomeEntityTypeConfiguration : IEntityTypeConfiguration<BiomeEntity
         builder.ToTable("biomes");
         
         builder.HasKey(e => e.Id);
+
+        builder.Property(e => e.Slug)
+            .IsRequired();
         
         builder.Property(e => e.Name)
             .IsRequired()
@@ -21,12 +24,16 @@ public class BiomeEntityTypeConfiguration : IEntityTypeConfiguration<BiomeEntity
         
         builder.Property(e => e.Temperature)
             .IsRequired();
+        
+        builder.HasIndex(e => e.Slug)
+            .IsUnique();
 
         builder.HasData(new BiomeEntity
         {
             Id = 1,
             UserId = "user-1",
             Name = "Biotest Ultimate",
+            Slug = "biotest-ultimate",
             IsPublic = true,
             Humidity = 16,
             Temperature = 25,

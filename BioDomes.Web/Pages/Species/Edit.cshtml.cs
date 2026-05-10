@@ -18,6 +18,7 @@ public class EditModel(
     IImagePathResolver imageResolver,
     IWebHostEnvironment env) : AppPageModel
 {
+    [BindProperty(SupportsGet = true)] public string Slug { get; set; } = null!;
     [BindProperty] public SpeciesInputModel Input { get; set; } = new();
 
     public Specie Specie { get; set; } = null!;
@@ -27,7 +28,7 @@ public class EditModel(
     public SelectList Classifications { get; set; } = null!;
     public SelectList Diets { get; set; } = null!;
 
-    public async Task<IActionResult> OnGetAsync(string slug)
+    public async Task<IActionResult> OnGetAsync()
     {
         var userId = User.GetUserId();
         if (userId == null)
@@ -35,7 +36,7 @@ public class EditModel(
             return Forbid();
         }
 
-        var result = await repository.FindBySlugAsync(slug, userId, User.IsAdmin());
+        var result = await repository.FindBySlugAsync(Slug, userId, User.IsAdmin());
         if (result.Failed)
         {
             return result.ToPageResult(this);
@@ -55,8 +56,8 @@ public class EditModel(
         Input = new SpeciesInputModel
         {
             Name = specie.Name,
-            ClassificationId = specie.Classification.Id,
-            DietId = specie.Diet.Id,
+            ClassificationSlug = specie.Classification.Label,
+            DietSlug = specie.Diet.Label,
             Height = specie.Height,
             Weight = specie.Weight,
             Public = specie.IsPublic
@@ -68,7 +69,7 @@ public class EditModel(
         return Page();
     }
 
-    public async Task<IActionResult> OnPost(string slug, string action)
+    public async Task<IActionResult> OnPost(string action)
     {
         var userId = User.GetUserId();
         if (userId == null)
@@ -76,7 +77,7 @@ public class EditModel(
             return Forbid();
         }
 
-        var result = await repository.FindBySlugAsync(slug, userId, User.IsAdmin());
+        var result = await repository.FindBySlugAsync(Slug, userId, User.IsAdmin());
         if (result.Failed)
         {
             return result.ToPageResult(this);
@@ -95,7 +96,7 @@ public class EditModel(
 
     private async Task<IActionResult> PerformDelete(string userId, Specie specie)
     {
-        await repository.DeleteAsync(specie.Id, userId, User.IsAdmin());
+        await repository.DeleteAsync(specie.Slug, userId, User.IsAdmin());
 
         if (!string.IsNullOrEmpty(specie.ImageUrl))
         {
@@ -119,10 +120,10 @@ public class EditModel(
 
         var updatedSpecie = new UpdateSpecieRequest
         {
-            Id = specie.Id,
+            PreviousSlug = Slug,
             Name = Input.Name,
-            ClassificationId = (int)Input.ClassificationId!,
-            DietId = (int)Input.DietId!,
+            ClassificationSlug = Input.ClassificationSlug,
+            DietSlug = Input.DietSlug,
             Height = Input.Height,
             Weight = Input.Weight
         };
@@ -174,8 +175,8 @@ public class EditModel(
         var dietsResult = await attributesRepository.GetDiets();
         if (dietsResult.Failed) return dietsResult.ToPageResult(this);
 
-        Classifications = new SelectList(classificationsResult.Value!, "Id", "Label", Input.ClassificationId);
-        Diets = new SelectList(dietsResult.Value!, "Id", "Label", Input.DietId);
+        Classifications = new SelectList(classificationsResult.Value!, "Slug", "Label", Input.ClassificationSlug);
+        Diets = new SelectList(dietsResult.Value!, "Slug", "Label", Input.DietSlug);
 
         return null;
     }

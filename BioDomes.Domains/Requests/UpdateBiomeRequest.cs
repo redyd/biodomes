@@ -2,7 +2,7 @@
 
 public class UpdateBiomeRequest
 {
-    public required int Id { get; set; }
+    public required string PreviousSlug { get; set; }
     public required string Name { get; set; }
     public required double Temperature { get; set; }
     public required double Humidity { get; set; }

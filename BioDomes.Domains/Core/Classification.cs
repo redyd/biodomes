@@ -1,23 +1,20 @@
+using BioDomes.Domains.Extensions;
+
 namespace BioDomes.Domains.Core;
 
-public class Classification
+public class Classification(string label, List<Diet> eatenByDiets, bool requireFood)
 {
-    public int Id { get; }
-    public string Label { get; }
-    public List<Diet> EatenByDiets { get; }
-    public bool RequireFood { get; }
-
-    public Classification(int id, string label, List<Diet> eatenByDiets, bool requireFood)
-    {
-        Id = id;
-        Label = label;
-        EatenByDiets = eatenByDiets;
-        RequireFood = requireFood;
-    }
+    public string Slug => Label.ToKebabCase();
+    public string Label { get; } = label;
+    public List<Diet> EatenByDiets { get; } = eatenByDiets;
+    public bool RequireFood { get; } = requireFood;
     
+    public static bool operator==(Classification left, Classification right) => left.Equals(right);
+    public static bool operator !=(Classification left, Classification right) => !(left == right);
+
     protected bool Equals(Classification other)
     {
-        return Id == other.Id && Label == other.Label && EatenByDiets.Equals(other.EatenByDiets) && RequireFood == other.RequireFood;
+        return Label == other.Label;
     }
 
     public override bool Equals(object? obj)
@@ -30,16 +27,6 @@ public class Classification
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Id, Label, EatenByDiets, RequireFood);
-    }
-    
-    public static bool operator ==(Classification a, Classification b)
-    {
-        return a.Id == b.Id && a.Label == b.Label;
-    }
-
-    public static bool operator !=(Classification a, Classification b)
-    {
-        return !(a == b);
+        return Label.GetHashCode();
     }
 }

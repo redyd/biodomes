@@ -2,9 +2,9 @@
 
 public class CreateBiomeRequest
 {
-    public required string Name { get; set; }
-    public required double Temperature { get; set; }
-    public required double Humidity { get; set; }
-    public required bool IsPublic  { get; set; }
-    public string? ImageUrl { get; set; }
+    public required string Name { get; init; }
+    public required double Temperature { get; init; }
+    public required double Humidity { get; init; }
+    public required bool IsPublic  { get; init; }
+    public string? ImageUrl { get; init; }
 }

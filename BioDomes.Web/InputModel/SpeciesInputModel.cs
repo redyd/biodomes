@@ -7,13 +7,13 @@ public class SpeciesInputModel
 {
     [Required(ErrorMessage = "Le nom est requis.")]
     [RegularExpression(@"^[a-zA-ZÀ-ÿ\s-]+$", ErrorMessage = "Le nom ne peut contenir que des lettres, espaces ou tirets.")]
-    public string Name { get; set; } = string.Empty;
-    
+    public string Name { get; set; } = null!;
+
     [Required(ErrorMessage = "Le type est requis.")]
-    public int? ClassificationId { get; set; }
-    
+    public string ClassificationSlug { get; set; } = null!;
+
     [Required(ErrorMessage = "Le régime alimentaire est requis.")]
-    public int? DietId { get; set; }
+    public string DietSlug { get; set; } = null!;
     
     [Range(1, 10000, ErrorMessage = "La taille doit être entre 1 et 10000")]
     public int Height { get; set; }

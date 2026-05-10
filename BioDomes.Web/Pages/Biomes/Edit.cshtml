@@ -1,4 +1,4 @@
-﻿@page "/biomes/edit/{id:int}"
+﻿@page "/biomes/edit/{slug:kebab}"
 @model BioDomes.Web.Pages.Biomes.EditPage
 
 @{
@@ -16,7 +16,7 @@
 
         <div class="edit-body">
             <form method="post" enctype="multipart/form-data">
-                <input type="hidden" asp-for="Id"/>
+                <input type="hidden" asp-for="Slug"/>
 
                 <div class="field-group">
                     <label class="field-label">Nom</label>

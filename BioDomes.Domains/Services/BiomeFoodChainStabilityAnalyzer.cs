@@ -13,37 +13,37 @@ public static class BiomeFoodChainStabilityAnalyzer
     /// <summary>
     /// Calcule les stats de stabilité du biome.
     /// </summary>
-    public static BiomeStats Analyze(FoodChainGraph graph, Dictionary<int, Specie> allSpecies, int biomeId)
+    public static BiomeStats Analyze(ComplexBiome biome, FoodChainGraph graph, Dictionary<string, Specie> allSpecies)
     {
         var starved = new List<FoodChainNode>();
         var underfed = new List<FoodChainNode>();
 
         var predatorIdsWithPrey = graph.Edges
-            .Select(e => e.PredatorId)
+            .Select(e => e.PredatorSlug)
             .ToHashSet();
 
         var predatorsUnderfed = ComputeUnderfedPredators(graph, allSpecies);
 
         foreach (var node in graph.Nodes)
         {
-            if (!node.Classification.RequireFood) continue;
+            if (!node.Specie.Classification.RequireFood) continue;
 
-            if (!predatorIdsWithPrey.Contains(node.SpecieId))
+            if (!predatorIdsWithPrey.Contains(node.Specie.Slug))
                 starved.Add(node);
-            else if (predatorsUnderfed.Contains(node.SpecieId))
+            else if (predatorsUnderfed.Contains(node.Specie.Slug))
                 underfed.Add(node);
         }
 
         return new BiomeStats
         {
-            BiomeId = biomeId,
+            Biome = biome,
             TotalsSpecies = allSpecies.Count,
             AllSpeciesFed = starved.Count == 0 && underfed.Count == 0,
             StarvedSpecies = starved,
             UnderfedSpecies = underfed,
             ProblemCount = starved
-                .Select(s => s.SpecieId)
-                .Concat(underfed.Select(s => s.SpecieId))
+                .Select(s => s.Specie)
+                .Concat(underfed.Select(s => s.Specie))
                 .Distinct()
                 .Count(),
         };
@@ -53,36 +53,36 @@ public static class BiomeFoodChainStabilityAnalyzer
     /// Retourne les ids des prédateurs dont la biomasse combinée de toutes leurs proies
     /// dans le biome est insuffisante pour couvrir leur propre demande (count * weight).
     /// </summary>
-    private static HashSet<int> ComputeUnderfedPredators(
-        FoodChainGraph graph,
-        Dictionary<int, Specie> allSpecies)
+    private static HashSet<string> ComputeUnderfedPredators(FoodChainGraph graph, Dictionary<string, Specie> allSpecies)
     {
-        var underfedPredators = new HashSet<int>();
+        var underfedPredators = new HashSet<string>();
 
         var edgesByPredator = graph.Edges
-            .GroupBy(e => e.PredatorId)
-            .ToDictionary(g => g.Key, g => g.Select(e => e.PreyId).ToList());
+            .GroupBy(e => e.PredatorSlug)
+            .ToDictionary(g => g.Key, g => g.Select(e => e.PreySlug).ToList());
 
-        foreach (var (predatorId, preyIds) in edgesByPredator)
+        foreach (var (predatorSlug, preySlugs) in edgesByPredator)
         {
-            if (!allSpecies.TryGetValue(predatorId, out var predatorSpecie)) continue;
+            if (!allSpecies.TryGetValue(predatorSlug, out var predatorSpecie)) continue;
 
-            var predatorNode = graph.Nodes.FirstOrDefault(n => n.SpecieId == predatorId);
+            var predatorNode = graph.Nodes.FirstOrDefault(n => n.Specie.Slug == predatorSlug);
             if (predatorNode is null) continue;
 
             var demand = (double)(predatorNode.Count * predatorSpecie.Weight);
 
             // compute biomass of all preys in biome
-            var totalPreyBiomass = preyIds
-                .Select(preyId => (
-                    node: graph.Nodes.FirstOrDefault(n => n.SpecieId == preyId),
-                    specie: allSpecies.GetValueOrDefault(preyId)
+            var totalPreyBiomass = preySlugs
+                .Select(preySlug => (
+                    node: graph.Nodes.FirstOrDefault(n => n.Specie.Slug == preySlug),
+                    specie: allSpecies.GetValueOrDefault(preySlug)
                 ))
                 .Where(p => p.node is not null && p.specie is not null)
                 .Sum(p => (double)(p.node!.Count * p.specie!.Weight));
 
             if (totalPreyBiomass < demand)
-                underfedPredators.Add(predatorId);
+            {
+                underfedPredators.Add(predatorSlug);
+            }
         }
 
         return underfedPredators;
@@ -91,44 +91,37 @@ public static class BiomeFoodChainStabilityAnalyzer
     /// <summary>
     /// Simule l'ajout d'un candidat dans le graphe et retourne si le biome reste stable.
     /// </summary>
-    public static bool IsStableAfterAdding(
-        int biomeId,
+    public static bool IsStableAfterAdding(ComplexBiome biome,
         FoodChainGraph currentGraph,
         Specie candidate,
         FoodChainGraph globalGraph,
-        Dictionary<int, Specie> allSpecies)
+        Dictionary<string, Specie> allSpecies)
     {
         var candidatePreyIds = globalGraph.Edges
-            .Where(e => e.PredatorId == candidate.Id)
-            .Select(e => e.PreyId)
-            .Where(preyId => currentGraph.Nodes.Any(n => n.SpecieId == preyId))
+            .Where(e => e.PredatorSlug == candidate.Slug)
+            .Select(e => e.PreySlug)
+            .Where(preySlug => currentGraph.Nodes.Any(n => n.Specie.Slug == preySlug))
             .ToList();
 
         var simulatedEdges = currentGraph.Edges
-            .Concat(candidatePreyIds.Select(preyId => new FoodChainEdge(candidate.Id, preyId)))
+            .Concat(candidatePreyIds.Select(preySlug => new FoodChainEdge(candidate.Slug, preySlug)))
             .ToList();
 
-        var candidateNode = new FoodChainNode(
-            candidate.Id,
-            candidate.Name,
-            candidate.Diet,
-            candidate.Classification,
-            count: 1
-        );
+        var candidateNode = new FoodChainNode(specie: candidate, count: 1);
         var simulatedNodes = currentGraph.Nodes
-            .Where(n => n.SpecieId != candidate.Id)
+            .Where(n => n.Specie.Slug != candidate.Slug)
             .Concat([candidateNode])
             .ToList();
         var simulatedGraph = new FoodChainGraph(simulatedNodes, simulatedEdges);
 
-        var previouslyUnderfedIds = Analyze(currentGraph, allSpecies, biomeId)
+        var previouslyUnderfedIds = Analyze(biome, currentGraph, allSpecies)
             .UnderfedSpecies
-            .Select(n => n.SpecieId)
+            .Select(n => n.Specie)
             .ToHashSet();
 
-        var newStats = Analyze(simulatedGraph, allSpecies, biomeId);
+        var newStats = Analyze(biome, simulatedGraph, allSpecies);
         var newUnderfed = newStats.UnderfedSpecies
-            .Any(n => !previouslyUnderfedIds.Contains(n.SpecieId));
+            .Any(n => !previouslyUnderfedIds.Contains(n.Specie));
 
         return !newUnderfed;
     }
@@ -139,13 +132,13 @@ public static class BiomeFoodChainStabilityAnalyzer
     public static bool IntroducesLoop(FoodChainGraph currentGraph, Specie candidate, FoodChainGraph globalGraph)
     {
         var candidatePreyIds = globalGraph.Edges
-            .Where(e => e.PredatorId == candidate.Id)
-            .Select(e => e.PreyId)
+            .Where(e => e.PredatorSlug == candidate.Slug)
+            .Select(e => e.PreySlug)
             .ToHashSet();
 
         var predatorsOfCandidate = currentGraph.Edges
-            .Where(e => e.PreyId == candidate.Id)
-            .Select(e => e.PredatorId)
+            .Where(e => e.PreySlug == candidate.Slug)
+            .Select(e => e.PredatorSlug)
             .ToHashSet();
 
         return predatorsOfCandidate.Any(candidatePreyIds.Contains);
