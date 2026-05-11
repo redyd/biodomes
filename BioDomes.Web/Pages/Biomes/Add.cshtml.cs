@@ -11,6 +11,7 @@ using BioDomes.Web.Services;
 namespace BioDomes.Web.Pages.Biomes;
 
 [Authorize]
+[ValidateAntiForgeryToken]
 public class AddPage(IWebHostEnvironment env, IImagePathResolver imageResolver, IBiomeRepository repository)
     : AppPageModel
 {
@@ -21,7 +22,6 @@ public class AddPage(IWebHostEnvironment env, IImagePathResolver imageResolver, 
     {
     }
 
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid) return Page();

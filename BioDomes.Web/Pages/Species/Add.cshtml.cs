@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace BioDomes.Web.Pages.Species;
 
 [Authorize]
+[ValidateAntiForgeryToken]
 public class AddModel(
     ISpeciesRepository speciesRepository,
     ISpecieAttributesRepository attributesRepository,
@@ -37,7 +38,6 @@ public class AddModel(
         return Page();
     }
 
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)

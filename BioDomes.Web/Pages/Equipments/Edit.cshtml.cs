@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace BioDomes.Web.Pages.Equipments;
 
 [Authorize]
+[ValidateAntiForgeryToken]
 public class Edit(
     IWebHostEnvironment env,
     IImagePathResolver imageResolver,
@@ -55,7 +56,6 @@ public class Edit(
         return Page();
     }
 
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> OnPostAsync(string action)
     {
         var userId = User.GetUserId();
