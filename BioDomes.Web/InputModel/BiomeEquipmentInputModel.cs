@@ -5,6 +5,7 @@ namespace BioDomes.Web.InputModel;
 public class BiomeEquipmentInputModel
 {
     [Required(ErrorMessage = "Un équipement est requis")]
+    [RegularExpression(@"^[^<>&]*$", ErrorMessage = "HTML tags ne sont pas autorisé")]
     public string EquipmentSlug { get; set; } = null!;
     
     [Required(ErrorMessage = "La quantité est requise")]

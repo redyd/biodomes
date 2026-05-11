@@ -4,7 +4,7 @@
 <dialog id="add-species-dialog">
     <div class="large-edit-card">
         <div class="edit-header">
-            <p class="edit-breadcrumb">Biodômes · @Model.Biome.Model.Name</p>
+            <p class="edit-breadcrumb">Biodômes · @Model.Biome.Model.Name.Sanitize()</p>
             <h1 class="edit-title">Ajouter une espèce</h1>
         </div>
 
@@ -22,7 +22,7 @@
                                 <img class="suggestion-card-img"
                                      src="@specie.ImageUrl"
                                      alt="@specie.Model.Name"/>
-                                <span class="suggestion-name">@specie.Model.Name</span>
+                                <span class="suggestion-name">@specie.Model.Name.Sanitize()</span>
                             </label>
                         }
                     </div>

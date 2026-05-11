@@ -17,27 +17,27 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/CreateUnitTestDialog/TestProjectMapping/=57E32A9E_002D7758_002D4CB2_002DA7A9_002DCD392CF93D58/@EntryIndexedValue">19C53AEC-4B98-4559-BB7C-75029D7867BE</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/CreateUnitTestDialog/TestProjectMapping/=CDBC581E_002D5274_002D4D31_002D99C4_002D7A3EC27351B6/@EntryIndexedValue">22BC8654-79A4-4583-97A3-300E1790EA0C</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/CreateUnitTestDialog/TestTemplateMapping/=NUnit3x/@EntryIndexedValue">db4927dd-2e12-48a7-9a84-2b7e3e31b9c8</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=00c3fafe_002D661c_002D45f1_002Db62c_002D542ce2b6c10b/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="EquipmentRepositoryTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;Or&gt;
-    &lt;TestAncestor&gt;
-      &lt;TestId&gt;NUnit3x::22BC8654-79A4-4583-97A3-300E1790EA0C::net8.0::BioDomes.Domains.Tests.Core.BiomeTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::22BC8654-79A4-4583-97A3-300E1790EA0C::net8.0::BioDomes.Domains.Tests.Core.FoodChainGraphTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::22BC8654-79A4-4583-97A3-300E1790EA0C::net8.0::BioDomes.Domains.Tests.Core.GlobalStatisticTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::22BC8654-79A4-4583-97A3-300E1790EA0C::net8.0::BioDomes.Domains.Tests.Core.HumidityRuleTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::22BC8654-79A4-4583-97A3-300E1790EA0C::net8.0::BioDomes.Domains.Tests.Core.ResultTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::22BC8654-79A4-4583-97A3-300E1790EA0C::net8.0::BioDomes.Domains.Tests.Services.BiomeAnalyzerTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::22BC8654-79A4-4583-97A3-300E1790EA0C::net8.0::BioDomes.Domains.Tests.Services.BiomeFoodChainStabilityAnalyzerTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Repositories.BiomeManagementRepositoryTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Repositories.BiomeRepositoryTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Repositories.BiomeStatRepositoryTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Repositories.EquipmentRepositoryTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Repositories.FoodChainRepositoryTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Repositories.SpecieAttributesRepositoryTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Repositories.SpeciesRepositoryTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Mappers.BiomeMapperTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Mappers.EquipmentMapperTests&lt;/TestId&gt;
-      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Mappers.SpecieMapperTests&lt;/TestId&gt;
-    &lt;/TestAncestor&gt;
-    &lt;Project Location="C:\B2\devwebAvance\labo\biodomes\BioDomes.Domains.Tests" Presentation="&amp;lt;test&amp;gt;\&amp;lt;BioDomes.Domains.Tests&amp;gt;" /&gt;
-  &lt;/Or&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=00c3fafe_002D661c_002D45f1_002Db62c_002D542ce2b6c10b/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="EquipmentRepositoryTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Or&gt;&#xD;
+    &lt;TestAncestor&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::22BC8654-79A4-4583-97A3-300E1790EA0C::net8.0::BioDomes.Domains.Tests.Core.BiomeTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::22BC8654-79A4-4583-97A3-300E1790EA0C::net8.0::BioDomes.Domains.Tests.Core.FoodChainGraphTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::22BC8654-79A4-4583-97A3-300E1790EA0C::net8.0::BioDomes.Domains.Tests.Core.GlobalStatisticTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::22BC8654-79A4-4583-97A3-300E1790EA0C::net8.0::BioDomes.Domains.Tests.Core.HumidityRuleTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::22BC8654-79A4-4583-97A3-300E1790EA0C::net8.0::BioDomes.Domains.Tests.Core.ResultTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::22BC8654-79A4-4583-97A3-300E1790EA0C::net8.0::BioDomes.Domains.Tests.Services.BiomeAnalyzerTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::22BC8654-79A4-4583-97A3-300E1790EA0C::net8.0::BioDomes.Domains.Tests.Services.BiomeFoodChainStabilityAnalyzerTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Repositories.BiomeManagementRepositoryTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Repositories.BiomeRepositoryTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Repositories.BiomeStatRepositoryTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Repositories.EquipmentRepositoryTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Repositories.FoodChainRepositoryTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Repositories.SpecieAttributesRepositoryTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Repositories.SpeciesRepositoryTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Mappers.BiomeMapperTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Mappers.EquipmentMapperTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::19C53AEC-4B98-4559-BB7C-75029D7867BE::net8.0::BioDomes.Infrastructures.Tests.Mappers.SpecieMapperTests&lt;/TestId&gt;&#xD;
+    &lt;/TestAncestor&gt;&#xD;
+    &lt;Project Location="C:\B2\devwebAvance\labo\biodomes\BioDomes.Domains.Tests" Presentation="&amp;lt;test&amp;gt;\&amp;lt;BioDomes.Domains.Tests&amp;gt;" /&gt;&#xD;
+  &lt;/Or&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

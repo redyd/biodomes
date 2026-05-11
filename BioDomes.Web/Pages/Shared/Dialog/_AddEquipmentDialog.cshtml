@@ -1,9 +1,10 @@
+@using BioDomes.Web.Extensions
 @model BioDomes.Web.Pages.Biomes.Detail
 
 <dialog id="add-equipment-dialog">
     <div class="large-edit-card">
         <div class="edit-header">
-            <p class="edit-breadcrumb">Biodômes · @Model.Biome.Model.Name</p>
+            <p class="edit-breadcrumb">Biodômes · @Model.Biome.Model.Name.Sanitize()</p>
             <h1 class="edit-title">Ajouter un équipement</h1>
         </div>
 
@@ -18,7 +19,7 @@
                             <img class="suggestion-card-img"
                                  src="@equipment.Image"
                                  alt="@equipment.Name"/>
-                            <span class="suggestion-name">@equipment.Name</span>
+                            <span class="suggestion-name">@equipment.Name.Sanitize()</span>
                         </label>
                     }
                 </div>

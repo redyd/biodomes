@@ -4,20 +4,15 @@
 <div class="biome-row-wrap" data-slug="@Model.Model.Slug">
     <div class="biome-row">
         <div class="biome-row-image">
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-            {
-                <img src="@Model.ImageUrl" alt="@Model.Model.Name" />
-            }
-            else
-            {
-                <div class="biome-row-image-placeholder"></div>
-            }
-            <span class="biome-state biome-state-badge biome-state-@Model.Model.State.GetDisplayName().ToLower()">@Model.Model.State</span>
+            <img src="@Model.ImageUrl" alt="@Model.Model.Name"/>
+            <span class="biome-state biome-state-badge biome-state-@Model.Model.State.GetDisplayName().ToLower()">
+                @Model.Model.State.GetDisplayName()
+            </span>
         </div>
 
         <a class="biome-row-body" asp-page="/Biomes/Detail" asp-route-slug="@Model.Model.Slug">
             <div class="biome-row-header">
-                <h2 class="biome-row-name">@Model.Model.Name</h2>
+                <h2 class="biome-row-name">@Model.Model.Name.Sanitize()</h2>
                 @if (Model.IsPublic)
                 {
                     <span class="biome-badge-public">public</span>
@@ -37,7 +32,8 @@
 
         @if (Model.CanEdit)
         {
-            <a class="biome-row-actions biome-row-edit" asp-page="/Biomes/Edit" asp-route-slug="@Model.Model.Slug">Modifier →</a>
+            <a class="biome-row-actions biome-row-edit" asp-page="/Biomes/Edit" asp-route-slug="@Model.Model.Slug">Modifier
+                →</a>
         }
     </div>
 </div>

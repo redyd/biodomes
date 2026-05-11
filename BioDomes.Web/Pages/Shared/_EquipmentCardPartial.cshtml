@@ -1,3 +1,4 @@
+@using BioDomes.Web.Extensions
 @model BioDomes.Web.ViewModels.EquipmentView
 
 <div class="card">
@@ -5,9 +6,9 @@
         <img src="@Model.Image" alt="@Model.Name" class="card-image"/>
     </div>
     <div class="card-body">
-        <div class="card-name">@Model.Name</div>
-        <div class="card-info"><span class="card-label">Produit :</span> @Model.Produced</div>
-        <div class="card-info"><span class="card-label">Consomme :</span> @Model.Consumed</div>
+        <div class="card-name">@Model.Name.Sanitize()</div>
+        <div class="card-info"><span class="card-label">Produit :</span> @Model.Produced.Sanitize()</div>
+        <div class="card-info"><span class="card-label">Consomme :</span> @Model.Consumed.Sanitize()</div>
         @if (Model.CanEdit)
         {
             <a asp-page="/Equipments/Edit" asp-route-slug="@Model.Slug">Éditer</a>

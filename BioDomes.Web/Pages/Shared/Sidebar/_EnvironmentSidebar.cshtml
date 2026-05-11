@@ -64,7 +64,7 @@
         <ul class="list-unstyled d-flex flex-column gap-2">
             <li class="li-info-card">
                 <div class="d-flex flex-column">
-                    <span>@Model.Biome.Model.State</span>
+                    <span>@Model.Biome.Model.State.GetDisplayName().Sanitize()</span>
                     <span class="li-card-meta">État thermique</span>
                 </div>
             </li>
@@ -96,8 +96,8 @@
                     {
                         <li class="li-info-card">
                             <div class="d-flex flex-column">
-                                <span>@rec.Message</span>
-                                <span class="li-card-meta">@rec.Label</span>
+                                <span>@rec.Message.Sanitize()</span>
+                                <span class="li-card-meta">@rec.Label.Sanitize()</span>
                             </div>
 
                             <div class="d-inline-flex">

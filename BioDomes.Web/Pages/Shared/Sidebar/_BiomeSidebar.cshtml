@@ -1,3 +1,4 @@
+@using BioDomes.Web.Extensions
 @model BioDomes.Web.Pages.Biomes.Detail
 
 @{
@@ -29,16 +30,16 @@
             {
                 <li class="li-info-card">
                     <div class="d-flex flex-column">
-                        <span>@chainNode.Specie.Name (@chainNode.Count)</span>
-                        <span class="li-card-meta">@chainNode.Specie.Classification.Label</span>
+                        <span>@chainNode.Specie.Name.Sanitize() (@chainNode.Count)</span>
+                        <span class="li-card-meta">@chainNode.Specie.Classification.Label.Sanitize()</span>
                     </div>
                     @if (Model.Biome.CanEdit)
                     {
                         <button
                             class="btn-action btn-remove"
-                            title="Supprimer des @chainNode.Specie.Name"
-                            data-specie-slug="@chainNode.Specie.Slug"
-                            data-specie-name="@chainNode.Specie.Name"
+                            title="Supprimer des @chainNode.Specie.Name.Sanitize()"
+                            data-specie-slug="@chainNode.Specie.Slug.Sanitize()"
+                            data-specie-name="@chainNode.Specie.Name.Sanitize()"
                             data-specie-count="@chainNode.Count"
                             onclick="openRemoveSpecieDialog(this)">
                             ×
@@ -83,17 +84,17 @@
             {
                 <li class="li-info-card">
                     <div class="d-flex flex-column">
-                        <span>@equipment.Model.Name (@equipment.TrackedInsertionsById.Count)</span>
-                        <span class="li-card-meta">Produit: @equipment.Model.Produced.Label</span>
-                        <span class="li-card-meta">Consomme: @equipment.Model.Consumed.Label</span>
+                        <span>@equipment.Model.Name.Sanitize() (@equipment.TrackedInsertionsById.Count)</span>
+                        <span class="li-card-meta">Produit: @equipment.Model.Produced.Label.Sanitize()</span>
+                        <span class="li-card-meta">Consomme: @equipment.Model.Consumed.Label.Sanitize()</span>
                     </div>
                     @if (Model.Biome.CanEdit)
                     {
                         <button
                             class="btn-action btn-remove"
-                            title="Supprimer des @equipment.Model.Name"
-                            data-equipment-slug="@equipment.Model.Slug"
-                            data-equipment-name="@equipment.Model.Name"
+                            title="Supprimer des @equipment.Model.Name.Sanitize()"
+                            data-equipment-slug="@equipment.Model.Slug.Sanitize()"
+                            data-equipment-name="@equipment.Model.Name.Sanitize()"
                             data-equipment-count="@equipment.TrackedInsertionsById.Count"
                             onclick="openRemoveEquipmentDialog(this)">
                             ×
