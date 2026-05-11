@@ -15,7 +15,7 @@
 @if (notification is not null)
 {
     <div class="@classType-banner" id="notification-banner">
-        @notification.Message
+        @notification.Message.Sanitize()
     </div>
 
     <script>

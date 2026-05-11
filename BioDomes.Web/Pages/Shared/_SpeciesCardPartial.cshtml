@@ -1,16 +1,17 @@
-﻿@model BioDomes.Web.ViewModels.SpecieView
+﻿@using BioDomes.Web.Extensions
+@model BioDomes.Web.ViewModels.SpecieView
 
 <div class="card">
     <div>
         <img src="@Model.ImageUrl" alt="@Model.Model.Name" class="card-image"/>
     </div>
     <div class="card-body">
-        <div class="card-name">@Model.Model.Name</div>
-        <div class="card-info"><span class="card-label">Type :</span> @Model.Model.Classification.Label</div>
-        <div class="card-info"><span class="card-label">Régime :</span> @Model.Model.Diet.Label</div>
-        <div class="card-info"><span class="card-label">Taille :</span> @Model.FormatedHeight</div>
-        <div class="card-info"><span class="card-label">Poids :</span> @Model.FormatedWeight</div>
-        @if (@Model.CanEdit)
+        <div class="card-name">@Model.Model.Name.Sanitize()</div>
+        <div class="card-info"><span class="card-label">Type :</span> @Model.Model.Classification.Label.Sanitize()</div>
+        <div class="card-info"><span class="card-label">Régime :</span> @Model.Model.Diet.Label.Sanitize()</div>
+        <div class="card-info"><span class="card-label">Taille :</span> @Model.FormatedHeight.Sanitize()</div>
+        <div class="card-info"><span class="card-label">Poids :</span> @Model.FormatedWeight.Sanitize()</div>
+        @if (Model.CanEdit)
         {
             <a asp-page="/Species/Edit" asp-route-slug="@Model.Model.Slug">Éditer</a>
         }

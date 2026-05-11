@@ -12,7 +12,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace BioDomes.Web.Pages.Equipments;
 
 [Authorize]
-public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEquipmentRepository repository, ILogger<Add> logger)
+[ValidateAntiForgeryToken]
+public class Add(
+    IWebHostEnvironment env,
+    IImagePathResolver imageResolver,
+    IEquipmentRepository repository,
+    ILogger<Add> logger)
     : AppPageModel
 {
     [BindProperty] public EquipmentInputModel Input { get; set; } = new();
@@ -26,10 +31,10 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
         {
             return Forbid();
         }
-        
+
         var loaded = await LoadSelectLists();
         if (loaded is not null) return loaded;
-        
+
         return Page();
     }
 
@@ -39,7 +44,7 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
         {
             var loaded = await LoadSelectLists();
             if (loaded is not null) return loaded;
-            
+
             return Page();
         }
 
@@ -65,11 +70,11 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
         if (result.Status == ResultStatus.Conflict)
         {
             ErrorNotification("Un équipement de ce nom existe déjà.");
-            
+
             imageResolver.DeleteImage(imageId, env);
             var loaded = await LoadSelectLists();
             if (loaded is not null) return loaded;
-            
+
             return Page();
         }
 
@@ -84,12 +89,12 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
 
         return RedirectToPage("/Equipments/Index");
     }
-    
+
     private async Task<IActionResult?> LoadSelectLists()
     {
         var resourcesResult = await repository.GetResourcesAsync();
         if (resourcesResult.Failed) return resourcesResult.ToPageResult(this);
-        
+
         Productions = new SelectList(resourcesResult.Value!, "Slug", "Label", Input.ProducedResourceSlug);
         Consomations = new SelectList(resourcesResult.Value!, "Slug", "Label", Input.ConsumedResourceSlug);
         return null;

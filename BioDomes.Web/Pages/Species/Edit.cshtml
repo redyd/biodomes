@@ -1,4 +1,5 @@
 ﻿@page "/species/edit/{slug:kebab}"
+@using BioDomes.Web.Extensions
 @model BioDomes.Web.Pages.Species.EditModel
 @{
     Layout = "Shared/_Layout";
@@ -10,11 +11,13 @@
 
         <div class="edit-header">
             <p class="edit-breadcrumb">Biodômes · Espèces</p>
-            <h1 class="edit-title">Éditer : <em>@Model.Specie.Name</em></h1>
+            <h1 class="edit-title">Éditer : <em>@Model.Specie.Name.Sanitize()</em></h1>
         </div>
 
         <div class="edit-body">
             <form method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
                 <div class="field-group">
                     <label class="field-label">Nom</label>
                     <input class="field-input" type="text" asp-for="Input.Name"/>
@@ -23,7 +26,7 @@
 
                 <div class="field-group">
                     <label class="field-label" asp-for="Input.ClassificationSlug">Classification</label>
-                    <select class="field-input" 
+                    <select class="field-input"
                             asp-for="Input.ClassificationSlug"
                             asp-items="Model.Classifications">
                         <option value="">-- Choisir --</option>
@@ -33,7 +36,7 @@
 
                 <div class="field-group">
                     <label class="field-label" asp-for="Input.DietSlug">Régime</label>
-                    <select class="field-input" 
+                    <select class="field-input"
                             asp-for="Input.DietSlug"
                             asp-items="Model.Diets">
                         <option value="">-- Choisir --</option>

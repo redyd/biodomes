@@ -5,7 +5,9 @@ namespace BioDomes.Web.InputModel;
 public class BiomeSpecieInputModel
 {
     [Required(ErrorMessage = "Une espèce est requise")]
+    [RegularExpression(@"^[^<>&]*$", ErrorMessage = "HTML tags ne sont pas autorisé")]
     public string SpecieSlug { get; set; } = null!;
+
     [Required(ErrorMessage = "La quantité est requise")]
     [Range(minimum:1, maximum: int.MaxValue, ErrorMessage = "Entrez un nombre valide")]
     public int? Count { get; set; }

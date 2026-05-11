@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace BioDomes.Web.Pages.Species;
 
 [Authorize]
+[ValidateAntiForgeryToken]
 public class EditModel(
     ISpeciesRepository repository,
     ISpecieAttributesRepository attributesRepository,
@@ -62,7 +63,7 @@ public class EditModel(
             Weight = specie.Weight,
             Public = specie.IsPublic
         };
-        
+
         var loaded = await LoadSelectLists();
         if (loaded is not null) return loaded;
 
@@ -149,12 +150,12 @@ public class EditModel(
         if (result.Status == ResultStatus.Conflict)
         {
             ErrorNotification("Une espèce avec ce nom existe déjà");
-            
+
             IsAdmin = User.IsAdmin();
             var loaded = await LoadSelectLists();
             if (loaded is not null) return loaded;
             ImageUrl = imageResolver.UseImageWithDefault(specie.ImageUrl, "specie.png");
-            
+
             return Page();
         }
 
@@ -168,7 +169,7 @@ public class EditModel(
         SuccessNotification($"Espèce {updated.Name} correctement modifiée");
         return RedirectToPage("/Species/Index");
     }
-    
+
     private async Task<IActionResult?> LoadSelectLists()
     {
         var classificationsResult = await attributesRepository.GetClassifications();

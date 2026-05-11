@@ -11,7 +11,9 @@ using BioDomes.Web.Services;
 namespace BioDomes.Web.Pages.Biomes;
 
 [Authorize]
-public class AddPage(IWebHostEnvironment env, IImagePathResolver imageResolver, IBiomeRepository repository) : AppPageModel
+[ValidateAntiForgeryToken]
+public class AddPage(IWebHostEnvironment env, IImagePathResolver imageResolver, IBiomeRepository repository)
+    : AppPageModel
 {
     [BindProperty] public BiomeInputModel Input { get; set; } = new();
     public string? Humidity { get; set; }
@@ -23,7 +25,7 @@ public class AddPage(IWebHostEnvironment env, IImagePathResolver imageResolver, 
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid) return Page();
-        
+
         var temp = Input.Temperature;
         var humidity = Input.AbsoluteHumidity;
         var rule = new HumidityRule(temp, humidity);
@@ -60,7 +62,7 @@ public class AddPage(IWebHostEnvironment env, IImagePathResolver imageResolver, 
             ErrorNotification("Un biome de ce nom existe déjà");
             return Page();
         }
-        
+
         if (result.Failed)
         {
             ErrorNotification("Erreur dans la création du biome");

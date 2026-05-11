@@ -1,9 +1,10 @@
+@using BioDomes.Web.Extensions
 @model BioDomes.Web.Pages.Biomes.Detail
 
 <dialog id="remove-species-dialog">
     <div class="large-edit-card">
         <div class="edit-header">
-            <p class="edit-breadcrumb">Biodômes · @Model.Biome.Model.Name</p>
+            <p class="edit-breadcrumb">Biodômes · @Model.Biome.Model.Name.Sanitize()</p>
             <h1 class="edit-title">Retirer une espèce</h1>
         </div>
 

@@ -16,7 +16,7 @@
 
         <div class="edit-body">
             <form method="post" enctype="multipart/form-data">
-
+                @Html.AntiForgeryToken()
                 <div class="field-group">
                     <label class="field-label">Nom du biome</label>
                     <input class="field-input" type="text" asp-for="Input.Name" />

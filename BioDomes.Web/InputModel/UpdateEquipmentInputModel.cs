@@ -7,12 +7,15 @@ public class UpdateEquipmentInputModel
 {
     [Required(ErrorMessage = "Le nom est requis.")]
     [MaxLength(75, ErrorMessage = "Le nom ne peut pas dépasser 75 caractères.")]
+    [RegularExpression(@"^[^<>&]*$", ErrorMessage = "HTML tags ne sont pas autorisé")]
     public string Name { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "La ressource produite est requise.")]
+    [RegularExpression(@"^[^<>&]*$", ErrorMessage = "HTML tags ne sont pas autorisé")]
     public string ProducedResourceSlug { get; set; } = null!;
 
     [Required(ErrorMessage = "La ressource consommée est requise.")]
+    [RegularExpression(@"^[^<>&]*$", ErrorMessage = "HTML tags ne sont pas autorisé")]
     public string ConsumedResourceSlug { get; set; } = null!;
 
     public bool Public { get; set; }
@@ -20,5 +23,6 @@ public class UpdateEquipmentInputModel
     [DataType(DataType.Upload)]
     [AllowedExtensions([".jpg", ".jpeg", ".png", ".gif"],
         ErrorMessage = "Le fichier doit être une image (jpg, jpeg, png, gif).")]
+    [RegularExpression(@"^[^<>&]*$", ErrorMessage = "HTML tags ne sont pas autorisé")]
     public IFormFile? Image { get; set; }
 }

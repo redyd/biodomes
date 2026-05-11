@@ -6,13 +6,15 @@ namespace BioDomes.Web.InputModel;
 public class SpeciesInputModel
 {
     [Required(ErrorMessage = "Le nom est requis.")]
-    [RegularExpression(@"^[a-zA-ZÀ-ÿ\s-]+$", ErrorMessage = "Le nom ne peut contenir que des lettres, espaces ou tirets.")]
+    [RegularExpression(@"^[^<>&]*$", ErrorMessage = "HTML tags ne sont pas autorisé")]
     public string Name { get; set; } = null!;
 
     [Required(ErrorMessage = "Le type est requis.")]
+    [RegularExpression(@"^[^<>&]*$", ErrorMessage = "HTML tags ne sont pas autorisé")]
     public string ClassificationSlug { get; set; } = null!;
 
     [Required(ErrorMessage = "Le régime alimentaire est requis.")]
+    [RegularExpression(@"^[^<>&]*$", ErrorMessage = "HTML tags ne sont pas autorisé")]
     public string DietSlug { get; set; } = null!;
     
     [Range(1, 10000, ErrorMessage = "La taille doit être entre 1 et 10000")]
@@ -25,5 +27,6 @@ public class SpeciesInputModel
     
     [AllowedExtensions([".jpg", ".jpeg", ".png", ".gif"],
         ErrorMessage = "Le fichier doit être une image (jpg, jpeg, png, gif).")]
+    [RegularExpression(@"^[^<>&]*$", ErrorMessage = "HTML tags ne sont pas autorisé")]
     public IFormFile? Image { get; set; }
 }

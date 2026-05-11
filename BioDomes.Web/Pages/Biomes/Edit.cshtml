@@ -1,4 +1,5 @@
 ﻿@page "/biomes/edit/{slug:kebab}"
+@using BioDomes.Web.Extensions
 @model BioDomes.Web.Pages.Biomes.EditPage
 
 @{
@@ -11,11 +12,12 @@
 
         <div class="edit-header">
             <p class="edit-breadcrumb">Biodômes · Biomes</p>
-            <h1 class="edit-title">Éditer : <em>@Model.BiomeName</em></h1>
+            <h1 class="edit-title">Éditer : <em>@Model.BiomeName.Sanitize()</em></h1>
         </div>
 
         <div class="edit-body">
             <form method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="Slug"/>
 
                 <div class="field-group">

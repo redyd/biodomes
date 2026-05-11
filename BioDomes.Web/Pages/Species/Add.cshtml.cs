@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace BioDomes.Web.Pages.Species;
 
 [Authorize]
+[ValidateAntiForgeryToken]
 public class AddModel(
     ISpeciesRepository speciesRepository,
     ISpecieAttributesRepository attributesRepository,

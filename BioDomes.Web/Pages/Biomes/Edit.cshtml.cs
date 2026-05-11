@@ -11,7 +11,8 @@ using BioDomes.Web.Services;
 namespace BioDomes.Web.Pages.Biomes;
 
 [Authorize]
-public class EditPage(IBiomeRepository repository, IWebHostEnvironment env, IImagePathResolver imageResolver) : AppPageModel
+[ValidateAntiForgeryToken]
+class EditPage(IBiomeRepository repository, IWebHostEnvironment env, IImagePathResolver imageResolver) : AppPageModel
 {
     [BindProperty(SupportsGet = true)] public string Slug { get; set; } = null!;
     [BindProperty] public UpdateBiomeInputModel Input { get; set; } = new();

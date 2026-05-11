@@ -1,4 +1,5 @@
 @page "/equipments/edit/{slug:kebab}"
+@using BioDomes.Web.Extensions
 @model BioDomes.Web.Pages.Equipments.Edit
 @{
     Layout = "Shared/_Layout";
@@ -10,11 +11,13 @@
 
         <div class="edit-header">
             <p class="edit-breadcrumb">Biodômes · Equipements</p>
-            <h1 class="edit-title">Éditer : <em>@Model.Input.Name</em></h1>
+            <h1 class="edit-title">Éditer : <em>@Model.Input.Name.Sanitize()</em></h1>
         </div>
 
         <div class="edit-body">
             <form method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
                 <div class="field-group">
                     <label class="field-label">Nom</label>
                     <input class="field-input" type="text" asp-for="Input.Name"/>
@@ -44,11 +47,11 @@
                     </select>
                     <span asp-validation-for="Input.ConsumedResourceSlug" class="field-error"></span>
                 </div>
-                
+
                 <div class="field-group">
                     <span class="image-current-label">Image actuelle</span>
                     <img src="@Model.ImageSource" class="card-image" alt="@Model.Input.Name"/>
-                    
+
                     <label class="image-upload-hint">
                         Changer l'image
                     </label>

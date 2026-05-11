@@ -13,12 +13,12 @@
         <section>
             <div class="container-title">
                 <div class="d-flex justify-content-center align-items-center gap-3 flex-row">
-                    <h1 id="top">@Model.Biome.Model.Name</h1>
+                    <h1 id="top">@Model.Biome.Model.Name.Sanitize()</h1>
                     <span class="biome-state biome-state-@Model.Biome.Model.State.GetDisplayName().ToLower()">
-                        @Model.Biome.Model.State
+                        @Model.Biome.Model.State.GetDisplayName()
                     </span>
                 </div>
-                <p>Créé par "@Model.Creator"</p>
+                <p>Créé par "@Model.Creator.Sanitize()"</p>
                 @if (Model.Biome.CanEdit)
                 {
                     <a class="btn-save" asp-page="/Biomes/Edit" asp-route-slug="@Model.Biome.Model.Slug">

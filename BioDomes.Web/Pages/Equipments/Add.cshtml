@@ -16,12 +16,13 @@
 
         <div class="edit-body">
             <form method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
                 <div class="field-group">
                     <label class="field-label">Nom</label>
                     <input class="field-input" type="text" asp-for="Input.Name"/>
                     <span asp-validation-for="Input.Name" class="field-error"></span>
                 </div>
-                
+
                 <div class="field-group">
                     <label class="field-label" asp-for="Input.ProducedResourceSlug">Production</label>
                     <select class="field-input" asp-for="Input.ProducedResourceSlug">
@@ -45,7 +46,7 @@
                     </select>
                     <span asp-validation-for="Input.ConsumedResourceSlug" class="field-error"></span>
                 </div>
-                
+
                 <div class="field-group">
                     <label class="image-upload-hint">Ajouter une image</label>
                     <div class="image-upload-zone">
