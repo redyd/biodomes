@@ -16,6 +16,8 @@
 
         <div class="edit-body">
             <form method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
                 <div class="field-group">
                     <label class="field-label">Nom</label>
                     <input class="field-input" type="text" asp-for="Input.Name"/>
@@ -52,7 +54,7 @@
                     <input class="field-input" type="number" asp-for="Input.Weight"/>
                     <span asp-validation-for="Input.Weight" class="field-error"></span>
                 </div>
-                
+
                 <div class="field-group">
                     <label class="image-upload-hint">Ajouter une image</label>
                     <div class="image-upload-zone">

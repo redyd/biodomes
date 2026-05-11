@@ -33,6 +33,7 @@ public class Add(IWebHostEnvironment env, IImagePathResolver imageResolver, IEqu
         return Page();
     }
 
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)

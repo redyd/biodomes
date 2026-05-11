@@ -37,6 +37,7 @@ public class AddModel(
         return Page();
     }
 
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)

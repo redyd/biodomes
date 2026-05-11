@@ -16,6 +16,7 @@
 
         <div class="edit-body">
             <form method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="Slug"/>
 
                 <div class="field-group">

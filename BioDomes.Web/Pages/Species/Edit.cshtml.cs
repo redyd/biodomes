@@ -69,6 +69,7 @@ public class EditModel(
         return Page();
     }
 
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> OnPost(string action)
     {
         var userId = User.GetUserId();

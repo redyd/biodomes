@@ -42,6 +42,7 @@ public class EditPage(IBiomeRepository repository, IWebHostEnvironment env, IIma
         return Page();
     }
 
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> OnPostAsync(string action)
     {
         var userId = User.GetUserId();

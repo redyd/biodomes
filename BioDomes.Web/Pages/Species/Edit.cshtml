@@ -15,6 +15,8 @@
 
         <div class="edit-body">
             <form method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
                 <div class="field-group">
                     <label class="field-label">Nom</label>
                     <input class="field-input" type="text" asp-for="Input.Name"/>
@@ -23,7 +25,7 @@
 
                 <div class="field-group">
                     <label class="field-label" asp-for="Input.ClassificationSlug">Classification</label>
-                    <select class="field-input" 
+                    <select class="field-input"
                             asp-for="Input.ClassificationSlug"
                             asp-items="Model.Classifications">
                         <option value="">-- Choisir --</option>
@@ -33,7 +35,7 @@
 
                 <div class="field-group">
                     <label class="field-label" asp-for="Input.DietSlug">Régime</label>
-                    <select class="field-input" 
+                    <select class="field-input"
                             asp-for="Input.DietSlug"
                             asp-items="Model.Diets">
                         <option value="">-- Choisir --</option>
